@@ -1,5 +1,5 @@
 <div align="center">
-<img src="img/logo-banner.png" alt="Reality TV Intel" width="600"/>
+<img src="https://github.com/MasterBillyButcher/realitytv-intel/blob/a48645752cb464217dd2339e7195e4c53e129a09/public/img/logo-banner.png" alt="Reality TV Intel" width="600"/>
 </div>
 
 <div align="center">
