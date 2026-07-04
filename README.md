@@ -10,7 +10,7 @@
 
 [![Live Site](https://img.shields.io/badge/🌐_Open_Live_Site-realitytv--intel.vercel.app-7C3AED?style=for-the-badge&labelColor=0d0221)](https://realitytv-intel.vercel.app/)
 &nbsp;
-[![GitHub](https://img.shields.io/badge/GitHub-Repository-181717?style=for-the-badge&logo=github&labelColor=0d1117)](https://github.com/MasterBillyButcher/realitytv2026)
+[![GitHub](https://img.shields.io/badge/GitHub-Repository-181717?style=for-the-badge&logo=github&labelColor=0d1117)](https://github.com/MasterBillyButcher/realitytv-intel)
 
 <br/>
 
@@ -41,7 +41,7 @@ Every show gets a **Roster** table, a **Card View**, and a **Growth** tracker �
 ## 🚀 Getting Started
 
 ```bash
-git clone https://github.com/MasterBillyButcher/realitytv2026.git
+git clone https://github.com/MasterBillyButcher/realitytv-intel.git
 open public/index.html
 ```
 
@@ -156,7 +156,7 @@ Make sure the repo is set to <b>Public</b> on GitHub — private repos 404 on th
 
 <div align="center">
 
-**[🌐 realitytv-intel.vercel.app](https://realitytv-intel.vercel.app/)** &nbsp;·&nbsp; **[⭐ Star on GitHub](https://github.com/MasterBillyButcher/realitytv2026)**
+**[🌐 realitytv-intel.vercel.app](https://realitytv-intel.vercel.app/)** &nbsp;·&nbsp; **[⭐ Star on GitHub](https://github.com/MasterBillyButcher/realitytv-intel)**
 
 Built with ❤️ by BobMasterBillie
 

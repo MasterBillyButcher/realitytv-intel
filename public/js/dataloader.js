@@ -26,7 +26,7 @@
 
 const DATA_CONFIG = {
   owner:  'MasterBillyButcher',
-  repo:   'realitytv2026',
+  repo:   'realitytv-intel',
   file:   'public/data/data.js',
   branch: 'main',
 };

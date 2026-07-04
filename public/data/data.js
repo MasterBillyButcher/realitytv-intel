@@ -1,6 +1,6 @@
 {
   "_meta": {
-    "savedAt": "02 Jul 2026, 20:07",
+    "savedAt": "04 Jul 2026, 19:51",
     "generator": "Reality TV Intel 2026"
   },
   "SHOWS": {
@@ -2966,6 +2966,7 @@
   "HIDDEN_SHOWS_INIT": [
     "traitors",
     "kkk",
-    "bb20"
+    "bb20",
+    "alliance"
   ]
 }
