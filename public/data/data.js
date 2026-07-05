@@ -1,6 +1,6 @@
 {
   "_meta": {
-    "savedAt": "04 Jul 2026, 19:51",
+    "savedAt": "05 Jul 2026, 14:37",
     "generator": "Reality TV Intel 2026"
   },
   "SHOWS": {
@@ -1946,6 +1946,70 @@
           {
             "heading": "Trivia / Fun Facts",
             "html": "<p>Made his international fashion-world debut at the Cannes Film Festival in May 2026, one of the few young Indian digital creators to attend at his age; fluent in three languages; his first major viral moment came from praising content creator Nancy Tyagi's Cannes look over established Bollywood stars' looks.</p><p>---</p><p><em>End of Lock Upp S2 profiles. Note: Several fields — particularly exact birth years, detailed family information, and some relationship statuses for newer digital-first personalities (Yogesh Rawat, Akanksha Choudhary, Shresta Iyer, Sufi Motiwala) — vary or conflict across tabloid/entertainment sources and should be treated as best-available public information rather than officially confirmed facts. Next up: Alliance India profiles.</em></p>"
+          }
+        ]
+      },
+      {
+        "name": "Shilpa Shinde",
+        "gender": "F",
+        "status": "WILDCARD",
+        "profession": "Actor / Reality TV Personality",
+        "tier": "",
+        "ig": "shilpa_shinde_official",
+        "photo": "https://img.indiaforums.com/article/900x900/23/0072-shilpa-shinde-coming-back-as-angoori-bhabi.webp",
+        "follBefore": "673528",
+        "follBeforeDate": "July 5",
+        "follLast": "673528",
+        "follLastDate": "July 5",
+        "follCur": "673528",
+        "follCurDate": " July 5",
+        "knownFor": "Iconic role as Angoori Bhabhi in Bhabhi Ji Ghar Par Hai!\nWinner of Bigg Boss 11 (2017)\nBold, outspoken personality in reality TV and recent podcast revelations\n\n",
+        "history": "Bigg Boss 11 (Winner, 2017)\nMultiple TV serials since late 1990s/early 2000s\nCurrent: First wild card entrant in Lock Upp Season 2 (Netflix, 2026)\n\n",
+        "id": 34,
+        "bio": [
+          {
+            "heading": "Personal Details",
+            "html": "<ul><li>Born: 28 August 1977</li><li>Birthplace: Mumbai, Maharashtra, India</li><li>Education: Studied psychology at K.C. College, Mumbai</li><li>Languages: Marathi, Hindi, English</li><li>Family: Dr. Satyadeo Shinde (Father), Geeta Satyadeo Shinde (Mother); has two elder sisters and one younger brother</li><li>Other Names/Aliases: Angoori Bhabhi</li><li>Spouse: Unmarried</li><li>Children: None</li></ul>"
+          },
+          {
+            "heading": "Early Life & Career Beginnings",
+            "html": "<p>Shilpa Shinde began her professional acting career in 1999. Despite initial resistance from her father regarding a career in show business, she persevered, citing a passion for the arts that superseded her initial educational pursuits.</p>"
+          },
+          {
+            "heading": "Television Career",
+            "html": "<ul><li><em>Bhabhi</em> (1999–2002): Manju</li><li><em>Amrapali</em> (2002–2003): Amrapali</li><li><em>Sanjeevani</em> (2004–2005): Chitra</li><li><em>Miss India</em> (2004–2006): Sanjana Gujral</li><li><em>Meher</em> (2005–2006): Meher/Naaz</li><li><em>Chidiya Ghar</em> (2011–2014): Koyal Narayan</li><li><em>Bhabi Ji Ghar Par Hai!</em> (2015–2016; 2025–present): Angoori Manmohan Tiwari</li></ul>"
+          },
+          {
+            "heading": "Film Career",
+            "html": "<ul><li><em>Chinna</em> (2001)</li><li><em>Shivani</em> (2001)</li><li><em>Patel Ki Punjabi Shaadi</em> (2017): Special appearance (Item song)</li></ul>"
+          },
+          {
+            "heading": "Web Series / OTT Career",
+            "html": "<ul><li><em>Paurashpur</em> (2020): Queen Meerawati</li></ul>"
+          },
+          {
+            "heading": "Reality Television Journey",
+            "html": "<ul><li><em>Bigg Boss 11</em> (2017–2018): Winner</li><li><em>Jhalak Dikhhla Jaa 10</em> (2022): 12th place</li><li><em>Fear Factor: Khatron Ke Khiladi 14</em> (2024): 9th position</li></ul>"
+          },
+          {
+            "heading": "Awards & Recognition",
+            "html": "<p>Recipient of the Indian Telly Award for Best Actress in a Comic Role for <em>Bhabi Ji Ghar Par Hai!</em> among other recognitions for her comedic timing and character work.</p>"
+          },
+          {
+            "heading": "Personal Life",
+            "html": "<p>Known for her resilient and outspoken personality. She faced a significant period of grief following the passing of her father due to Alzheimer's disease in 2013. In her personal time, she enjoys interior design, painting, and cooking.</p>"
+          },
+          {
+            "heading": "Controversies / Notable Events",
+            "html": "<ul><li>2016: High-profile and contentious exit from <em>Bhabi Ji Ghar Par Hai!</em> following disputes with the production team regarding working conditions and pay.</li><li>2017: Filed a complaint alleging sexual harassment against producer Sanjay R. Kohli; in 2026, she publicly clarified the nature of the dispute, framing it within the context of complex contractual disagreements.</li></ul>"
+          },
+          {
+            "heading": "Social Media Presence",
+            "html": "<ul><li>Instagram: @shilpashinde_official</li></ul>"
+          },
+          {
+            "heading": "Trivia / Fun Facts",
+            "html": "<p>She personally designed and decorated her home. Despite being Maharashtrian, her portrayal of a North Indian character with a specific 'Bihari' dialect became a cultural phenomenon in India.</p>"
           }
         ]
       }
