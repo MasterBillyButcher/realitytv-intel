@@ -1,0 +1,401 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Reality TV Intel — Live Follower Analytics for India's Biggest Reality Shows</title>
+<meta name="description" content="Live rankings, growth tracking, and contestant intel across KKK, Lock Upp, Alliance India, Traitors India and Bigg Boss.">
+<meta name="theme-color" content="#08080F">
+<link rel="icon" type="image/png" sizes="32x32" href="img/favicon-32.png">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+<script type="importmap">
+{ "imports": { "three": "https://unpkg.com/three@0.160.0/build/three.module.js", "three/addons/": "https://unpkg.com/three@0.160.0/examples/jsm/" } }
+</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/lenis/1.1.13/lenis.min.js"></script>
+
+<style>
+:root{
+  --bg:#08080F; --card:#13131F; --panel:rgba(19,19,31,.55);
+  --divider:rgba(255,255,255,.08);
+  --txt:#F0F0FF; --txt2:#9090B8; --txt-dim:#4A4A72;
+  --acc:#4A9EFF; --gld:#F5A623; --pur:#8B5CF6; --red:#EF4444;
+  --f-display:'Space Grotesk',sans-serif; --f-body:'Inter',sans-serif; --f-mono:'JetBrains Mono',monospace;
+  --ease-out:cubic-bezier(.16,1,.3,1); --ease-io:cubic-bezier(.65,0,.35,1);
+}
+*,*::before,*::after{ box-sizing:border-box; margin:0; padding:0; }
+html{ background:var(--bg); }
+body{ background:var(--bg); color:var(--txt); font-family:var(--f-body); font-weight:300; overflow-x:hidden; cursor:none; }
+@media (max-width:860px){ body{ cursor:auto; } }
+::selection{ background:var(--pur); color:#fff; }
+img{ display:block; max-width:100%; }
+@media (prefers-reduced-motion: reduce){ *{ animation-duration:.01ms !important; transition-duration:.01ms !important; } }
+
+/* LOADER */
+#loader{ position:fixed; inset:0; z-index:1000; background:var(--bg); display:flex; flex-direction:column; align-items:center; justify-content:center; gap:26px; }
+#loader img{ width:56px; height:56px; border-radius:14px; }
+#loader .mark{ font-family:var(--f-display); font-weight:700; font-size:14px; letter-spacing:.28em; text-transform:uppercase; color:var(--txt2); }
+#loader-track{ width:220px; height:1px; background:var(--divider); position:relative; overflow:hidden; }
+#loader-fill{ position:absolute; left:0; top:0; height:100%; width:0%; background:linear-gradient(90deg,var(--pur),var(--acc)); }
+#loader-pct{ font-family:var(--f-mono); font-size:11px; color:var(--txt-dim); letter-spacing:.1em; }
+#loader.done{ opacity:0; visibility:hidden; transition:opacity .8s var(--ease-out), visibility 0s .8s; }
+
+/* CURSOR */
+#cursor-dot,#cursor-ring{ position:fixed; top:0; left:0; pointer-events:none; z-index:999; border-radius:50%; transform:translate(-50%,-50%); }
+#cursor-dot{ width:5px; height:5px; background:var(--acc); }
+#cursor-ring{ width:32px; height:32px; border:1px solid rgba(74,158,255,.5); transition:width .25s var(--ease-out),height .25s var(--ease-out),border-color .25s; }
+#cursor-ring.hover{ width:56px; height:56px; border-color:var(--gld); }
+@media (max-width:860px){ #cursor-dot,#cursor-ring{ display:none; } }
+
+#progress{ position:fixed; top:0; left:0; height:2px; width:0%; z-index:900; background:linear-gradient(90deg,var(--pur),var(--acc),var(--gld)); }
+#scene-wrap{ position:fixed; inset:0; z-index:1; }
+#scene-wrap canvas{ display:block; width:100%; height:100%; }
+main{ position:relative; z-index:2; }
+
+nav{ position:fixed; top:0; left:0; right:0; z-index:100; display:flex; align-items:center; justify-content:space-between; padding:24px 5vw; }
+nav .brand{ display:flex; align-items:center; gap:10px; }
+nav .brand img{ width:30px; height:30px; border-radius:8px; }
+nav .brand span{ font-family:var(--f-display); font-weight:700; font-size:14px; letter-spacing:.1em; }
+nav .live{ display:flex; align-items:center; gap:7px; font-family:var(--f-mono); font-size:11px; letter-spacing:.12em; color:var(--txt2); text-transform:uppercase; }
+nav .live i{ width:6px; height:6px; border-radius:50%; background:#22C55E; box-shadow:0 0 8px #22C55E; animation:pulse 1.8s infinite; }
+@keyframes pulse{ 0%,100%{opacity:1;} 50%{opacity:.35;} }
+
+section{ position:relative; padding:0 5vw; }
+
+#hero{ min-height:100vh; display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center; gap:22px; }
+#hero .eyebrow{ font-family:var(--f-mono); font-size:12px; letter-spacing:.28em; text-transform:uppercase; color:var(--gld); opacity:0; }
+#hero h1{ font-family:var(--f-display); font-weight:600; font-size:clamp(42px,8.5vw,116px); line-height:.98; letter-spacing:-.02em; overflow:hidden; }
+#hero h1 .line{ display:block; overflow:hidden; }
+#hero h1 .line span{ display:inline-block; transform:translateY(110%); }
+#hero h1 .grad{ background:linear-gradient(90deg,var(--pur),var(--acc)); -webkit-background-clip:text; background-clip:text; color:transparent; }
+#hero p{ max-width:520px; color:var(--txt2); font-size:16px; line-height:1.6; opacity:0; }
+#hero .scrollcue{ position:absolute; bottom:44px; left:50%; transform:translateX(-50%); display:flex; flex-direction:column; align-items:center; gap:10px; font-family:var(--f-mono); font-size:10px; letter-spacing:.2em; color:var(--txt-dim); opacity:0; }
+#hero .scrollcue .wire{ width:1px; height:44px; background:var(--divider); position:relative; overflow:hidden; }
+#hero .scrollcue .wire i{ position:absolute; top:-100%; left:0; width:100%; height:100%; background:linear-gradient(var(--acc),transparent); animation:cueDrop 1.8s var(--ease-io) infinite; }
+@keyframes cueDrop{ to{ top:100%; } }
+
+.sec-head{ max-width:640px; margin-bottom:60px; }
+.sec-head .tag{ font-family:var(--f-mono); font-size:11px; letter-spacing:.24em; text-transform:uppercase; color:var(--acc); margin-bottom:16px; display:block; }
+.sec-head h2{ font-family:var(--f-display); font-weight:600; font-size:clamp(30px,4.6vw,52px); line-height:1.08; letter-spacing:-.01em; }
+.sec-head p{ margin-top:16px; color:var(--txt2); font-size:16px; line-height:1.7; max-width:520px; }
+
+/* FEATURES */
+#features{ min-height:100vh; padding-top:16vh; padding-bottom:10vh; }
+.feat-row{ display:grid; grid-template-columns:repeat(2,1fr); gap:20px; }
+@media (max-width:800px){ .feat-row{ grid-template-columns:1fr; } }
+.glass-card{ position:relative; padding:32px 28px; border-radius:8px; background:var(--panel); border:1px solid var(--divider); backdrop-filter:blur(18px) saturate(140%); -webkit-backdrop-filter:blur(18px) saturate(140%); transform-style:preserve-3d; overflow:hidden; transition:border-color .4s; }
+.glass-card::before{ content:''; position:absolute; inset:0; background:radial-gradient(420px circle at var(--mx,50%) var(--my,50%), rgba(139,92,246,.14), transparent 60%); opacity:0; transition:opacity .4s; }
+.glass-card:hover::before{ opacity:1; }
+.glass-card:hover{ border-color:rgba(139,92,246,.4); }
+.glass-card .ico{ font-size:26px; }
+.glass-card h3{ font-family:var(--f-display); font-size:20px; font-weight:600; margin:16px 0 10px; }
+.glass-card p{ font-size:14px; color:var(--txt2); line-height:1.65; }
+
+/* STATS */
+#stats{ min-height:70vh; display:flex; align-items:center; }
+.stat-grid{ display:grid; grid-template-columns:repeat(4,1fr); gap:1px; background:var(--divider); border:1px solid var(--divider); max-width:900px; width:100%; }
+.stat{ background:var(--bg); padding:32px 20px; text-align:center; }
+.stat .v{ font-family:var(--f-mono); font-size:clamp(26px,3.2vw,38px); color:var(--acc); }
+.stat .l{ font-family:var(--f-mono); font-size:10.5px; color:var(--txt-dim); letter-spacing:.08em; margin-top:8px; text-transform:uppercase; }
+@media (max-width:700px){ .stat-grid{ grid-template-columns:1fr 1fr; } }
+
+/* SHOWS */
+#shows{ min-height:100vh; padding-top:14vh; padding-bottom:14vh; }
+.show-row{ display:grid; grid-template-columns:repeat(3,1fr); gap:20px; }
+@media (max-width:900px){ .show-row{ grid-template-columns:1fr; } }
+.show-card{ padding:28px 24px; border-radius:8px; border:1px solid var(--divider); background:var(--panel); backdrop-filter:blur(14px); }
+.show-card .plat{ font-family:var(--f-mono); font-size:10.5px; letter-spacing:.12em; text-transform:uppercase; color:var(--gld); }
+.show-card h3{ font-family:var(--f-display); font-size:22px; font-weight:600; margin:12px 0 8px; }
+.show-card .n{ font-size:13px; color:var(--txt2); }
+
+/* CTA */
+#cta{ min-height:90vh; display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center; gap:28px; }
+#cta h2{ font-family:var(--f-display); font-weight:600; font-size:clamp(34px,5.6vw,68px); max-width:760px; line-height:1.06; }
+#cta p{ color:var(--txt2); max-width:440px; }
+.btn{ position:relative; overflow:hidden; font-family:var(--f-mono); font-size:13px; letter-spacing:.08em; text-transform:uppercase; padding:17px 36px; border:1px solid var(--pur); color:var(--txt); background:transparent; cursor:pointer; text-decoration:none; display:inline-block; transition:box-shadow .4s,color .4s,background .4s; }
+.btn:hover{ color:#fff; background:linear-gradient(90deg,var(--pur),var(--acc)); box-shadow:0 0 40px rgba(139,92,246,.55); border-color:transparent; }
+.btn .ripple{ position:absolute; border-radius:50%; background:rgba(255,255,255,.5); transform:scale(0); animation:rip .7s var(--ease-out); pointer-events:none; }
+@keyframes rip{ to{ transform:scale(3); opacity:0; } }
+
+footer{ position:relative; z-index:2; padding:36px 5vw; display:flex; justify-content:space-between; flex-wrap:wrap; gap:12px; font-family:var(--f-mono); font-size:11px; color:var(--txt-dim); letter-spacing:.06em; border-top:1px solid var(--divider); }
+footer a{ color:var(--txt-dim); }
+</style>
+</head>
+<body>
+
+<div id="loader">
+  <img src="img/logo-icon.png" alt="Reality TV Intel">
+  <div class="mark">REALITY TV INTEL</div>
+  <div id="loader-track"><div id="loader-fill"></div></div>
+  <div id="loader-pct">00%</div>
+</div>
+
+<div id="cursor-dot"></div>
+<div id="cursor-ring"></div>
+<div id="progress"></div>
+<div id="scene-wrap"></div>
+
+<nav>
+  <div class="brand"><img src="img/logo-icon.png" alt=""><span>REALITY TV INTEL</span></div>
+  <div class="live"><i></i>LIVE SEASON</div>
+</nav>
+
+<main>
+
+  <section id="hero">
+    <span class="eyebrow">SEASON TRACKER · 2026</span>
+    <h1>
+      <span class="line"><span>Every follower.</span></span>
+      <span class="line"><span class="grad">Every ranking.</span></span>
+      <span class="line"><span>Live.</span></span>
+    </h1>
+    <p>Real-time Instagram growth, cross-show rankings, and full contestant intel across India's biggest reality TV seasons — updated the moment it changes.</p>
+    <div class="scrollcue"><span>SCROLL</span><div class="wire"><i></i></div></div>
+  </section>
+
+  <section id="features">
+    <div class="sec-head">
+      <span class="tag">What You Get</span>
+      <h2>Built for people who<br>refresh the rankings daily.</h2>
+    </div>
+    <div class="feat-row">
+      <div class="glass-card" data-tilt><div class="ico">🏆</div><h3>Cross-Show Rankings</h3><p>Every confirmed contestant, every show, ranked by real follower count — filterable by status, gender, or show.</p></div>
+      <div class="glass-card" data-tilt><div class="ico">📈</div><h3>Growth Tracking</h3><p>Before → Last Checked → Current. See exactly how fast someone's following is moving, not just where it stands today.</p></div>
+      <div class="glass-card" data-tilt><div class="ico">🔄</div><h3>Live Instagram Refresh</h3><p>Real follower counts pulled on demand — no manual entry, no guessing, no stale numbers.</p></div>
+      <div class="glass-card" data-tilt><div class="ico">📇</div><h3>Full Bio Profiles</h3><p>Career history, reality TV journey, personal life, trivia — one tap on any contestant.</p></div>
+    </div>
+  </section>
+
+  <section id="stats">
+    <div style="width:100%;display:flex;flex-direction:column;align-items:center;gap:48px;">
+      <div class="sec-head" style="text-align:center;max-width:600px;">
+        <span class="tag" style="margin-left:auto;margin-right:auto;">Right Now</span>
+        <h2>The board, as it stands.</h2>
+      </div>
+      <div class="stat-grid">
+        <div class="stat"><div class="v">3</div><div class="l">Live Shows</div></div>
+        <div class="stat"><div class="v">46</div><div class="l">Contestants Tracked</div></div>
+        <div class="stat"><div class="v">100%</div><div class="l">Confirmed Cast</div></div>
+        <div class="stat"><div class="v">2</div><div class="l">Upcoming Seasons</div></div>
+      </div>
+    </div>
+  </section>
+
+  <section id="shows">
+    <div class="sec-head">
+      <span class="tag">The Shows</span>
+      <h2>Tracked, right now.</h2>
+    </div>
+    <div class="show-row">
+      <div class="show-card"><div class="plat">COLORS TV + JIOHOTSTAR</div><h3>KKK 15</h3><div class="n">15 contestants</div></div>
+      <div class="show-card"><div class="plat">NETFLIX</div><h3>Lock Upp S2</h3><div class="n">15 contestants</div></div>
+      <div class="show-card"><div class="plat">AMAZON PRIME VIDEO</div><h3>Alliance India</h3><div class="n">16 contestants</div></div>
+    </div>
+  </section>
+
+  <section id="cta">
+    <span class="tag" style="color:var(--gld);">ENTER THE TRACKER</span>
+    <h2>See where everyone<br>actually stands.</h2>
+    <p>Live rankings, growth charts, and full rosters — no login needed to browse.</p>
+    <a href="index.html" class="btn" id="enter-btn">Open Dashboard →</a>
+  </section>
+
+</main>
+
+<footer>
+  <span>© 2026 Reality TV Intel · Built by BobMasterBillie</span>
+  <a href="index.html">Open Dashboard</a>
+</footer>
+
+<script type="module">
+import * as THREE from 'three';
+import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
+import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
+import { UnrealBloomPass } from 'three/addons/postprocessing/UnrealBloomPass.js';
+
+const REDUCED = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+/* LOADER */
+const loaderFill = document.getElementById('loader-fill');
+const loaderPct  = document.getElementById('loader-pct');
+const loaderEl   = document.getElementById('loader');
+let pct = 0;
+const loaderTimer = setInterval(() => {
+  pct += Math.random() * 18;
+  if (pct >= 100) { pct = 100; clearInterval(loaderTimer); finishLoad(); }
+  loaderFill.style.width = pct + '%';
+  loaderPct.textContent = String(Math.floor(pct)).padStart(2,'0') + '%';
+}, 130);
+function finishLoad(){ setTimeout(() => { loaderEl.classList.add('done'); playHeroIntro(); }, 220); }
+function playHeroIntro(){
+  if (REDUCED){
+    document.querySelectorAll('#hero h1 .line span, #hero p, #hero .eyebrow, #hero .scrollcue')
+      .forEach(el => { el.style.opacity = 1; el.style.transform = 'none'; });
+    return;
+  }
+  const tl = gsap.timeline({ delay:.2 });
+  tl.to('#hero .eyebrow', { opacity:1, duration:.6, ease:'power2.out' })
+    .to('#hero h1 .line span', { y:'0%', duration:1.1, stagger:.12, ease:'power4.out' }, '-=.2')
+    .to('#hero p', { opacity:1, duration:.8, ease:'power2.out' }, '-=.5')
+    .to('#hero .scrollcue', { opacity:1, duration:.6 }, '-=.3');
+}
+
+/* CURSOR */
+const dot = document.getElementById('cursor-dot');
+const ring = document.getElementById('cursor-ring');
+let mx=innerWidth/2, my=innerHeight/2, rx=mx, ry=my;
+window.addEventListener('mousemove', e => { mx=e.clientX; my=e.clientY; });
+(function loop(){ rx+=(mx-rx)*.16; ry+=(my-ry)*.16;
+  dot.style.transform=`translate(${mx}px,${my}px) translate(-50%,-50%)`;
+  ring.style.transform=`translate(${rx}px,${ry}px) translate(-50%,-50%)`;
+  requestAnimationFrame(loop);
+})();
+document.querySelectorAll('a,button,[data-tilt]').forEach(el=>{
+  el.addEventListener('mouseenter',()=>ring.classList.add('hover'));
+  el.addEventListener('mouseleave',()=>ring.classList.remove('hover'));
+});
+
+/* LENIS + SCROLLTRIGGER */
+gsap.registerPlugin(ScrollTrigger);
+const lenis = new Lenis({ duration:1.15, smoothWheel:true, syncTouch:false });
+lenis.on('scroll', ScrollTrigger.update);
+gsap.ticker.add((t)=>lenis.raf(t*1000));
+gsap.ticker.lagSmoothing(0);
+ScrollTrigger.create({ start:0, end:'max', onUpdate:(s)=>{ document.getElementById('progress').style.width=(s.progress*100)+'%'; } });
+
+/* THREE.JS — growth-bars signature element */
+const wrap = document.getElementById('scene-wrap');
+const scene = new THREE.Scene();
+scene.fog = new THREE.FogExp2(0x08080F, 0.045);
+const camera = new THREE.PerspectiveCamera(45, innerWidth/innerHeight, .1, 100);
+camera.position.set(0,1,10);
+const renderer = new THREE.WebGLRenderer({ antialias:true, alpha:true, powerPreference:'high-performance' });
+renderer.setPixelRatio(Math.min(devicePixelRatio,2));
+renderer.setSize(innerWidth, innerHeight);
+wrap.appendChild(renderer.domElement);
+
+scene.add(new THREE.AmbientLight(0x141428, 1.2));
+const keyLight = new THREE.PointLight(0x4A9EFF, 20, 30); keyLight.position.set(4,4,5); scene.add(keyLight);
+const rimLight = new THREE.PointLight(0x8B5CF6, 14, 30); rimLight.position.set(-5,-1,-4); scene.add(rimLight);
+const gldLight = new THREE.PointLight(0xF5A623, 8, 20); gldLight.position.set(0,-3,3); scene.add(gldLight);
+
+/* A ring of glowing "growth bars" — heights represent follower momentum,
+   orbiting a central core. This is the thematic centerpiece: the whole
+   product is about watching numbers climb, so the hero visual IS a
+   live-feeling bar chart in 3D space rather than arbitrary geometry. */
+const BAR_COUNT = 14;
+const bars = [];
+const barColors = [0x4A9EFF, 0x8B5CF6, 0xF5A623];
+for (let i=0;i<BAR_COUNT;i++){
+  const h = .6 + Math.random()*1.8;
+  const geo = new THREE.BoxGeometry(.22, h, .22);
+  const mat = new THREE.MeshStandardMaterial({
+    color: barColors[i % barColors.length],
+    emissive: barColors[i % barColors.length], emissiveIntensity: .35,
+    metalness:.4, roughness:.35
+  });
+  const bar = new THREE.Mesh(geo, mat);
+  const ang = (i / BAR_COUNT) * Math.PI * 2;
+  const r = 3.2;
+  bar.position.set(Math.cos(ang)*r, h/2 - 1, Math.sin(ang)*r);
+  bar.userData = { baseH:h, ang, r };
+  scene.add(bar);
+  bars.push(bar);
+}
+
+const coreGeo = new THREE.IcosahedronGeometry(.75, 1);
+const coreMat = new THREE.MeshPhysicalMaterial({ color:0x13131F, metalness:.3, roughness:.15, transmission:.5, thickness:1.1, ior:1.4, clearcoat:1, clearcoatRoughness:.1 });
+const core = new THREE.Mesh(coreGeo, coreMat);
+scene.add(core);
+
+const PARTICLE_COUNT = 800;
+const posArr = new Float32Array(PARTICLE_COUNT*3);
+for (let i=0;i<PARTICLE_COUNT;i++){
+  const r = 5 + Math.random()*9, th = Math.random()*Math.PI*2, ph = Math.acos(2*Math.random()-1);
+  posArr[i*3]=r*Math.sin(ph)*Math.cos(th); posArr[i*3+1]=r*Math.sin(ph)*Math.sin(th); posArr[i*3+2]=r*Math.cos(ph);
+}
+const pGeo = new THREE.BufferGeometry(); pGeo.setAttribute('position', new THREE.BufferAttribute(posArr,3));
+const pMat = new THREE.PointsMaterial({ color:0x8B5CF6, size:.025, transparent:true, opacity:.5, blending:THREE.AdditiveBlending, depthWrite:false });
+const particles = new THREE.Points(pGeo, pMat);
+scene.add(particles);
+
+const composer = new EffectComposer(renderer);
+composer.addPass(new RenderPass(scene, camera));
+const bloom = new UnrealBloomPass(new THREE.Vector2(innerWidth,innerHeight), REDUCED?0:.6, .5, .15);
+composer.addPass(bloom);
+
+let mouseNX=0, mouseNY=0;
+window.addEventListener('mousemove', e=>{ mouseNX=(e.clientX/innerWidth-.5)*2; mouseNY=(e.clientY/innerHeight-.5)*2; });
+
+let sceneProgress = 0;
+ScrollTrigger.create({ start:0, end:'max', onUpdate: s => sceneProgress = s.progress });
+
+const clock = new THREE.Clock();
+function animate(){
+  requestAnimationFrame(animate);
+  const t = clock.getElapsedTime();
+
+  core.rotation.y += .002;
+  scene.rotation.y = sceneProgress * Math.PI * .7 + Math.sin(t*.15)*.05;
+
+  /* Bars "grow" as you scroll — the literal metaphor of the product:
+     numbers climbing the further you go. */
+  bars.forEach((b,i) => {
+    const growth = 1 + sceneProgress * (1.4 + (i % 3) * .3);
+    const targetH = b.userData.baseH * growth;
+    b.scale.y += (growth - b.scale.y) * .05;
+    b.position.y = (b.userData.baseH * b.scale.y)/2 - 1;
+  });
+
+  const camZ = 10 - sceneProgress * 3.2;
+  const camY = 1 + Math.sin(sceneProgress*Math.PI)*1.1;
+  camera.position.z += (camZ - camera.position.z)*.06;
+  camera.position.y += (camY - camera.position.y)*.06;
+  camera.position.x += ((mouseNX*.7) - camera.position.x)*.04;
+  camera.lookAt(0, mouseNY*-.3, 0);
+
+  particles.rotation.y += .0004;
+
+  composer.render();
+}
+animate();
+
+window.addEventListener('resize', ()=>{
+  camera.aspect = innerWidth/innerHeight; camera.updateProjectionMatrix();
+  renderer.setSize(innerWidth, innerHeight); composer.setSize(innerWidth, innerHeight);
+});
+
+/* SECTION REVEALS */
+gsap.utils.toArray('.sec-head, .stat, .glass-card, .show-card').forEach(el=>{
+  gsap.fromTo(el, { opacity:0, y:34, filter:'blur(6px)' },
+    { opacity:1, y:0, filter:'blur(0px)', duration:.9, ease:'power3.out',
+      scrollTrigger:{ trigger:el, start:'top 88%' } });
+});
+
+/* CARD TILT */
+document.querySelectorAll('[data-tilt]').forEach(card=>{
+  card.addEventListener('mousemove', e=>{
+    const r = card.getBoundingClientRect();
+    const px=(e.clientX-r.left)/r.width, py=(e.clientY-r.top)/r.height;
+    card.style.setProperty('--mx',(px*100)+'%'); card.style.setProperty('--my',(py*100)+'%');
+    card.style.transform = `perspective(700px) rotateX(${(py-.5)*-14}deg) rotateY(${(px-.5)*14}deg) translateZ(6px)`;
+  });
+  card.addEventListener('mouseleave', ()=>{ card.style.transform='perspective(700px) rotateX(0) rotateY(0)'; });
+});
+
+/* RIPPLE */
+document.getElementById('enter-btn').addEventListener('click', function(e){
+  const r=this.getBoundingClientRect(); const span=document.createElement('span'); span.className='ripple';
+  const size=Math.max(r.width,r.height);
+  span.style.width=span.style.height=size+'px';
+  span.style.left=(e.clientX-r.left-size/2)+'px'; span.style.top=(e.clientY-r.top-size/2)+'px';
+  this.appendChild(span); setTimeout(()=>span.remove(),700);
+});
+</script>
+</body>
+</html>
