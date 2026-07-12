@@ -1,6 +1,6 @@
 {
   "_meta": {
-    "savedAt": "08 Jul 2026, 06:14",
+    "savedAt": "12 Jul 2026, 15:45",
     "generator": "Reality TV Intel 2026"
   },
   "SHOWS": {
@@ -1396,7 +1396,7 @@
       {
         "name": "Sunita Ahuja",
         "gender": "F",
-        "status": "CONFIRMED",
+        "status": "ELIMINATED",
         "profession": " Personality, Media Figure",
         "tier": "",
         "ig": "@officialsunitaahuja",
