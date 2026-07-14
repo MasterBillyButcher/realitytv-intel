@@ -1,6 +1,6 @@
 {
   "_meta": {
-    "savedAt": "14 Jul 2026, 08:52",
+    "savedAt": "14 Jul 2026, 08:54",
     "generator": "Reality TV Intel 2026"
   },
   "SHOWS": {
@@ -3032,5 +3032,11 @@
     "kkk",
     "bb20",
     "alliance"
+  ],
+  "HIDDEN_INIT": [
+    "lockupp::31",
+    "lockupp::32",
+    "lockupp::30",
+    "lockupp::19"
   ]
 }
