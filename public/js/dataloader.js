@@ -50,7 +50,9 @@ async function loadBundledData() {
   try {
     const res = await fetch('data/data.js', { cache: 'no-cache' });
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
-    _applyDataJSON(await res.text());
+    const text = await res.text();
+    _applyDataJSON(text);
+    _lastAppliedText = text;
     return true;
   } catch (err) {
     console.warn('[DataLoader] Bundled data.js failed to load/parse:', err.message);
@@ -58,13 +60,21 @@ async function loadBundledData() {
   }
 }
 
-/** Load the latest copy from GitHub — may be newer than the bundled one. */
+/** Load the latest copy from GitHub — may be newer than the bundled one.
+ * Returns true only if the fetched text actually differs from what's
+ * already applied, so the caller can skip a disruptive re-render when
+ * nothing changed (the common case — most loads match the bundled copy). */
+let _lastAppliedText = null;
+
 async function loadDataFromGitHub() {
   const url = _rawUrl();
   try {
     const res = await fetch(url + '?cb=' + Date.now(), { cache: 'no-cache' });
     if (!res.ok) throw new Error(`HTTP ${res.status} — ${res.statusText}`);
-    _applyDataJSON(await res.text());
+    const text = await res.text();
+    if (text === _lastAppliedText) return false; // identical — nothing to re-render
+    _applyDataJSON(text);
+    _lastAppliedText = text;
     console.log('[DataLoader] ✓ Loaded from GitHub:', url);
     return true;
   } catch (err) {
@@ -81,15 +91,8 @@ async function loadDataFromGitHub() {
    overwrites it if it successfully loads something newer. */
 window._dataReady = false;
 
-async function bootApp() {
-  const bundledOK = await loadBundledData();
-  await loadDataFromGitHub(); // best-effort refresh; bundled copy already in place either way
-
-  if (!bundledOK && !window.SHOWS) {
-    console.error('[DataLoader] No data source succeeded — site will render with no contestants.');
-  }
-
-  window._dataReady = true;
+/** Build/rebuild every panel from whatever's currently in window.SHOWS/window.DB. */
+function _renderApp() {
   if (typeof getShowKeys !== 'function') return;
 
   if (Array.isArray(window.HIDDEN_SHOWS_INIT) && typeof HIDDEN_SHOWS !== 'undefined') {
@@ -116,4 +119,25 @@ async function bootApp() {
     const t = localStorage.getItem('realityTV2026_theme') || 'dark';
     if (typeof setTheme === 'function') setTheme(t, false);
   } catch {}
+}
+
+async function bootApp() {
+  // Same-origin bundled copy: fast, always available. Render as soon as
+  // this lands — don't make every visitor wait on a cross-origin round
+  // trip to GitHub before they see anything.
+  const bundledOK = await loadBundledData();
+
+  if (!bundledOK && !window.SHOWS) {
+    console.error('[DataLoader] No data source succeeded — site will render with no contestants.');
+  }
+
+  window._dataReady = true;
+  _renderApp();
+
+  // GitHub copy may be newer (admin pushed an edit since this deploy) —
+  // fetch it in the background and only re-render if it actually changes
+  // anything. Never blocks first paint.
+  loadDataFromGitHub().then(githubOK => {
+    if (githubOK) _renderApp();
+  });
 }

@@ -191,7 +191,7 @@ function contestantAvatar(c) {
     return `<div class="contestant-avatar"><div class="contestant-avatar-fallback">${init}</div></div>`;
   }
   return `<div class="contestant-avatar">
-    <img src="${photo.replace(/"/g, '&quot;')}" alt="${sanitizeHTML(name)}" loading="lazy"
+    <img src="${photo.replace(/"/g, '&quot;')}" alt="${sanitizeHTML(name)}" loading="lazy" crossorigin="anonymous"
       onload="this.nextElementSibling.style.display='none'"
       onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
     <div class="contestant-avatar-fallback" style="display:none">${init}</div>
@@ -605,7 +605,7 @@ function renderCards(key) {
 
     const photoBlock = photo
       ? `<div class="ccard-photo-wrap" style="border-top:3px solid ${col}">
-           <img class="ccard-photo-img" src="${photo.replace(/"/g, '&quot;')}" alt="${sanitizeHTML(c.name)}" loading="lazy"
+           <img class="ccard-photo-img" src="${photo.replace(/"/g, '&quot;')}" alt="${sanitizeHTML(c.name)}" loading="lazy" crossorigin="anonymous"
              onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
            <div class="ccard-photo-fallback" style="display:none;background:linear-gradient(150deg,${col}22,${col}55)">
              <div class="ccard-initials">${initials}</div>

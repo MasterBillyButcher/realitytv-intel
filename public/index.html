@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Reality TV Intel · BobMasterBillie</title>
   <meta name="description" content="Indian Reality TV Season Tracker — live follower analytics, rankings and contestant intel across KKK, Lock Upp, Alliance India, Traitors India and Bigg Boss.">
+  <link rel="canonical" href="https://realitytv-intel.vercel.app/">
 
   <!-- Open Graph / social share preview -->
   <meta property="og:title" content="Reality TV Intel">
@@ -35,6 +36,20 @@
 
   <!-- html2canvas for screenshots (defer so it doesn't block render) -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js" defer></script>
+
+  <!-- Structured data: this page IS the product (no separate landing page in the crawl path) -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "WebApplication",
+    "name": "Reality TV Intel",
+    "url": "https://realitytv-intel.vercel.app/",
+    "description": "Live follower analytics, rankings, and contestant intel across India's biggest reality TV shows — KKK, Lock Upp, Alliance India, Traitors India and Bigg Boss.",
+    "applicationCategory": "EntertainmentApplication",
+    "operatingSystem": "Any",
+    "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" }
+  }
+  </script>
 </head>
 <body>
 <div class="app">
@@ -47,8 +62,8 @@
     <div class="brand">
       <img class="brand-icon" src="img/logo-icon.png" alt="Reality TV Intel logo">
       <div>
-        <div class="brand-name">Reality TV Intel</div>
-        <div class="brand-sub">Season Tracker</div>
+        <h1 class="brand-name">Reality TV Intel</h1>
+        <p class="brand-sub">Season Tracker</p>
       </div>
     </div>
 
@@ -57,22 +72,22 @@
 
     <div class="tb-btns">
       <!-- PUBLIC — always visible -->
-      <button class="btn b-gh b-sm" id="themeBtn" onclick="toggleTheme()" title="Toggle theme">☾ Dark Mode</button>
-      <button class="btn b-pur b-sm" onclick="captureCurrentPanel()" title="Screenshot current panel">📷 Capture</button>
-      <button class="btn b-gh b-sm" onclick="window.print()" title="Print / Save as PDF">🖨</button>
+      <button class="btn b-gh b-sm" id="themeBtn" onclick="toggleTheme()" title="Toggle theme" aria-label="Toggle dark/light theme">☾ Dark Mode</button>
+      <button class="btn b-pur b-sm" onclick="captureCurrentPanel()" title="Screenshot current panel" aria-label="Screenshot current panel">📷 Capture</button>
+      <button class="btn b-gh b-sm" onclick="window.print()" title="Print / Save as PDF" aria-label="Print or save as PDF">🖨</button>
 
       <!-- ADMIN ONLY — shown when body.admin-active -->
       <button class="btn b-gh b-sm admin-only" id="editBtn" onclick="toggleEdit()">✎ Edit: OFF</button>
       <button class="btn b-gh b-sm admin-only" onclick="openShowMgr()">⚙ Shows</button>
       <button class="btn b-gh b-sm admin-only" onclick="openHideMgr('')">👁 Visibility</button>
-      <button class="btn b-gld b-sm admin-only" onclick="exportJSON()" title="Download data.js → upload to GitHub">↓ Save JSON</button>
+      <button class="btn b-gld b-sm admin-only" onclick="exportJSON()" title="Download data.js → upload to GitHub" aria-label="Save and download data.js">↓ Save JSON</button>
       <button class="btn b-gh b-sm admin-only" onclick="toggleSaveBar()">💾 Local</button>
 
       <div class="tb-divider"></div>
-      <button class="btn b-gh b-sm" id="admin-toggle-btn" onclick="openAdminLogin()">🔒 Admin</button>
+      <button class="btn b-gh b-sm" id="admin-toggle-btn" onclick="openAdminLogin()" aria-label="Open admin login">🔒 Admin</button>
 
       <!-- Mobile nav toggle -->
-      <button class="btn b-gh b-sm mobile-nav-btn" id="mobile-nav-btn" onclick="toggleMobileNav()" title="Navigation" style="display:none">☰</button>
+      <button class="btn b-gh b-sm mobile-nav-btn" id="mobile-nav-btn" onclick="toggleMobileNav()" title="Navigation" aria-label="Open navigation menu" style="display:none">☰</button>
     </div>
   </header>
 
@@ -81,7 +96,7 @@
   <div class="mobile-nav-drawer" id="mobile-nav-drawer">
     <div class="mobile-nav-header">
       <span style="font-size:13px;font-weight:800;color:var(--txt)">Navigate</span>
-      <button class="mclose" onclick="closeMobileNav()">✕</button>
+      <button class="mclose" onclick="closeMobileNav()" aria-label="Close navigation menu">✕</button>
     </div>
     <div id="mobile-nav-links"></div>
   </div>
@@ -455,7 +470,7 @@ git push</pre>
     <button class="btn b-gh b-sm"  onclick="openImportModal()">↑ Import</button>
     <button class="btn b-gh b-sm"  onclick="exportAllCSV()">↓ CSV</button>
   </div>
-  <button class="save-bar-close" onclick="toggleSaveBar()">✕</button>
+  <button class="save-bar-close" onclick="toggleSaveBar()" aria-label="Close local save panel">✕</button>
 </div>
 
 <!-- ══════════════════════════════════════════════════════════
@@ -465,7 +480,7 @@ git push</pre>
   <div class="modal">
     <div class="mhdr">
       <div class="mtitle" id="mc-title">Add Contestant</div>
-      <button class="mclose" onclick="closeModal('modal-c')">✕</button>
+      <button class="mclose" onclick="closeModal('modal-c')" aria-label="Close contestant editor">✕</button>
     </div>
     <div class="msec">
       <div class="msec-t">Basic Info</div>
@@ -523,7 +538,7 @@ git push</pre>
   <div class="modal" style="width:660px">
     <div class="mhdr">
       <div class="mtitle">👁 Show / Hide Contestants</div>
-      <button class="mclose" onclick="closeModal('modal-hide')">✕</button>
+      <button class="mclose" onclick="closeModal('modal-hide')" aria-label="Close visibility manager">✕</button>
     </div>
     <div class="msec">
       <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:10px">
@@ -550,7 +565,7 @@ git push</pre>
   <div class="modal" style="width:620px">
     <div class="mhdr">
       <div class="mtitle" id="show-edit-title">⚙ Manage Shows</div>
-      <button class="mclose" onclick="closeModal('modal-shows')">✕</button>
+      <button class="mclose" onclick="closeModal('modal-shows')" aria-label="Close show manager">✕</button>
     </div>
     <div class="msec">
       <div id="show-list"></div>
@@ -584,7 +599,7 @@ git push</pre>
   <div class="modal" style="width:540px">
     <div class="mhdr">
       <div class="mtitle">↑ Import / Load Data</div>
-      <button class="mclose" onclick="closeModal('modal-import')">✕</button>
+      <button class="mclose" onclick="closeModal('modal-import')" aria-label="Close import dialog">✕</button>
     </div>
     <div class="msec">
       <div class="clarify-box" style="margin-bottom:16px">
@@ -627,7 +642,7 @@ git push</pre>
   <div class="modal" style="max-width:380px">
     <div class="mhdr">
       <div class="mtitle">Admin Access</div>
-      <button class="mclose" onclick="closeAdminLogin()">✕</button>
+      <button class="mclose" onclick="closeAdminLogin()" aria-label="Close admin login">✕</button>
     </div>
     <div>
       <div class="admin-modal-icon">🔐</div>
@@ -654,7 +669,7 @@ git push</pre>
 <div class="mbg no-capture" id="modal-bio">
   <div class="modal bio-modal">
     <div class="mhdr bio-mhdr" id="bio-mhdr">
-      <button class="mclose" onclick="closeModal('modal-bio')">✕</button>
+      <button class="mclose" onclick="closeModal('modal-bio')" aria-label="Close bio profile">✕</button>
       <div class="bio-mhdr-photo" id="bio-photo-wrap"></div>
       <div class="bio-mhdr-info">
         <div class="bio-mhdr-name" id="bio-name"></div>
@@ -672,7 +687,7 @@ git push</pre>
   <div class="modal" style="width:420px">
     <div class="mhdr">
       <div class="mtitle">📋 Copy to Another Show</div>
-      <button class="mclose" onclick="closeModal('modal-copy-show')">✕</button>
+      <button class="mclose" onclick="closeModal('modal-copy-show')" aria-label="Close copy-to-show dialog">✕</button>
     </div>
     <div class="msec">
       <div class="dnote" style="margin-bottom:14px">

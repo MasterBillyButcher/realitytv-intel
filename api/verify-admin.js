@@ -28,6 +28,36 @@ function timingSafeStringEqual(a, b) {
   return crypto.timingSafeEqual(aBuf, bBuf);
 }
 
+/* ─── LOGIN ATTEMPT LIMITER ─────────────────────────────────
+   Best-effort, in-memory, per-warm-instance. This is NOT a real
+   distributed rate limit — Vercel functions are stateless across
+   cold starts and scale out across multiple instances, so a
+   determined attacker spreading requests across many invocations
+   can still get around this. It's here to stop the trivial case
+   (a script hammering one warm instance) cheaply, with zero new
+   infra or env vars. For real protection, put this behind Vercel
+   KV / Upstash Redis (shared counter) or Vercel's WAF rate-limit
+   rules — this comment is here so that upgrade isn't forgotten. */
+const LOGIN_ATTEMPTS = new Map(); // ip -> { count, windowStart }
+const WINDOW_MS = 5 * 60 * 1000;  // 5 minutes
+const MAX_ATTEMPTS = 8;           // per IP, per window
+
+function getClientIp(req) {
+  const fwd = req.headers['x-forwarded-for'];
+  return (fwd ? fwd.split(',')[0].trim() : req.socket?.remoteAddress) || 'unknown';
+}
+
+function isRateLimited(ip) {
+  const now = Date.now();
+  const entry = LOGIN_ATTEMPTS.get(ip);
+  if (!entry || now - entry.windowStart > WINDOW_MS) {
+    LOGIN_ATTEMPTS.set(ip, { count: 1, windowStart: now });
+    return false;
+  }
+  entry.count += 1;
+  return entry.count > MAX_ATTEMPTS;
+}
+
 export default async function handler(req, res) {
   if (req.method === 'GET') {
     res.status(200).json({ authenticated: isValidAdminSession(req) });
@@ -42,6 +72,12 @@ export default async function handler(req, res) {
 
   if (req.method !== 'POST') {
     res.status(405).json({ error: 'Use POST to log in, GET to check session, DELETE to log out.' });
+    return;
+  }
+
+  const ip = getClientIp(req);
+  if (isRateLimited(ip)) {
+    res.status(429).json({ error: 'Too many login attempts. Wait a few minutes and try again.' });
     return;
   }
 

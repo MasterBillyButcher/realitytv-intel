@@ -4,6 +4,40 @@
    Loaded first — zero dependencies.
 ═══════════════════════════════════════════════════════════ */
 
+/* ─── ACCESSIBILITY: keyboard support for sidebar nav ──────
+   .sb-item elements are plain <div onclick> — not reachable by
+   Tab and not activatable by Enter/Space with a screen reader or
+   keyboard-only navigation. Rather than editing every place app.js
+   generates these (static HTML + rebuildSidebar + mobile nav), a
+   MutationObserver tags any .sb-item that appears, and a single
+   delegated keydown listener activates focused items on Enter/Space. */
+function _makeSbItemAccessible(el) {
+  if (el.hasAttribute('data-a11y-bound')) return;
+  el.setAttribute('data-a11y-bound', '1');
+  el.setAttribute('role', 'button');
+  el.setAttribute('tabindex', '0');
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+  document.querySelectorAll('.sb-item').forEach(_makeSbItemAccessible);
+
+  const observer = new MutationObserver(muts => {
+    muts.forEach(m => m.addedNodes.forEach(node => {
+      if (node.nodeType !== Node.ELEMENT_NODE) return;
+      if (node.classList?.contains('sb-item')) _makeSbItemAccessible(node);
+      node.querySelectorAll?.('.sb-item').forEach(_makeSbItemAccessible);
+    }));
+  });
+  observer.observe(document.body, { childList: true, subtree: true });
+
+  document.addEventListener('keydown', e => {
+    if ((e.key === 'Enter' || e.key === ' ') && e.target.classList?.contains('sb-item')) {
+      e.preventDefault();
+      e.target.click();
+    }
+  });
+});
+
 /* ─── SANITIZE ──────────────────────────────────────────── */
 
 /** Escape raw string for safe innerHTML insertion. */
