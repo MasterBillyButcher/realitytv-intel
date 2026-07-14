@@ -179,6 +179,10 @@ function importJSONData(raw) {
         HIDDEN_SHOWS.clear();
         data.HIDDEN_SHOWS_INIT.forEach(k => HIDDEN_SHOWS.add(k));
       }
+      if (Array.isArray(data.HIDDEN_INIT) && typeof HIDDEN !== 'undefined') {
+        HIDDEN.clear();
+        data.HIDDEN_INIT.forEach(k => HIDDEN.add(k));
+      }
       if (typeof refreshShowUIs === 'function') {
         refreshShowUIs();
       } else {

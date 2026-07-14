@@ -1,6 +1,6 @@
 {
   "_meta": {
-    "savedAt": "12 Jul 2026, 15:45",
+    "savedAt": "14 Jul 2026, 08:42",
     "generator": "Reality TV Intel 2026"
   },
   "SHOWS": {
@@ -1764,7 +1764,7 @@
       {
         "name": "Riyaz Aly",
         "gender": "M",
-        "status": "CONFIRMED",
+        "status": "ELIMINATED",
         "profession": "Social Media Star, Content Creator",
         "tier": "",
         "ig": "riyaz.14",
@@ -1956,7 +1956,7 @@
         "profession": "Actor / Reality TV Personality",
         "tier": "",
         "ig": "shilpa_shinde_official",
-        "photo": "https://img.indiaforums.com/article/900x900/23/0072-shilpa-shinde-coming-back-as-angoori-bhabi.webp",
+        "photo": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRy31_KuekHrLKbF1VOfDMBxE_0iZyQ1svSbTStCZaAq_uodTGLUSUfRrJG&s=10",
         "follBefore": "673528",
         "follBeforeDate": "July 5",
         "follLast": "673528",

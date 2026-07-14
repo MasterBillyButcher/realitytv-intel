@@ -1076,11 +1076,12 @@ function renderHideMgr() {
   setText('hm-count', hiddenCount);
   grid.innerHTML = all.map(c => {
     const vis = !isH(c._k, c.id);
+    const eliminated = (c.status || '').toUpperCase().trim() === 'ELIMINATED';
     return `<div class="hm-item ${vis ? 'hm-vis' : 'hm-hid'}" onclick="toggleH('${c._k}',${c.id});renderHideMgr()">
       <div class="hm-chk">${vis ? '✓' : ''}</div>
       <div>
         <div class="hm-name">${sanitizeHTML(c.name)}</div>
-        <div class="hm-show">${sanitizeHTML(window.SHOWS[c._k]?.label || c._k)}</div>
+        <div class="hm-show">${sanitizeHTML(window.SHOWS[c._k]?.label || c._k)}${!vis && eliminated ? ' · <span style="color:var(--mut)">eliminated</span>' : ''}</div>
       </div>
     </div>`;
   }).join('');
@@ -1243,6 +1244,11 @@ function saveContestant() {
   const errors = validateContestant(obj);
   if (errors.length) { toast(errors[0], 'err'); return; }
   const wasEdit = !!editTarget;
+  const previousStatus = wasEdit
+    ? ((window.DB[key] || []).find(c => c.id === editTarget.id)?.status || '').toUpperCase().trim()
+    : '';
+  const newStatus = (obj.status || '').toUpperCase().trim();
+
   if (editTarget && editTarget.key === key) {
     const idx = (window.DB[key] || []).findIndex(c => c.id === editTarget.id);
     if (idx > -1) {
@@ -1260,10 +1266,30 @@ function saveContestant() {
     obj.id = ids.length ? Math.max(...ids) + 1 : 1;
     window.DB[key].push(obj);
   }
+
+  // Auto-hide on the ELIMINATED transition only — i.e. either a brand
+  // new contestant added as already-eliminated, or an existing one just
+  // switched from a non-eliminated status to ELIMINATED. This fires
+  // exactly once per elimination event; it never re-hides someone the
+  // admin has since manually restored, because on later saves
+  // previousStatus is already ELIMINATED and the condition won't match
+  // again. This is what makes them drop out of the Growth table and
+  // get skipped by the live follower refresh (both key off HIDDEN).
+  if (newStatus === 'ELIMINATED' && previousStatus !== 'ELIMINATED') {
+    HIDDEN.add(key + '::' + obj.id);
+  }
+
   closeModal('modal-c');
   renderAll(); rebuildSidebar(); updateStats();
-  toast(wasEdit ? '✓ Updated' : '✓ Added to ' + (window.SHOWS[key]?.label || key));
-  if (typeof logActivity === 'function') logActivity(wasEdit ? 'Edited contestant' : 'Added contestant', obj.name + ' · ' + (window.SHOWS[key]?.label || key), wasEdit ? '✏️' : '➕');
+  const autoHidden = newStatus === 'ELIMINATED' && previousStatus !== 'ELIMINATED';
+  toast(
+    (wasEdit ? '✓ Updated' : '✓ Added to ' + (window.SHOWS[key]?.label || key)) +
+    (autoHidden ? ' — auto-hidden from Growth (eliminated). Unhide in 👁 Visibility if needed.' : '')
+  );
+  if (typeof logActivity === 'function') {
+    logActivity(wasEdit ? 'Edited contestant' : 'Added contestant', obj.name + ' · ' + (window.SHOWS[key]?.label || key), wasEdit ? '✏️' : '➕');
+    if (autoHidden) logActivity('Auto-hidden (eliminated)', obj.name + ' · ' + (window.SHOWS[key]?.label || key), '🙈');
+  }
   if (typeof _autoPersist === 'function') _autoPersist();
 }
 function delRow(key, id) {

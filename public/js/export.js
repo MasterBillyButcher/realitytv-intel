@@ -19,6 +19,12 @@ function exportJSON() {
     SHOWS: window.SHOWS,
     DB: window.DB,
     HIDDEN_SHOWS_INIT: [...(typeof HIDDEN_SHOWS !== 'undefined' ? HIDDEN_SHOWS : [])],
+    // Per-contestant hidden list — includes contestants auto-hidden on
+    // elimination as well as any manually hidden/unhidden by the admin.
+    // Publishing this is what makes "eliminated → hidden from Growth →
+    // skipped by live follower refresh" apply site-wide, not just in
+    // the admin's own browser.
+    HIDDEN_INIT: [...(typeof HIDDEN !== 'undefined' ? HIDDEN : [])],
   };
 
   const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' });

@@ -43,6 +43,13 @@ function _applyDataJSON(text) {
   if (parsed.SHOWS) window.SHOWS = parsed.SHOWS;
   if (parsed.DB)    window.DB    = parsed.DB;
   if (Array.isArray(parsed.HIDDEN_SHOWS_INIT)) window.HIDDEN_SHOWS_INIT = parsed.HIDDEN_SHOWS_INIT;
+  // Per-contestant hidden list (e.g. eliminated contestants auto-hidden
+  // by the admin) — previously this only ever lived in the admin's own
+  // browser localStorage and never reached data.js/GitHub, so regular
+  // visitors (and the admin on a different device) never saw it and the
+  // followers API had no way to know who to skip. Now it round-trips
+  // through data.js like HIDDEN_SHOWS_INIT already does.
+  if (Array.isArray(parsed.HIDDEN_INIT)) window.HIDDEN_INIT = parsed.HIDDEN_INIT;
 }
 
 /** Load the copy bundled with this deploy — same-origin, fast, always available. */
@@ -98,6 +105,11 @@ function _renderApp() {
   if (Array.isArray(window.HIDDEN_SHOWS_INIT) && typeof HIDDEN_SHOWS !== 'undefined') {
     HIDDEN_SHOWS.clear();
     window.HIDDEN_SHOWS_INIT.forEach(k => HIDDEN_SHOWS.add(k));
+  }
+
+  if (Array.isArray(window.HIDDEN_INIT) && typeof HIDDEN !== 'undefined') {
+    HIDDEN.clear();
+    window.HIDDEN_INIT.forEach(k => HIDDEN.add(k));
   }
 
   const dp = document.getElementById('dynamic-panels');

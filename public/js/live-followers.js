@@ -10,15 +10,21 @@ const LIVE_BATCH_SIZE = 40; // stay under the API route's own cap with room to s
 function _collectRefreshTargets(scopeKey) {
   const keys = scopeKey ? [scopeKey] : getShowKeys();
   const targets = [];
+  let skippedHidden = 0;
   keys.forEach(k => {
     (window.DB[k] || []).forEach(c => {
+      // Hidden contestants (eliminated & auto-hidden, or hidden for any
+      // other admin reason) are skipped entirely — no Apify credits
+      // spent tracking someone who isn't shown in the Growth table.
+      // Unhide them in 👁 Visibility to bring them back into refreshes.
+      if (typeof isH === 'function' && isH(k, c.id)) { skippedHidden++; return; }
       const handle = String(c.ig || '').trim().replace(/^@/, '');
       if (handle && handle.toLowerCase() !== 'n/v') {
         targets.push({ key: k, id: c.id, handle: handle.toLowerCase(), contestant: c });
       }
     });
   });
-  return targets;
+  return { targets, skippedHidden };
 }
 
 async function refreshFollowersLive(scopeKey) {
@@ -27,9 +33,11 @@ async function refreshFollowersLive(scopeKey) {
     return;
   }
 
-  const targets = _collectRefreshTargets(scopeKey);
+  const { targets, skippedHidden } = _collectRefreshTargets(scopeKey);
   if (!targets.length) {
-    toast('No Instagram handles found to refresh', 'warn');
+    toast(skippedHidden
+      ? `No refreshable profiles — all ${skippedHidden} contestant(s) in scope are hidden. Unhide in 👁 Visibility first.`
+      : 'No Instagram handles found to refresh', 'warn');
     return;
   }
 
@@ -41,7 +49,7 @@ async function refreshFollowersLive(scopeKey) {
     b.disabled = true; // real buttons (per-show export list)
     b.classList.add('ecard-disabled'); // the Export panel's div-based card
   });
-  toast(`⟳ Fetching live follower counts for ${targets.length} profile(s) in ${label}…`);
+  toast(`⟳ Fetching live follower counts for ${targets.length} profile(s) in ${label}${skippedHidden ? ` (${skippedHidden} hidden, skipped)` : ''}…`);
 
   const today = new Date().toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
   let updated = 0;
