@@ -1,6 +1,6 @@
 {
   "_meta": {
-    "savedAt": "14 Jul 2026, 08:54",
+    "savedAt": "02 Jul 2026, 20:07",
     "generator": "Reality TV Intel 2026"
   },
   "SHOWS": {
@@ -1045,8 +1045,8 @@
         "follBeforeDate": "June 24",
         "follLast": "10.0M",
         "follLastDate": "June 30",
-        "follCur": "10148833",
-        "follCurDate": "14 Jul 2026",
+        "follCur": "10114184",
+        "follCurDate": "2 Jul 2026",
         "knownFor": "Naira in YRKKH; Bade Achhe Lagte Hain 4; ex-boyfriend Kushal Tandon (now Alliance India)",
         "history": "Lock Upp S2 debut",
         "id": 1,
@@ -1109,8 +1109,8 @@
         "follBeforeDate": "June 24",
         "follLast": "370.0K",
         "follLastDate": "June 30",
-        "follCur": "375331",
-        "follCurDate": "14 Jul 2026",
+        "follCur": "371650",
+        "follCurDate": "2 Jul 2026",
         "knownFor": "Bade Acche Lagte Hain lead; dramatic weight-loss transformation",
         "history": "N/V",
         "id": 6,
@@ -1169,8 +1169,8 @@
         "follBeforeDate": "June 24",
         "follLast": "944.0K",
         "follLastDate": "June 30",
-        "follCur": "1010185",
-        "follCurDate": "14 Jul 2026",
+        "follCur": "954567",
+        "follCurDate": "2 Jul 2026",
         "knownFor": "Desi Bling fame\n\n",
         "history": "",
         "id": 15,
@@ -1233,8 +1233,8 @@
         "follBeforeDate": "June 24",
         "follLast": "4.3M",
         "follLastDate": "June 30",
-        "follCur": "4375597",
-        "follCurDate": "14 Jul 2026",
+        "follCur": "4363946",
+        "follCurDate": "2 Jul 2026",
         "knownFor": " Sasural Simar Ka, Kundali Bhagya; awards for popular roles.\n\n",
         "history": " TV actor; limited prior reality.\n\n",
         "id": 16,
@@ -1293,8 +1293,8 @@
         "follBeforeDate": "June 24",
         "follLast": "1.9M",
         "follLastDate": "June 30",
-        "follCur": "2190659",
-        "follCurDate": "14 Jul 2026",
+        "follCur": "2085211",
+        "follCurDate": "2 Jul 2026",
         "knownFor": "MTV Splitsvilla X6, Roadies XX ; fitness &amp; lifestyle content.\n\n",
         "history": "MTV Splitsvilla Season 16/X6 (major breakout), Roadies appearances.\n\n",
         "id": 18,
@@ -1349,8 +1349,8 @@
         "follBeforeDate": "June 24",
         "follLast": "3.1M",
         "follLastDate": "June 30",
-        "follCur": "3475857",
-        "follCurDate": "14 Jul 2026",
+        "follCur": "3302698",
+        "follCurDate": "2 Jul 2026",
         "knownFor": "MTV Splitsvilla X6 (paired with Yogesh Rawat), modeling, pageants (Miss Universe India participation buzz), fashion &amp;amp; lifestyle content.\n\n",
         "history": "MTV Splitsvilla Season 16 / X6 (2026) – Major breakout role.\nPageant background and modeling shows.\nNew to big OTT prison-format shows like Lock Upp.\n\n",
         "id": 17,
@@ -1396,7 +1396,7 @@
       {
         "name": "Sunita Ahuja",
         "gender": "F",
-        "status": "ELIMINATED",
+        "status": "CONFIRMED",
         "profession": " Personality, Media Figure",
         "tier": "",
         "ig": "@officialsunitaahuja",
@@ -1405,8 +1405,8 @@
         "follBeforeDate": "June 24",
         "follLast": "510.0K",
         "follLastDate": "June 30",
-        "follCur": "530071",
-        "follCurDate": "14 Jul 2026",
+        "follCur": "513412",
+        "follCurDate": "2 Jul 2026",
         "knownFor": "Bold media appearances, family controversies.\nWife Of GOVINDA\n",
         "history": "New to this format; public figure via marriage.\n\n",
         "id": 19,
@@ -1465,8 +1465,8 @@
         "follBeforeDate": "June 24",
         "follLast": "3.8M",
         "follLastDate": "June 30",
-        "follCur": "4001466",
-        "follCurDate": "14 Jul 2026",
+        "follCur": "3911958",
+        "follCurDate": "2 Jul 2026",
         "knownFor": "Yeh Rishta Kya Kehlata Hai, Bepannah, Kuch Toh Hai.\n\n",
         "history": "Primarily scripted TV; limited prior reality TV experience.\n\n",
         "id": 21,
@@ -1529,8 +1529,8 @@
         "follBeforeDate": "June 27",
         "follLast": "941.0K",
         "follLastDate": "June 30",
-        "follCur": "1181496",
-        "follCurDate": "14 Jul 2026",
+        "follCur": "1049242",
+        "follCurDate": "2 Jul 2026",
         "knownFor": "Acting and digital content.\n\n",
         "history": "Limited prior reality; actress appearances.\n\n",
         "id": 27,
@@ -1589,7 +1589,7 @@
         "follBeforeDate": "June 27",
         "follLast": "2.1M",
         "follLastDate": "June 27",
-        "follCur": "2404416",
+        "follCur": "2.2M",
         "follCurDate": "June 30",
         "knownFor": "Social media reels, prior shows like Rise and Fall.\n\n",
         "history": "Rise and Fall; Lock Upp entry\n\n",
@@ -1649,8 +1649,8 @@
         "follBeforeDate": "June 27",
         "follLast": "116.0K",
         "follLastDate": "June 30",
-        "follCur": "119437",
-        "follCurDate": "14 Jul 2026",
+        "follCur": "117196",
+        "follCurDate": "2 Jul 2026",
         "knownFor": "Business, family/public appearances\n\nWife of Ashneer Grover; fintech background (BharatPe/ZeroPe).\n\n",
         "history": "Limited; reality debut\n\n",
         "id": 29,
@@ -1700,7 +1700,7 @@
       {
         "name": "Shresta Iyer",
         "gender": "F",
-        "status": "ELIMINATED",
+        "status": "CONFIRMED",
         "profession": "Professional Dancer/Choreographer, Influencer",
         "tier": "",
         "ig": "shrestaiyer29",
@@ -1709,8 +1709,8 @@
         "follBeforeDate": "June 27",
         "follLast": "420.0K",
         "follLastDate": "June 30",
-        "follCur": "429201",
-        "follCurDate": "14 Jul 2026",
+        "follCur": "426119",
+        "follCurDate": "2 Jul 2026",
         "knownFor": "Dance, family cricket connections.\n\n",
         "history": "Limited reality prior\n\n",
         "id": 30,
@@ -1764,7 +1764,7 @@
       {
         "name": "Riyaz Aly",
         "gender": "M",
-        "status": "ELIMINATED",
+        "status": "CONFIRMED",
         "profession": "Social Media Star, Content Creator",
         "tier": "",
         "ig": "riyaz.14",
@@ -1773,8 +1773,8 @@
         "follBeforeDate": "June 27",
         "follLast": "26.6M",
         "follLastDate": "June 30",
-        "follCur": "26869469",
-        "follCurDate": "14 Jul 2026",
+        "follCur": "26665845",
+        "follCurDate": "2 Jul 2026",
         "knownFor": "Lip-sync, comedy, fashion reels.\n\nMassive TikTok/Instagram following\n\n",
         "history": "Social media; reality debut\n\n",
         "id": 31,
@@ -1833,8 +1833,8 @@
         "follBeforeDate": "June 27",
         "follLast": "1.4M",
         "follLastDate": "2 Jul 2026",
-        "follCur": "1611609",
-        "follCurDate": "14 Jul 2026",
+        "follCur": "1446674",
+        "follCurDate": "2 Jul 2026",
         "knownFor": "MTV Roadies, Squid Game India (winner), other shows.\n\n",
         "history": "Roadies Revolution (wildcard), Squid Game India, music videos\n\n",
         "id": 32,
@@ -1897,8 +1897,8 @@
         "follBeforeDate": "June 27",
         "follLast": "435.0K",
         "follLastDate": "June 30",
-        "follCur": "473179",
-        "follCurDate": "14 Jul 2026",
+        "follCur": "437433",
+        "follCurDate": "2 Jul 2026",
         "knownFor": "Fashion critique, social media influence, style reels, and appearances in reality formats\n\n",
         "history": "The Traitors Season 1; digital creator with growing reality TV footprint. Expected to add drama through opinions and fashion-related tasks in Lock Upp\n\n",
         "id": 33,
@@ -1946,70 +1946,6 @@
           {
             "heading": "Trivia / Fun Facts",
             "html": "<p>Made his international fashion-world debut at the Cannes Film Festival in May 2026, one of the few young Indian digital creators to attend at his age; fluent in three languages; his first major viral moment came from praising content creator Nancy Tyagi's Cannes look over established Bollywood stars' looks.</p><p>---</p><p><em>End of Lock Upp S2 profiles. Note: Several fields — particularly exact birth years, detailed family information, and some relationship statuses for newer digital-first personalities (Yogesh Rawat, Akanksha Choudhary, Shresta Iyer, Sufi Motiwala) — vary or conflict across tabloid/entertainment sources and should be treated as best-available public information rather than officially confirmed facts. Next up: Alliance India profiles.</em></p>"
-          }
-        ]
-      },
-      {
-        "name": "Shilpa Shinde",
-        "gender": "F",
-        "status": "WILDCARD",
-        "profession": "Actor / Reality TV Personality",
-        "tier": "",
-        "ig": "shilpa_shinde_official",
-        "photo": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRy31_KuekHrLKbF1VOfDMBxE_0iZyQ1svSbTStCZaAq_uodTGLUSUfRrJG&s=10",
-        "follBefore": "673528",
-        "follBeforeDate": "July 5",
-        "follLast": "673528",
-        "follLastDate": "July 5",
-        "follCur": "676182",
-        "follCurDate": "14 Jul 2026",
-        "knownFor": "Iconic role as Angoori Bhabhi in Bhabhi Ji Ghar Par Hai!\nWinner of Bigg Boss 11 (2017)\nBold, outspoken personality in reality TV and recent podcast revelations\n\n",
-        "history": "Bigg Boss 11 (Winner, 2017)\nMultiple TV serials since late 1990s/early 2000s\nCurrent: First wild card entrant in Lock Upp Season 2 (Netflix, 2026)\n\n",
-        "id": 34,
-        "bio": [
-          {
-            "heading": "Personal Details",
-            "html": "<ul><li>Born: 28 August 1977</li><li>Birthplace: Mumbai, Maharashtra, India</li><li>Education: Studied psychology at K.C. College, Mumbai</li><li>Languages: Marathi, Hindi, English</li><li>Family: Dr. Satyadeo Shinde (Father), Geeta Satyadeo Shinde (Mother); has two elder sisters and one younger brother</li><li>Other Names/Aliases: Angoori Bhabhi</li><li>Spouse: Unmarried</li><li>Children: None</li></ul>"
-          },
-          {
-            "heading": "Early Life & Career Beginnings",
-            "html": "<p>Shilpa Shinde began her professional acting career in 1999. Despite initial resistance from her father regarding a career in show business, she persevered, citing a passion for the arts that superseded her initial educational pursuits.</p>"
-          },
-          {
-            "heading": "Television Career",
-            "html": "<ul><li><em>Bhabhi</em> (1999–2002): Manju</li><li><em>Amrapali</em> (2002–2003): Amrapali</li><li><em>Sanjeevani</em> (2004–2005): Chitra</li><li><em>Miss India</em> (2004–2006): Sanjana Gujral</li><li><em>Meher</em> (2005–2006): Meher/Naaz</li><li><em>Chidiya Ghar</em> (2011–2014): Koyal Narayan</li><li><em>Bhabi Ji Ghar Par Hai!</em> (2015–2016; 2025–present): Angoori Manmohan Tiwari</li></ul>"
-          },
-          {
-            "heading": "Film Career",
-            "html": "<ul><li><em>Chinna</em> (2001)</li><li><em>Shivani</em> (2001)</li><li><em>Patel Ki Punjabi Shaadi</em> (2017): Special appearance (Item song)</li></ul>"
-          },
-          {
-            "heading": "Web Series / OTT Career",
-            "html": "<ul><li><em>Paurashpur</em> (2020): Queen Meerawati</li></ul>"
-          },
-          {
-            "heading": "Reality Television Journey",
-            "html": "<ul><li><em>Bigg Boss 11</em> (2017–2018): Winner</li><li><em>Jhalak Dikhhla Jaa 10</em> (2022): 12th place</li><li><em>Fear Factor: Khatron Ke Khiladi 14</em> (2024): 9th position</li></ul>"
-          },
-          {
-            "heading": "Awards & Recognition",
-            "html": "<p>Recipient of the Indian Telly Award for Best Actress in a Comic Role for <em>Bhabi Ji Ghar Par Hai!</em> among other recognitions for her comedic timing and character work.</p>"
-          },
-          {
-            "heading": "Personal Life",
-            "html": "<p>Known for her resilient and outspoken personality. She faced a significant period of grief following the passing of her father due to Alzheimer's disease in 2013. In her personal time, she enjoys interior design, painting, and cooking.</p>"
-          },
-          {
-            "heading": "Controversies / Notable Events",
-            "html": "<ul><li>2016: High-profile and contentious exit from <em>Bhabi Ji Ghar Par Hai!</em> following disputes with the production team regarding working conditions and pay.</li><li>2017: Filed a complaint alleging sexual harassment against producer Sanjay R. Kohli; in 2026, she publicly clarified the nature of the dispute, framing it within the context of complex contractual disagreements.</li></ul>"
-          },
-          {
-            "heading": "Social Media Presence",
-            "html": "<ul><li>Instagram: @shilpashinde_official</li></ul>"
-          },
-          {
-            "heading": "Trivia / Fun Facts",
-            "html": "<p>She personally designed and decorated her home. Despite being Maharashtrian, her portrayal of a North Indian character with a specific 'Bihari' dialect became a cultural phenomenon in India.</p>"
           }
         ]
       }
@@ -3030,13 +2966,6 @@
   "HIDDEN_SHOWS_INIT": [
     "traitors",
     "kkk",
-    "bb20",
-    "alliance"
-  ],
-  "HIDDEN_INIT": [
-    "lockupp::31",
-    "lockupp::32",
-    "lockupp::30",
-    "lockupp::19"
+    "bb20"
   ]
 }

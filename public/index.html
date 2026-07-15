@@ -5,16 +5,16 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Reality TV Intel · BobMasterBillie</title>
   <meta name="description" content="Indian Reality TV Season Tracker — live follower analytics, rankings and contestant intel across KKK, Lock Upp, Alliance India, Traitors India and Bigg Boss.">
-  <link rel="canonical" href="https://realitytv-intel.vercel.app/">
+  <link rel="canonical" href="https://realitytv-intel.vercel.app/index.html">
 
   <!-- Open Graph / social share preview -->
-  <meta property="og:title" content="Reality TV Intel">
+  <meta property="og:title" content="Reality TV Intel — Dashboard">
   <meta property="og:description" content="Live follower analytics, rankings, and contestant intel across India's biggest reality TV shows.">
   <meta property="og:image" content="https://realitytv-intel.vercel.app/img/logo-banner.png">
-  <meta property="og:url" content="https://realitytv-intel.vercel.app/">
+  <meta property="og:url" content="https://realitytv-intel.vercel.app/index.html">
   <meta property="og:type" content="website">
   <meta name="twitter:card" content="summary_large_image">
-  <meta name="twitter:title" content="Reality TV Intel">
+  <meta name="twitter:title" content="Reality TV Intel — Dashboard">
   <meta name="twitter:description" content="Live follower analytics, rankings, and contestant intel across India's biggest reality TV shows.">
   <meta name="twitter:image" content="https://realitytv-intel.vercel.app/img/logo-banner.png">
   <meta name="theme-color" content="#08080F">
@@ -37,17 +37,16 @@
   <!-- html2canvas for screenshots (defer so it doesn't block render) -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js" defer></script>
 
-  <!-- Structured data: this page IS the product (no separate landing page in the crawl path) -->
+  <!-- Structured data: the dashboard itself — the 3D landing page at
+       the site root carries the primary WebApplication entry -->
   <script type="application/ld+json">
   {
     "@context": "https://schema.org",
-    "@type": "WebApplication",
-    "name": "Reality TV Intel",
-    "url": "https://realitytv-intel.vercel.app/",
-    "description": "Live follower analytics, rankings, and contestant intel across India's biggest reality TV shows — KKK, Lock Upp, Alliance India, Traitors India and Bigg Boss.",
-    "applicationCategory": "EntertainmentApplication",
-    "operatingSystem": "Any",
-    "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" }
+    "@type": "WebPage",
+    "name": "Reality TV Intel — Dashboard",
+    "url": "https://realitytv-intel.vercel.app/index.html",
+    "isPartOf": { "@type": "WebApplication", "name": "Reality TV Intel", "url": "https://realitytv-intel.vercel.app/" },
+    "description": "Live follower analytics, rankings, and contestant intel across India's biggest reality TV shows."
   }
   </script>
 </head>
@@ -60,7 +59,7 @@
   <header class="topbar">
 
     <div class="brand">
-      <img class="brand-icon" src="img/logo-icon.png" alt="Reality TV Intel logo">
+      <a href="/" title="Back to the 3D experience"><img class="brand-icon" src="img/logo-icon.png" alt="Reality TV Intel logo"></a>
       <div>
         <h1 class="brand-name">Reality TV Intel</h1>
         <p class="brand-sub">Season Tracker</p>

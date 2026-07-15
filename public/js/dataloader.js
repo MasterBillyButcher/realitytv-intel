@@ -131,6 +131,25 @@ function _renderApp() {
     const t = localStorage.getItem('realityTV2026_theme') || 'dark';
     if (typeof setTheme === 'function') setTheme(t, false);
   } catch {}
+
+  _applyDeepLinkOnce();
+}
+
+/** Honors ?show=<key> (e.g. from a link on landing.html's 3D show
+ * portals) by opening that show's panel directly. Only fires once, on
+ * the first successful render — a later background GitHub refresh
+ * re-running _renderApp() must never yank the visitor back to this
+ * panel if they've since navigated elsewhere in the app. */
+let _deepLinkApplied = false;
+function _applyDeepLinkOnce() {
+  if (_deepLinkApplied) return;
+  _deepLinkApplied = true;
+  try {
+    const key = new URLSearchParams(location.search).get('show');
+    if (key && window.SHOWS && window.SHOWS[key] && typeof showPanel === 'function') {
+      showPanel('show-' + key);
+    }
+  } catch {}
 }
 
 async function bootApp() {
