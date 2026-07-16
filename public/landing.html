@@ -43,11 +43,11 @@
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 
 <script type="importmap">
-{ "imports": { "three": "https://unpkg.com/three@0.160.0/build/three.module.js", "three/addons/": "https://unpkg.com/three@0.160.0/examples/jsm/" } }
+{ "imports": { "three": "vendor/three/build/three.module.min.js", "three/addons/": "vendor/three/addons/" } }
 </script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/lenis/1.1.13/lenis.min.js"></script>
+<script src="vendor/gsap/gsap.min.js"></script>
+<script src="vendor/gsap/ScrollTrigger.min.js"></script>
+<script src="vendor/lenis/lenis.min.js"></script>
 
 <style>
 :root{
@@ -84,13 +84,46 @@ img{ display:block; max-width:100%; }
 @media (max-width:860px){ #cursor-dot,#cursor-ring{ display:none; } }
 
 #progress{ position:fixed; top:0; left:0; height:2px; width:0%; z-index:900; background:linear-gradient(90deg,var(--pur),var(--acc),var(--gld)); }
-#scene-wrap{ position:fixed; inset:0; z-index:1; }
+#scene-wrap{ position:fixed; inset:0; z-index:1; overflow:hidden; }
 #scene-wrap canvas{ display:block; width:100%; height:100%; }
+
+/* CSS-only ambient background — pure CSS, zero JS dependency, so it
+   renders no matter what happens to the 3D scene or any script on the
+   page. This is the actual visual fallback (not an apology banner):
+   glowing drifting orbs in the brand palette + a starfield. When
+   WebGL successfully initializes, JS adds .has-3d to fade this behind
+   the real canvas; if it never does, this simply stays as the scene. */
+#scene-wrap::before, #scene-wrap::after{
+  content:''; position:absolute; inset:-10%; z-index:1;
+  background:
+    radial-gradient(38em 38em at 18% 24%, rgba(74,158,255,.30), transparent 60%),
+    radial-gradient(34em 34em at 82% 30%, rgba(139,92,246,.28), transparent 60%),
+    radial-gradient(30em 30em at 50% 82%, rgba(245,166,35,.20), transparent 60%),
+    radial-gradient(26em 26em at 78% 78%, rgba(229,62,106,.22), transparent 60%);
+  filter:blur(2px);
+  animation: ambientDrift 22s ease-in-out infinite alternate;
+  transition: opacity 1s ease;
+}
+#scene-wrap::after{
+  background:
+    radial-gradient(1.5px 1.5px at 12% 30%, #fff, transparent),
+    radial-gradient(1.5px 1.5px at 78% 62%, #fff, transparent),
+    radial-gradient(1px 1px at 44% 18%, #fff, transparent),
+    radial-gradient(1px 1px at 60% 84%, #fff, transparent),
+    radial-gradient(1.5px 1.5px at 30% 70%, #fff, transparent),
+    radial-gradient(1px 1px at 90% 20%, #fff, transparent),
+    radial-gradient(1px 1px at 20% 90%, #fff, transparent);
+  opacity:.5; filter:none; animation: ambientDrift 30s ease-in-out infinite alternate-reverse;
+}
+#scene-wrap.has-3d::before, #scene-wrap.has-3d::after{ opacity:0; }
+@keyframes ambientDrift{
+  0%{ transform:translate(0,0) scale(1); }
+  100%{ transform:translate(-2%,2%) scale(1.06); }
+}
+@media (prefers-reduced-motion: reduce){ #scene-wrap::before, #scene-wrap::after{ animation:none; } }
 main{ position:relative; z-index:2; }
 
 #warp-overlay{ position:fixed; inset:0; z-index:950; background:var(--portal-color, var(--acc)); opacity:0; pointer-events:none; }
-
-#no-webgl{ position:fixed; bottom:18px; left:50%; transform:translateX(-50%); z-index:110; font-family:var(--f-mono); font-size:11px; color:var(--txt-dim); background:var(--panel); border:1px solid var(--divider); padding:9px 16px; border-radius:100px; max-width:90vw; text-align:center; }
 
 nav{ position:fixed; top:0; left:0; right:0; z-index:100; display:flex; align-items:center; justify-content:space-between; padding:24px 5vw; }
 nav .brand{ display:flex; align-items:center; gap:10px; text-decoration:none; color:inherit; }
@@ -191,9 +224,9 @@ footer a{ color:var(--txt-dim); }
 
 <script>
 /* FAILSAFE — runs as a plain script, independent of the module below.
-   The module depends on three external CDNs (unpkg for Three.js,
-   cdnjs for GSAP/ScrollTrigger/Lenis). If any of them is slow, blocked
-   by an ad blocker/privacy extension, or down, the module can stall or
+   Three.js/GSAP/Lenis are self-hosted from vendor/ (no external CDN
+   dependency), but this still guards against any unexpected runtime
+   error, slow device, or WebGL init failure so the module can never stall or
    throw — and without this, the loading screen would stay up forever
    and the hero text (which starts at opacity:0, only revealed by a
    GSAP animation) would never appear. This guarantees the page reveals
@@ -211,7 +244,6 @@ setTimeout(function () {
 <div id="progress"></div>
 <div id="scene-wrap"></div>
 <div id="warp-overlay"></div>
-<div id="no-webgl" hidden>Your browser can't render the 3D scene, so you're seeing the streamlined version. Everything below still works.</div>
 
 <nav>
   <a href="#hero" class="brand"><img src="img/logo-icon.png" alt=""><span>REALITY TV INTEL</span></a>
@@ -419,8 +451,9 @@ async function loadLiveData() {
 loadLiveData();
 
 /* THREE.JS — dynamically imported and try/caught on its own: if
-   unpkg is slow/blocked/down, this fails without taking the rest of
-   the page (loader, hero, stats, show cards, nav) down with it. */
+   the device/browser can't init WebGL (old GPU drivers, disabled
+   hardware acceleration, restrictive embedded webviews), this fails
+   without taking the rest of the page down with it. */
 let THREE = null, EffectComposer, RenderPass, UnrealBloomPass;
 if (WEBGL_OK) {
   try {
@@ -444,6 +477,7 @@ const renderer = new THREE.WebGLRenderer({ antialias:true, alpha:true, powerPref
 renderer.setPixelRatio(Math.min(devicePixelRatio, MOBILE ? 1.5 : 2));
 renderer.setSize(innerWidth, innerHeight);
 wrap.appendChild(renderer.domElement);
+wrap.classList.add('has-3d');
 
 scene.add(new THREE.AmbientLight(0x141428, 1.2));
 const keyLight = new THREE.PointLight(0x4A9EFF, 22, 30); keyLight.position.set(4,4,5); scene.add(keyLight);
@@ -702,8 +736,10 @@ window.addEventListener('resize', () => { clearTimeout(resizeTimer); resizeTimer
 window.addEventListener('orientationchange', () => { clearTimeout(resizeTimer); resizeTimer = setTimeout(handleResize, 250); });
 
 } else {
-  const wrapEl = document.getElementById('scene-wrap'); if (wrapEl) wrapEl.remove();
-  const notice = document.getElementById('no-webgl'); if (notice) notice.hidden = false;
+  // scene-wrap is intentionally left in place — its CSS ::before/::after
+  // ambient background (glowing orbs + starfield, pure CSS, no JS) is
+  // the real fallback here, not an apology. The hint copy just needs
+  // to stop promising an interaction that isn't available.
   const hint = document.getElementById('portal-hint');
   if (hint) hint.textContent = 'Browse the shows below';
 }
@@ -742,8 +778,10 @@ document.getElementById('enter-btn')?.addEventListener('click', function(e){
   document.getElementById('loader')?.classList.add('done');
   document.querySelectorAll('#hero h1 .line span, #hero p, #hero .eyebrow, #hero .scrollcue')
     .forEach(el => { el.style.opacity = 1; el.style.transform = 'none'; });
-  document.getElementById('scene-wrap')?.remove();
-  const notice = document.getElementById('no-webgl'); if (notice) notice.hidden = false;
+  // scene-wrap stays — its pure-CSS ambient background needs no JS at
+  // all, so it still renders even from inside this catch block.
+  const hint = document.getElementById('portal-hint');
+  if (hint) hint.textContent = 'Browse the shows below';
 }
 })();
 </script>
