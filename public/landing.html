@@ -3,8 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Reality TV Intel — Live Follower Analytics for India's Biggest Reality Shows</title>
-<meta name="description" content="Step inside a live 3D tracker for India's biggest reality TV shows — real-time Instagram growth, cross-show rankings, and full contestant intel for KKK, Lock Upp, Alliance India, Traitors India and Bigg Boss.">
+<title>Reality TV Intel: Live Follower Analytics for India's Biggest Reality Shows</title>
+<meta name="description" content="A live 3D tracker for India's biggest reality TV shows. Real-time Instagram growth, cross-show rankings, and full contestant intel for KKK, Lock Upp, Alliance India, Traitors India and Bigg Boss.">
 <link rel="canonical" href="https://realitytv-intel.vercel.app/">
 
 <meta property="og:title" content="Reality TV Intel">
@@ -31,7 +31,7 @@
   "@type": "WebApplication",
   "name": "Reality TV Intel",
   "url": "https://realitytv-intel.vercel.app/",
-  "description": "Live follower analytics, rankings, and contestant intel across India's biggest reality TV shows — KKK, Lock Upp, Alliance India, Traitors India and Bigg Boss.",
+  "description": "Live follower analytics, rankings, and contestant intel across India's biggest reality TV shows: KKK, Lock Upp, Alliance India, Traitors India and Bigg Boss.",
   "applicationCategory": "EntertainmentApplication",
   "operatingSystem": "Any",
   "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" }
@@ -60,8 +60,9 @@
 }
 *,*::before,*::after{ box-sizing:border-box; margin:0; padding:0; }
 html{ background:var(--bg); }
-body{ background:var(--bg); color:var(--txt); font-family:var(--f-body); font-weight:300; overflow-x:hidden; cursor:none; }
-@media (max-width:860px){ body{ cursor:auto; } }
+body{ background:var(--bg); color:var(--txt); font-family:var(--f-body); font-weight:300; overflow-x:hidden; }
+body.custom-cursor-active{ cursor:none; }
+@media (max-width:860px){ body.custom-cursor-active{ cursor:auto; } }
 ::selection{ background:var(--pur); color:#fff; }
 img{ display:block; max-width:100%; }
 @media (prefers-reduced-motion: reduce){ *{ animation-duration:.01ms !important; transition-duration:.01ms !important; } }
@@ -92,14 +93,17 @@ main{ position:relative; z-index:2; }
 #no-webgl{ position:fixed; bottom:18px; left:50%; transform:translateX(-50%); z-index:110; font-family:var(--f-mono); font-size:11px; color:var(--txt-dim); background:var(--panel); border:1px solid var(--divider); padding:9px 16px; border-radius:100px; max-width:90vw; text-align:center; }
 
 nav{ position:fixed; top:0; left:0; right:0; z-index:100; display:flex; align-items:center; justify-content:space-between; padding:24px 5vw; }
-nav .brand{ display:flex; align-items:center; gap:10px; }
+nav .brand{ display:flex; align-items:center; gap:10px; text-decoration:none; color:inherit; }
 nav .brand img{ width:30px; height:30px; border-radius:8px; }
 nav .brand span{ font-family:var(--f-display); font-weight:700; font-size:14px; letter-spacing:.1em; }
 nav .nav-right{ display:flex; align-items:center; gap:22px; }
+nav .nav-link{ font-family:var(--f-mono); font-size:11px; letter-spacing:.1em; text-transform:uppercase; color:var(--txt2); text-decoration:none; transition:color .3s; }
+nav .nav-link:hover{ color:var(--txt); }
 nav .live{ display:flex; align-items:center; gap:7px; font-family:var(--f-mono); font-size:11px; letter-spacing:.12em; color:var(--txt2); text-transform:uppercase; }
 nav .live i{ width:6px; height:6px; border-radius:50%; background:#22C55E; box-shadow:0 0 8px #22C55E; animation:pulse 1.8s infinite; }
 nav .nav-dash{ font-family:var(--f-mono); font-size:11px; letter-spacing:.1em; text-transform:uppercase; color:var(--txt2); text-decoration:none; padding:9px 16px; border:1px solid var(--divider); border-radius:100px; transition:color .3s,border-color .3s,background .3s; }
 nav .nav-dash:hover{ color:var(--txt); border-color:var(--acc); background:rgba(74,158,255,.08); }
+@media (max-width:700px){ nav .nav-link{ display:none; } }
 @media (max-width:600px){ nav .live span, nav .live{ display:none; } }
 @keyframes pulse{ 0%,100%{opacity:1;} 50%{opacity:.35;} }
 
@@ -115,12 +119,12 @@ nav .nav-dash:hover{ color:var(--txt); border-color:var(--acc); background:rgba(
 
 section{ position:relative; padding:0 5vw; }
 
-#hero{ min-height:100vh; display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center; gap:22px; }
+#hero{ min-height:100vh; min-height:100svh; display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center; gap:22px; }
 #hero .eyebrow{ font-family:var(--f-mono); font-size:12px; letter-spacing:.28em; text-transform:uppercase; color:var(--gld); opacity:0; }
 #hero h1{ font-family:var(--f-display); font-weight:600; font-size:clamp(42px,8.5vw,116px); line-height:.98; letter-spacing:-.02em; overflow:hidden; }
 #hero h1 .line{ display:block; overflow:hidden; }
 #hero h1 .line span{ display:inline-block; transform:translateY(110%); }
-#hero h1 .grad{ background:linear-gradient(90deg,var(--pur),var(--acc)); -webkit-background-clip:text; background-clip:text; color:transparent; }
+#hero h1 .accent{ color:var(--acc); }
 #hero p{ max-width:520px; color:var(--txt2); font-size:16px; line-height:1.6; opacity:0; }
 #hero .scrollcue{ position:absolute; bottom:44px; left:50%; transform:translateX(-50%); display:flex; flex-direction:column; align-items:center; gap:10px; font-family:var(--f-mono); font-size:10px; letter-spacing:.2em; color:var(--txt-dim); opacity:0; }
 #hero .scrollcue .wire{ width:1px; height:44px; background:var(--divider); position:relative; overflow:hidden; }
@@ -133,14 +137,14 @@ section{ position:relative; padding:0 5vw; }
 .sec-head p{ margin-top:16px; color:var(--txt2); font-size:16px; line-height:1.7; max-width:520px; }
 
 /* FEATURES */
-#features{ min-height:100vh; padding-top:16vh; padding-bottom:10vh; }
+#features{ min-height:100vh; min-height:100svh; padding-top:16vh; padding-bottom:10vh; }
 .feat-row{ display:grid; grid-template-columns:repeat(2,1fr); gap:20px; }
 @media (max-width:800px){ .feat-row{ grid-template-columns:1fr; } }
 .glass-card{ position:relative; padding:32px 28px; border-radius:8px; background:var(--panel); border:1px solid var(--divider); backdrop-filter:blur(18px) saturate(140%); -webkit-backdrop-filter:blur(18px) saturate(140%); transform-style:preserve-3d; overflow:hidden; transition:border-color .4s; }
 .glass-card::before{ content:''; position:absolute; inset:0; background:radial-gradient(420px circle at var(--mx,50%) var(--my,50%), rgba(139,92,246,.14), transparent 60%); opacity:0; transition:opacity .4s; }
 .glass-card:hover::before{ opacity:1; }
 .glass-card:hover{ border-color:rgba(139,92,246,.4); }
-.glass-card .ico{ font-size:26px; }
+.glass-card .idx{ font-family:var(--f-mono); font-size:13px; letter-spacing:.1em; color:var(--acc); opacity:.7; }
 .glass-card h3{ font-family:var(--f-display); font-size:20px; font-weight:600; margin:16px 0 10px; }
 .glass-card p{ font-size:14px; color:var(--txt2); line-height:1.65; }
 
@@ -153,7 +157,7 @@ section{ position:relative; padding:0 5vw; }
 @media (max-width:700px){ .stat-grid{ grid-template-columns:1fr 1fr; } }
 
 /* SHOWS */
-#shows{ min-height:100vh; padding-top:14vh; padding-bottom:14vh; }
+#shows{ min-height:100vh; min-height:100svh; padding-top:14vh; padding-bottom:14vh; }
 .portal-hint{ font-family:var(--f-mono); font-size:12px; letter-spacing:.06em; color:var(--txt-dim); margin-top:14px; }
 .show-row{ display:grid; grid-template-columns:repeat(auto-fit, minmax(220px, 1fr)); gap:20px; }
 @media (max-width:800px){ .show-row{ grid-template-columns:1fr; } }
@@ -185,18 +189,37 @@ footer a{ color:var(--txt-dim); }
   <div id="loader-pct">00%</div>
 </div>
 
+<script>
+/* FAILSAFE — runs as a plain script, independent of the module below.
+   The module depends on three external CDNs (unpkg for Three.js,
+   cdnjs for GSAP/ScrollTrigger/Lenis). If any of them is slow, blocked
+   by an ad blocker/privacy extension, or down, the module can stall or
+   throw — and without this, the loading screen would stay up forever
+   and the hero text (which starts at opacity:0, only revealed by a
+   GSAP animation) would never appear. This guarantees the page reveals
+   itself no matter what happens to those third-party scripts. */
+setTimeout(function () {
+  var l = document.getElementById('loader');
+  if (l && !l.classList.contains('done')) l.classList.add('done');
+  document.querySelectorAll('#hero h1 .line span, #hero p, #hero .eyebrow, #hero .scrollcue')
+    .forEach(function (el) { el.style.opacity = 1; el.style.transform = 'none'; });
+}, 3200);
+</script>
+
 <div id="cursor-dot"></div>
 <div id="cursor-ring"></div>
 <div id="progress"></div>
 <div id="scene-wrap"></div>
 <div id="warp-overlay"></div>
-<div id="no-webgl" hidden>Your browser can't render the 3D scene, so you're seeing the streamlined version — everything below still works.</div>
+<div id="no-webgl" hidden>Your browser can't render the 3D scene, so you're seeing the streamlined version. Everything below still works.</div>
 
 <nav>
-  <div class="brand"><img src="img/logo-icon.png" alt=""><span>REALITY TV INTEL</span></div>
+  <a href="#hero" class="brand"><img src="img/logo-icon.png" alt=""><span>REALITY TV INTEL</span></a>
   <div class="nav-right">
-    <div class="live"><i></i>LIVE SEASON</div>
-    <a href="index.html" class="nav-dash">Dashboard →</a>
+    <a href="#features" class="nav-link">Features</a>
+    <a href="#shows" class="nav-link">Shows</a>
+    <div class="live"><i></i>LIVE</div>
+    <a href="index.html" class="nav-dash">Dashboard</a>
   </div>
 </nav>
 
@@ -208,10 +231,11 @@ footer a{ color:var(--txt-dim); }
     <span class="eyebrow">SEASON TRACKER · 2026</span>
     <h1>
       <span class="line"><span>Every follower.</span></span>
-      <span class="line"><span class="grad">Every ranking.</span></span>
+      <span class="line"><span class="accent">Every ranking.</span></span>
       <span class="line"><span>Live.</span></span>
     </h1>
-    <p>Real-time Instagram growth, cross-show rankings, and full contestant intel across India's biggest reality TV seasons — updated the moment it changes.</p>
+    <p>Real-time Instagram growth, cross-show rankings, and full contestant intel across India's biggest reality TV seasons, updated the moment it changes.</p>
+    <p id="portal-hint" class="portal-hint">The glowing orbs around you are live shows. Move your cursor to look around, click one to step inside.</p>
     <div class="scrollcue"><span>SCROLL</span><div class="wire"><i></i></div></div>
   </section>
 
@@ -221,10 +245,10 @@ footer a{ color:var(--txt-dim); }
       <h2>Built for people who<br>refresh the rankings daily.</h2>
     </div>
     <div class="feat-row">
-      <div class="glass-card" data-tilt><div class="ico">🏆</div><h3>Cross-Show Rankings</h3><p>Every confirmed contestant, every show, ranked by real follower count — filterable by status, gender, or show.</p></div>
-      <div class="glass-card" data-tilt><div class="ico">📈</div><h3>Growth Tracking</h3><p>Before → Last Checked → Current. See exactly how fast someone's following is moving, not just where it stands today.</p></div>
-      <div class="glass-card" data-tilt><div class="ico">🔄</div><h3>Live Instagram Refresh</h3><p>Real follower counts pulled on demand — no manual entry, no guessing, no stale numbers.</p></div>
-      <div class="glass-card" data-tilt><div class="ico">📇</div><h3>Full Bio Profiles</h3><p>Career history, reality TV journey, personal life, trivia — one tap on any contestant.</p></div>
+      <div class="glass-card" data-tilt><div class="idx">01</div><h3>Cross-Show Rankings</h3><p>Every confirmed contestant, every show, ranked by real follower count. Filter by status, gender, or show.</p></div>
+      <div class="glass-card" data-tilt><div class="idx">02</div><h3>Growth Tracking</h3><p>Before, Last Checked, Current: see exactly how fast someone's following is moving, not just where it stands today.</p></div>
+      <div class="glass-card" data-tilt><div class="idx">03</div><h3>Live Instagram Refresh</h3><p>Real follower counts pulled on demand. No manual entry, no guessing, no stale numbers.</p></div>
+      <div class="glass-card" data-tilt><div class="idx">04</div><h3>Full Bio Profiles</h3><p>Career history, reality TV journey, personal life, trivia: one tap on any contestant.</p></div>
     </div>
   </section>
 
@@ -247,17 +271,16 @@ footer a{ color:var(--txt-dim); }
     <div class="sec-head">
       <span class="tag">The Shows</span>
       <h2>Tracked, right now.</h2>
-      <p id="portal-hint" class="portal-hint">Move your cursor to look around · click a show to step inside</p>
     </div>
     <div class="show-row" id="show-row">
-      <!-- populated from live data.js — see script below -->
+      <!-- populated from live data.js, see script below -->
     </div>
   </section>
 
   <section id="cta">
-    <span class="tag" style="color:var(--gld);">ENTER THE TRACKER</span>
+    <span class="tag" style="color:var(--gld);">DASHBOARD</span>
     <h2>See where everyone<br>actually stands.</h2>
-    <p>Live rankings, growth charts, and full rosters — no login needed to browse.</p>
+    <p>Live rankings, growth charts, and full rosters. No login needed to browse.</p>
     <a href="index.html" class="btn" id="enter-btn">Open Dashboard →</a>
   </section>
 
@@ -269,59 +292,59 @@ footer a{ color:var(--txt-dim); }
 </footer>
 
 <script type="module">
-import * as THREE from 'three';
-import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
-import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
-import { UnrealBloomPass } from 'three/addons/postprocessing/UnrealBloomPass.js';
+(async () => {
+try {
 
 const REDUCED = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 const MOBILE  = innerWidth < 760 || (navigator.hardwareConcurrency && navigator.hardwareConcurrency <= 4);
 
-/* WebGL feature detection — devices/browsers that can't render the scene
-   get the streamlined page instead of a blank canvas or a thrown error.
-   Everything below (stats, show cards, dashboard link) works either way. */
 function hasWebGL() {
   try {
     const c = document.createElement('canvas');
     return !!(window.WebGLRenderingContext && (c.getContext('webgl') || c.getContext('experimental-webgl')));
   } catch (e) { return false; }
 }
-const WEBGL_OK = hasWebGL();
+let WEBGL_OK = hasWebGL();
 
-/* LOADER */
+/* LOADER — the setTimeout failsafe further up in the page guarantees
+   this can never trap the page even if everything below fails. */
 const loaderFill = document.getElementById('loader-fill');
 const loaderPct  = document.getElementById('loader-pct');
 const loaderEl   = document.getElementById('loader');
 let pct = 0;
 const loaderTimer = setInterval(() => {
-  pct += Math.random() * 18;
+  pct += Math.random() * 22;
   if (pct >= 100) { pct = 100; clearInterval(loaderTimer); finishLoad(); }
   loaderFill.style.width = pct + '%';
   loaderPct.textContent = String(Math.floor(pct)).padStart(2,'0') + '%';
-}, 130);
-function finishLoad(){ setTimeout(() => { loaderEl.classList.add('done'); playHeroIntro(); }, 220); }
+}, 90);
+function finishLoad(){ setTimeout(() => { loaderEl.classList.add('done'); playHeroIntro(); }, 180); }
 function playHeroIntro(){
-  if (REDUCED){
-    document.querySelectorAll('#hero h1 .line span, #hero p, #hero .eyebrow, #hero .scrollcue')
-      .forEach(el => { el.style.opacity = 1; el.style.transform = 'none'; });
+  const revealTargets = '#hero h1 .line span, #hero p, #hero .eyebrow, #hero .scrollcue';
+  if (REDUCED || typeof gsap === 'undefined') {
+    document.querySelectorAll(revealTargets).forEach(el => { el.style.opacity = 1; el.style.transform = 'none'; });
     return;
   }
-  const tl = gsap.timeline({ delay:.2 });
+  const tl = gsap.timeline({ delay:.15 });
   tl.to('#hero .eyebrow', { opacity:1, duration:.6, ease:'power2.out' })
-    .to('#hero h1 .line span', { y:'0%', duration:1.1, stagger:.12, ease:'power4.out' }, '-=.2')
-    .to('#hero p', { opacity:1, duration:.8, ease:'power2.out' }, '-=.5')
+    .to('#hero h1 .line span', { y:'0%', duration:1.05, stagger:.1, ease:'power4.out' }, '-=.2')
+    .to('#hero p', { opacity:1, duration:.7, ease:'power2.out' }, '-=.5')
+    .to('#portal-hint', { opacity:1, duration:.7, ease:'power2.out' }, '-=.4')
     .to('#hero .scrollcue', { opacity:1, duration:.6 }, '-=.3');
 }
 
-/* CURSOR */
+/* CURSOR — only takes over from the native cursor once it's confirmed
+   running (see body.custom-cursor-active in CSS), so a failure here
+   never leaves the user without any visible pointer. */
 const dot = document.getElementById('cursor-dot');
 const ring = document.getElementById('cursor-ring');
 let mx=innerWidth/2, my=innerHeight/2, rx=mx, ry=my;
+if (!MOBILE) document.body.classList.add('custom-cursor-active');
 window.addEventListener('mousemove', e => { mx=e.clientX; my=e.clientY; });
-(function loop(){ rx+=(mx-rx)*.16; ry+=(my-ry)*.16;
+(function cursorLoop(){ rx+=(mx-rx)*.16; ry+=(my-ry)*.16;
   dot.style.transform=`translate(${mx}px,${my}px) translate(-50%,-50%)`;
   ring.style.transform=`translate(${rx}px,${ry}px) translate(-50%,-50%)`;
-  requestAnimationFrame(loop);
+  requestAnimationFrame(cursorLoop);
 })();
 document.querySelectorAll('a,button,[data-tilt]').forEach(el=>{
   el.addEventListener('mouseenter',()=>ring.classList.add('hover'));
@@ -336,12 +359,10 @@ gsap.ticker.add((t)=>lenis.raf(t*1000));
 gsap.ticker.lagSmoothing(0);
 ScrollTrigger.create({ start:0, end:'max', onUpdate:(s)=>{ document.getElementById('progress').style.width=(s.progress*100)+'%'; } });
 
-/* ─── LIVE DATA — stats + show gallery are no longer hardcoded ───
-   Same same-origin fetch pattern the dashboard uses. Runs independently
-   of the WebGL scene so the numbers and show cards are correct even on
-   devices that fall back to the streamlined page. */
+/* ─── LIVE DATA — stats + show gallery pulled from the real data.js,
+   same fetch pattern the dashboard uses. Independent of the 3D scene. */
 let SHOW_KEYS = [], SHOWS_DATA = {}, DB_DATA = {};
-let _buildPortals = null; // wired up below, only if WEBGL_OK
+let _buildPortals = null;
 
 function escapeHtml(s){
   return String(s).replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
@@ -386,7 +407,7 @@ async function loadLiveData() {
   try {
     const res = await fetch('data/data.js', { cache: 'no-cache' });
     if (!res.ok) throw new Error('HTTP ' + res.status);
-    const parsed = JSON.parse(await res.text()); // strict JSON only, same as the dashboard
+    const parsed = JSON.parse(await res.text());
     SHOWS_DATA = parsed.SHOWS || {};
     DB_DATA    = parsed.DB || {};
     SHOW_KEYS  = Object.keys(SHOWS_DATA);
@@ -395,29 +416,40 @@ async function loadLiveData() {
   }
   populateStatsAndShows();
 }
-loadLiveData(); // fires immediately, doesn't block the loader or the 3D scene
+loadLiveData();
 
-/* THREE.JS — growth-bars signature element + interactive show portals */
+/* THREE.JS — dynamically imported and try/caught on its own: if
+   unpkg is slow/blocked/down, this fails without taking the rest of
+   the page (loader, hero, stats, show cards, nav) down with it. */
+let THREE = null, EffectComposer, RenderPass, UnrealBloomPass;
 if (WEBGL_OK) {
+  try {
+    THREE = await import('three');
+    ({ EffectComposer } = await import('three/addons/postprocessing/EffectComposer.js'));
+    ({ RenderPass }     = await import('three/addons/postprocessing/RenderPass.js'));
+    ({ UnrealBloomPass } = await import('three/addons/postprocessing/UnrealBloomPass.js'));
+  } catch (e) {
+    console.warn('[Landing] Three.js failed to load — showing streamlined page:', e.message);
+    WEBGL_OK = false;
+  }
+}
+
+if (WEBGL_OK && THREE) {
 const wrap = document.getElementById('scene-wrap');
 const scene = new THREE.Scene();
 scene.fog = new THREE.FogExp2(0x08080F, 0.045);
-const camera = new THREE.PerspectiveCamera(45, innerWidth/innerHeight, .1, 100);
-camera.position.set(0,1,10);
+const camera = new THREE.PerspectiveCamera(50, innerWidth/innerHeight, .1, 100);
+camera.position.set(0, 1, 8.5);
 const renderer = new THREE.WebGLRenderer({ antialias:true, alpha:true, powerPreference:'high-performance' });
 renderer.setPixelRatio(Math.min(devicePixelRatio, MOBILE ? 1.5 : 2));
 renderer.setSize(innerWidth, innerHeight);
 wrap.appendChild(renderer.domElement);
 
 scene.add(new THREE.AmbientLight(0x141428, 1.2));
-const keyLight = new THREE.PointLight(0x4A9EFF, 20, 30); keyLight.position.set(4,4,5); scene.add(keyLight);
-const rimLight = new THREE.PointLight(0x8B5CF6, 14, 30); rimLight.position.set(-5,-1,-4); scene.add(rimLight);
-const gldLight = new THREE.PointLight(0xF5A623, 8, 20); gldLight.position.set(0,-3,3); scene.add(gldLight);
+const keyLight = new THREE.PointLight(0x4A9EFF, 22, 30); keyLight.position.set(4,4,5); scene.add(keyLight);
+const rimLight = new THREE.PointLight(0x8B5CF6, 16, 30); rimLight.position.set(-5,-1,-4); scene.add(rimLight);
+const gldLight = new THREE.PointLight(0xF5A623, 9, 20); gldLight.position.set(0,-3,3); scene.add(gldLight);
 
-/* A ring of glowing "growth bars" — heights represent follower momentum,
-   orbiting a central core. This is the thematic centerpiece: the whole
-   product is about watching numbers climb, so the hero visual IS a
-   live-feeling bar chart in 3D space rather than arbitrary geometry. */
 const BAR_COUNT = MOBILE ? 9 : 14;
 const bars = [];
 const barColors = [0x4A9EFF, 0x8B5CF6, 0xF5A623];
@@ -431,14 +463,14 @@ for (let i=0;i<BAR_COUNT;i++){
   });
   const bar = new THREE.Mesh(geo, mat);
   const ang = (i / BAR_COUNT) * Math.PI * 2;
-  const r = 3.2;
+  const r = 3.6;
   bar.position.set(Math.cos(ang)*r, h/2 - 1, Math.sin(ang)*r);
   bar.userData = { baseH:h, ang, r };
   scene.add(bar);
   bars.push(bar);
 }
 
-const coreGeo = new THREE.IcosahedronGeometry(.75, 1);
+const coreGeo = new THREE.IcosahedronGeometry(.7, 1);
 const coreMat = new THREE.MeshPhysicalMaterial({ color:0x13131F, metalness:.3, roughness:.15, transmission:.5, thickness:1.1, ior:1.4, clearcoat:1, clearcoatRoughness:.1 });
 const core = new THREE.Mesh(coreGeo, coreMat);
 scene.add(core);
@@ -456,24 +488,16 @@ scene.add(particles);
 
 const composer = new EffectComposer(renderer);
 composer.addPass(new RenderPass(scene, camera));
-const bloom = new UnrealBloomPass(new THREE.Vector2(innerWidth,innerHeight), REDUCED?0:(MOBILE?.4:.6), .5, .15);
+const bloom = new UnrealBloomPass(new THREE.Vector2(innerWidth,innerHeight), REDUCED?0:(MOBILE?.55:.85), .5, .15);
 composer.addPass(bloom);
 
-let mouseNX=0, mouseNY=0;
-window.addEventListener('mousemove', e=>{ mouseNX=(e.clientX/innerWidth-.5)*2; mouseNY=(e.clientY/innerHeight-.5)*2; });
-
-let sceneProgress = 0;
-ScrollTrigger.create({ start:0, end:'max', onUpdate: s => sceneProgress = s.progress });
-
 /* ─── SHOW PORTALS ──────────────────────────────────────────
-   Each live show becomes a glowing object in the scene, arranged in a
-   ring, with a floating billboarded label sprite above it. Scaled to
-   ~invisible by default and revealed only while the #shows section is
-   in view, so the hero itself stays clean and the reveal reads as a
-   deliberate "arriving somewhere" moment rather than clutter. */
+   Visible and interactive from the very first frame — this IS the
+   hero, not a reward for scrolling. Five glowing orbs (one per live
+   show, in that show's real brand color) orbit close to camera with
+   a floating name label above each. */
 let portalGroup = null;
 const portalMeshes = [];
-let portalVisibility = 0;
 let hoveredPortal = null;
 
 function makeLabelSprite(text, colorHex) {
@@ -487,9 +511,9 @@ function makeLabelSprite(text, colorHex) {
   ctx.fillText(text, 160, 36);
   const tex = new THREE.CanvasTexture(canvas);
   tex.minFilter = THREE.LinearFilter;
-  const mat = new THREE.SpriteMaterial({ map: tex, transparent: true, opacity: 0, depthWrite: false });
+  const mat = new THREE.SpriteMaterial({ map: tex, transparent: true, opacity: REDUCED ? 1 : 0, depthWrite: false });
   const sprite = new THREE.Sprite(mat);
-  sprite.scale.set(1.7, .38, 1);
+  sprite.scale.set(1.8, .4, 1);
   sprite.userData = { isLabel: true };
   return sprite;
 }
@@ -497,27 +521,28 @@ function makeLabelSprite(text, colorHex) {
 function buildPortals() {
   if (portalGroup) { scene.remove(portalGroup); portalMeshes.length = 0; }
   portalGroup = new THREE.Group();
-  const radius = 2.3;
-  SHOW_KEYS.forEach((k, i) => {
+  const radius = 2.6;
+  const keys = SHOW_KEYS.length ? SHOW_KEYS : [];
+  keys.forEach((k, i) => {
     const s = SHOWS_DATA[k] || {};
     const colorHex = s.color || '#8B5CF6';
     const color = new THREE.Color(colorHex);
-    const ang = (i / SHOW_KEYS.length) * Math.PI * 2;
+    const ang = (i / keys.length) * Math.PI * 2;
 
-    const geo = new THREE.IcosahedronGeometry(.4, 1);
+    const geo = new THREE.IcosahedronGeometry(.5, 1);
     const mat = new THREE.MeshStandardMaterial({
-      color, emissive: color, emissiveIntensity: .6, metalness: .35, roughness: .3,
-      transparent: true, opacity: 0
+      color, emissive: color, emissiveIntensity: .65, metalness: .35, roughness: .3,
+      transparent: true, opacity: REDUCED ? .95 : 0
     });
     const mesh = new THREE.Mesh(geo, mat);
-    mesh.position.set(Math.cos(ang) * radius, .5, Math.sin(ang) * radius);
-    mesh.userData = { key: k, label: s.label || k, colorHex, count: (DB_DATA[k] || []).length };
-    mesh.scale.setScalar(0.0001);
+    mesh.position.set(Math.cos(ang) * radius, .35, Math.sin(ang) * radius);
+    mesh.userData = { key: k, label: s.label || k, colorHex, count: (DB_DATA[k] || []).length, baseScale: 1 };
+    mesh.scale.setScalar(REDUCED ? 1 : 0.0001);
     portalGroup.add(mesh);
     portalMeshes.push(mesh);
 
-    const ringGeo = new THREE.TorusGeometry(.52, .015, 8, 48);
-    const ringMat = new THREE.MeshBasicMaterial({ color, transparent: true, opacity: 0 });
+    const ringGeo = new THREE.TorusGeometry(.66, .018, 8, 48);
+    const ringMat = new THREE.MeshBasicMaterial({ color, transparent: true, opacity: REDUCED ? .8 : 0 });
     const accentRing = new THREE.Mesh(ringGeo, ringMat);
     accentRing.rotation.x = Math.PI / 2;
     accentRing.position.copy(mesh.position);
@@ -525,21 +550,42 @@ function buildPortals() {
     portalGroup.add(accentRing);
 
     const label = makeLabelSprite((s.emoji ? s.emoji + ' ' : '') + (s.label || k), colorHex);
-    label.position.set(mesh.position.x, mesh.position.y + .78, mesh.position.z);
+    label.position.set(mesh.position.x, mesh.position.y + .95, mesh.position.z);
     portalGroup.add(label);
   });
   scene.add(portalGroup);
+
+  if (!REDUCED) {
+    portalGroup.children.forEach((obj, idx) => {
+      const isMesh = obj.isMesh && !obj.userData.isRing;
+      gsap.to(obj.material, { opacity: obj.userData.isRing ? .8 : (isMesh ? 1 : 1), duration: 1, delay: .25 + idx*.03, ease:'power2.out' });
+      if (isMesh) gsap.to(obj.scale, { x:1, y:1, z:1, duration:1.1, delay: .25 + idx*.03, ease:'back.out(1.6)' });
+    });
+  }
 }
 _buildPortals = buildPortals;
 
-ScrollTrigger.create({
-  trigger: '#shows', start: 'top bottom', end: 'bottom top', scrub: true,
-  onUpdate: s => { portalVisibility = Math.max(0, Math.min(1, 1 - Math.abs(s.progress * 2 - 1))); }
+/* Drag-to-look-around — a real orbit control, not just decoration.
+   Pointer-drag rotates the whole scene azimuth; released, it keeps
+   drifting slightly and settles back toward the idle rotation. */
+let dragging = false, dragStartX = 0, dragStartRotY = 0, userRotY = 0, dragVelocity = 0, lastDragX = 0;
+const dom = renderer.domElement;
+dom.style.cursor = MOBILE ? 'default' : 'grab';
+dom.addEventListener('pointerdown', e => {
+  dragging = true; dragStartX = e.clientX; lastDragX = e.clientX; dragStartRotY = userRotY;
+  dom.style.cursor = 'grabbing';
 });
+window.addEventListener('pointermove', e => {
+  if (!dragging) return;
+  userRotY = dragStartRotY + (e.clientX - dragStartX) * .006;
+  dragVelocity = (e.clientX - lastDragX) * .006;
+  lastDragX = e.clientX;
+});
+window.addEventListener('pointerup', () => { dragging = false; dom.style.cursor = MOBILE ? 'default' : 'grab'; });
 
-/* Hover + click — raycast against the portal meshes only. Every portal
-   has an identical, fully accessible <a> counterpart in the DOM show
-   cards, so this is a bonus interaction layer, never the only way in. */
+/* Hover + click raycasting. Every portal has an identical, fully
+   accessible <a> counterpart in the DOM show cards below — this is a
+   bonus interaction layer, never the only way in. */
 const raycaster = new THREE.Raycaster();
 const ndc = new THREE.Vector2();
 const tooltip = document.getElementById('portal-tooltip');
@@ -547,10 +593,7 @@ const tooltipName = tooltip.querySelector('.pt-name');
 const tooltipMeta = tooltip.querySelector('.pt-meta');
 
 function checkHover(clientX, clientY) {
-  if (!portalMeshes.length || portalVisibility < 0.05) {
-    if (hoveredPortal) { hoveredPortal = null; tooltip.classList.remove('show'); ring.classList.remove('hover'); }
-    return;
-  }
+  if (!portalMeshes.length || dragging) return;
   ndc.x = (clientX / innerWidth) * 2 - 1;
   ndc.y = -(clientY / innerHeight) * 2 + 1;
   raycaster.setFromCamera(ndc, camera);
@@ -565,9 +608,11 @@ function checkHover(clientX, clientY) {
       tooltipMeta.textContent = hoveredPortal.userData.count + ' contestants · click to enter';
       tooltip.classList.add('show');
       ring.classList.add('hover');
+      dom.style.cursor = 'pointer';
     } else {
       tooltip.classList.remove('show');
       ring.classList.remove('hover');
+      dom.style.cursor = MOBILE ? 'default' : 'grab';
     }
   }
   if (hoveredPortal) { tooltip.style.left = clientX + 'px'; tooltip.style.top = clientY + 'px'; }
@@ -587,15 +632,26 @@ function enterShow(key, colorHex) {
   const mesh = portalMeshes.find(m => m.userData.key === key);
   const tl = gsap.timeline({ onComplete: () => { location.href = dest; } });
   if (mesh) {
-    tl.to(camera.position, { x: mesh.position.x * .6, y: mesh.position.y + .3, z: mesh.position.z * .6 + 2, duration: .9, ease: 'power2.in' }, 0)
-      .to(mesh.scale, { x: 2.4, y: 2.4, z: 2.4, duration: .9, ease: 'power2.in' }, 0);
+    const wp = mesh.getWorldPosition(new THREE.Vector3());
+    tl.to(camera.position, { x: wp.x * .6, y: wp.y + .3, z: wp.z * .6 + 2, duration: .9, ease: 'power2.in' }, 0)
+      .to(mesh.scale, { x: 2.6, y: 2.6, z: 2.6, duration: .9, ease: 'power2.in' }, 0);
   }
   tl.to(overlay, { opacity: 1, duration: .5, ease: 'power2.in' }, .5);
 }
+let dragMoved = false;
+dom.addEventListener('pointerdown', () => { dragMoved = false; });
+window.addEventListener('pointermove', e => { if (dragging) dragMoved = true; });
 window.addEventListener('click', e => {
-  checkHover(e.clientX, e.clientY); // fresh hit-test at the click point — covers touch taps with no prior pointermove
+  if (dragMoved) return; // a drag-to-look gesture shouldn't also trigger a click-to-enter
+  checkHover(e.clientX, e.clientY);
   if (hoveredPortal) enterShow(hoveredPortal.userData.key, hoveredPortal.userData.colorHex);
 });
+
+let mouseNX=0, mouseNY=0;
+window.addEventListener('mousemove', e=>{ mouseNX=(e.clientX/innerWidth-.5)*2; mouseNY=(e.clientY/innerHeight-.5)*2; });
+
+let sceneProgress = 0;
+ScrollTrigger.create({ start:0, end:'max', onUpdate: s => sceneProgress = s.progress });
 
 const clock = new THREE.Clock();
 function animate(){
@@ -603,39 +659,31 @@ function animate(){
   const t = clock.getElapsedTime();
 
   core.rotation.y += .002;
-  scene.rotation.y = sceneProgress * Math.PI * .7 + Math.sin(t*.15)*.05;
+  const idleRotSpeed = REDUCED ? 0 : .00025;
+  userRotY += dragVelocity;
+  dragVelocity *= .92;
+  scene.rotation.y = sceneProgress * Math.PI * .5 + userRotY + t*idleRotSpeed*0;
 
-  /* Bars "grow" as you scroll — the literal metaphor of the product:
-     numbers climbing the further you go. */
   bars.forEach((b,i) => {
     const growth = 1 + sceneProgress * (1.4 + (i % 3) * .3);
     b.scale.y += (growth - b.scale.y) * .05;
     b.position.y = (b.userData.baseH * b.scale.y)/2 - 1;
   });
 
-  /* Portals fade/scale in only while the Shows section is in view. */
   if (portalGroup) {
-    portalGroup.rotation.y += REDUCED ? 0 : .0015;
+    portalGroup.rotation.y += REDUCED ? 0 : .0022;
     portalGroup.children.forEach(obj => {
-      if (obj === hoveredPortal) { obj.material.opacity += (portalVisibility - obj.material.opacity)*.08; return; }
-      const targetScale = 0.0001 + portalVisibility * 0.9999;
-      if (!obj.userData.isRing) {
-        obj.scale.x += (targetScale - obj.scale.x)*.08;
-        obj.scale.y += (targetScale - obj.scale.y)*.08;
-        obj.scale.z += (targetScale - obj.scale.z)*.08;
-      }
-      const targetOpacity = obj.userData.isRing ? portalVisibility*.8 : portalVisibility;
-      obj.material.opacity += (targetOpacity - obj.material.opacity)*.08;
-      if (obj.isMesh && !obj.userData.isRing) obj.rotation.y += .01;
+      if (obj === hoveredPortal) return;
+      if (obj.isMesh && !obj.userData.isRing) obj.rotation.y += .012;
     });
   }
 
-  const camZ = 10 - sceneProgress * 3.2;
+  const camZ = 8.5 - sceneProgress * 2.5;
   const camY = 1 + Math.sin(sceneProgress*Math.PI)*1.1;
   camera.position.z += (camZ - camera.position.z)*.06;
   camera.position.y += (camY - camera.position.y)*.06;
-  camera.position.x += ((mouseNX*.7) - camera.position.x)*.04;
-  camera.lookAt(0, mouseNY*-.3, 0);
+  camera.position.x += ((mouseNX*.9) - camera.position.x)*.05;
+  camera.lookAt(0, mouseNY*-.35, 0);
 
   particles.rotation.y += .0004;
 
@@ -643,23 +691,31 @@ function animate(){
 }
 animate();
 
-window.addEventListener('resize', ()=>{
+/* RESPONSIVE — window resize AND orientation change (mobile browsers
+   don't always fire 'resize' reliably on rotation), debounced. */
+let resizeTimer = null;
+function handleResize(){
   camera.aspect = innerWidth/innerHeight; camera.updateProjectionMatrix();
   renderer.setSize(innerWidth, innerHeight); composer.setSize(innerWidth, innerHeight);
-});
+}
+window.addEventListener('resize', () => { clearTimeout(resizeTimer); resizeTimer = setTimeout(handleResize, 120); });
+window.addEventListener('orientationchange', () => { clearTimeout(resizeTimer); resizeTimer = setTimeout(handleResize, 250); });
+
 } else {
-  // No WebGL — remove the empty canvas layer and let the person know
-  // this is the streamlined version. Stats/show-cards above still work.
   const wrapEl = document.getElementById('scene-wrap'); if (wrapEl) wrapEl.remove();
   const notice = document.getElementById('no-webgl'); if (notice) notice.hidden = false;
+  const hint = document.getElementById('portal-hint');
+  if (hint) hint.textContent = 'Browse the shows below';
 }
 
 /* SECTION REVEALS */
-gsap.utils.toArray('.sec-head, .stat, .glass-card, .show-card').forEach(el=>{
-  gsap.fromTo(el, { opacity:0, y:34, filter:'blur(6px)' },
-    { opacity:1, y:0, filter:'blur(0px)', duration:.9, ease:'power3.out',
-      scrollTrigger:{ trigger:el, start:'top 88%' } });
-});
+if (typeof gsap !== 'undefined') {
+  gsap.utils.toArray('.sec-head, .stat, .glass-card, .show-card').forEach(el=>{
+    gsap.fromTo(el, { opacity:0, y:34, filter:'blur(6px)' },
+      { opacity:1, y:0, filter:'blur(0px)', duration:.9, ease:'power3.out',
+        scrollTrigger:{ trigger:el, start:'top 88%' } });
+  });
+}
 
 /* CARD TILT */
 document.querySelectorAll('[data-tilt]').forEach(card=>{
@@ -673,13 +729,23 @@ document.querySelectorAll('[data-tilt]').forEach(card=>{
 });
 
 /* RIPPLE */
-document.getElementById('enter-btn').addEventListener('click', function(e){
+document.getElementById('enter-btn')?.addEventListener('click', function(e){
   const r=this.getBoundingClientRect(); const span=document.createElement('span'); span.className='ripple';
   const size=Math.max(r.width,r.height);
   span.style.width=span.style.height=size+'px';
   span.style.left=(e.clientX-r.left-size/2)+'px'; span.style.top=(e.clientY-r.top-size/2)+'px';
   this.appendChild(span); setTimeout(()=>span.remove(),700);
 });
+
+} catch (err) {
+  console.error('[Landing] Fatal error — falling back to the streamlined page:', err);
+  document.getElementById('loader')?.classList.add('done');
+  document.querySelectorAll('#hero h1 .line span, #hero p, #hero .eyebrow, #hero .scrollcue')
+    .forEach(el => { el.style.opacity = 1; el.style.transform = 'none'; });
+  document.getElementById('scene-wrap')?.remove();
+  const notice = document.getElementById('no-webgl'); if (notice) notice.hidden = false;
+}
+})();
 </script>
 </body>
 </html>

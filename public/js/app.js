@@ -239,7 +239,7 @@ function toggleEdit() {
   btn.style.borderColor = editMode ? 'var(--acc)' : '';
   document.body.classList.toggle('edit-on', editMode);
   renderAll();
-  toast(editMode ? '✎ Edit Mode ON — click any field to edit' : '✓ Edit Mode OFF');
+  toast(editMode ? '✎ Edit Mode ON: click any field to edit' : '✓ Edit Mode OFF');
 }
 
 /* ─── SIDEBAR ───────────────────────────────────────────── */
@@ -353,7 +353,7 @@ function buildShowPanel(key) {
       <!-- GROWTH TAB -->
       <div class="tab-pane" id="sw-${key}-growth">
         <div class="ph" style="margin-bottom:12px">
-          <div style="font-size:14px;font-weight:800">📈 Instagram Growth — ${s.label}</div>
+          <div style="font-size:14px;font-weight:800">📈 Instagram Growth: ${s.label}</div>
           <div class="ph-act no-capture">
             <button class="shift-to-last-btn admin-only" onclick="shiftCurrentToLast('${key}')" title="Roll Current → Last Checked and set today's date on Last Checked field">⟳ Roll Current → Last Checked</button>
             <button class="btn b-gld b-sm" onclick="capture('gtbl-inner-${key}','${key}_Growth')">📷 Capture</button>
@@ -756,7 +756,7 @@ function buildGrowthHTML(key) {
     ${hasCustom ? `<button class="btn b-gh b-xs" onclick="resetGrowthOrder('${key}')">✕ Reset order</button>` : ''}
   </div>
   <div class="gtbl-wrap" id="gtbl-inner-${key}">
-    <div class="gtbl-title">${s?.emoji || ''} ${s?.label || key.toUpperCase()} — Instagram Follower Growth Analysis</div>
+    <div class="gtbl-title">${s?.emoji || ''} ${s?.label || key.toUpperCase()}: Instagram Follower Growth Analysis</div>
     <table>
       <thead><tr>
         <th style="min-width:200px">Contestant ↕</th>
@@ -824,7 +824,7 @@ function rosterDrop(e, key) {
   if (cEl) renderCards(key);
   renderRankings();
   if (typeof _autoPersist === 'function') _autoPersist();
-  toast('✓ Reordered — drag again or click ↓ Save JSON to publish');
+  toast('✓ Reordered. Drag again or click ↓ Save JSON to publish');
 }
 
 function growthDragStart(e) {
@@ -902,7 +902,7 @@ function shiftCurrentToLast(key) {
   renderTable(key);
   if (typeof _autoPersist === 'function') _autoPersist();
   if (shifted > 0) {
-    toast(`⟳ Rolled ${shifted} contestants — enter new Current values now`);
+    toast(`⟳ Rolled ${shifted} contestants. Enter new Current values now`);
     if (typeof logActivity === 'function') logActivity('Rolled Current → Last Checked', `${shifted} contestants in ${window.SHOWS[key]?.label || key}`, '⟳');
   } else {
     toast('No Current follower values to roll', 'warn');
@@ -1132,7 +1132,7 @@ function renderShowList() {
         <div class="show-name">${s.emoji || ''} ${sanitizeHTML(s.label)}</div>
         <div class="show-meta-sm">${sanitizeHTML(s.platform || '')} · ${showDateLabel(s)} · ${(window.DB[k] || []).length} contestants${hidden ? ' · <span style="color:var(--warn)">hidden from public</span>' : ''}</div>
       </div>
-      <button class="btn ${hidden ? 'b-grn' : 'b-warn'} b-xs" onclick="toggleShowHidden('${k}')" title="${hidden ? 'Publish — make visible to public' : 'Hide from public view'}">
+      <button class="btn ${hidden ? 'b-grn' : 'b-warn'} b-xs" onclick="toggleShowHidden('${k}')" title="${hidden ? 'Publish: make visible to public' : 'Hide from public view'}">
         ${hidden ? '✓ Publish' : '👁 Hide'}
       </button>
       <button class="btn b-gh b-xs" onclick="openShowEdit('${k}')">✎</button>
@@ -1284,7 +1284,7 @@ function saveContestant() {
   const autoHidden = newStatus === 'ELIMINATED' && previousStatus !== 'ELIMINATED';
   toast(
     (wasEdit ? '✓ Updated' : '✓ Added to ' + (window.SHOWS[key]?.label || key)) +
-    (autoHidden ? ' — auto-hidden from Growth (eliminated). Unhide in 👁 Visibility if needed.' : '')
+    (autoHidden ? ', auto-hidden from Growth (eliminated). Unhide in 👁 Visibility if needed.' : '')
   );
   if (typeof logActivity === 'function') {
     logActivity(wasEdit ? 'Edited contestant' : 'Added contestant', obj.name + ' · ' + (window.SHOWS[key]?.label || key), wasEdit ? '✏️' : '➕');
@@ -1319,7 +1319,7 @@ function openCopyToShow(key, id) {
   const otherShows = getShowKeys().filter(k => k !== key);
   const list = document.getElementById('copy-show-list');
   if (!otherShows.length) {
-    list.innerHTML = '<div style="color:var(--mut);font-size:12px;text-align:center;padding:20px 0">No other shows exist yet — add one via ⚙ Shows first.</div>';
+    list.innerHTML = '<div style="color:var(--mut);font-size:12px;text-align:center;padding:20px 0">No other shows exist yet. Add one via ⚙ Shows first.</div>';
   } else {
     list.innerHTML = otherShows.map(k => `
       <button class="btn b-gh" style="justify-content:flex-start;width:100%"
@@ -1351,7 +1351,7 @@ function confirmCopyToShow(targetKey) {
   _copySource = null;
 
   renderAll(); rebuildSidebar(); updateStats();
-  toast(`✓ Copied "${copy.name}" to ${window.SHOWS[targetKey]?.label || targetKey} — original untouched`);
+  toast(`✓ Copied "${copy.name}" to ${window.SHOWS[targetKey]?.label || targetKey}. Original untouched`);
   if (typeof logActivity === 'function') logActivity('Copied contestant', `${copy.name} · ${window.SHOWS[sourceKey]?.label || sourceKey} → ${window.SHOWS[targetKey]?.label || targetKey}`, '📋');
   if (typeof _autoPersist === 'function') _autoPersist();
 }

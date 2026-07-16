@@ -4,17 +4,17 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Reality TV Intel · BobMasterBillie</title>
-  <meta name="description" content="Indian Reality TV Season Tracker — live follower analytics, rankings and contestant intel across KKK, Lock Upp, Alliance India, Traitors India and Bigg Boss.">
+  <meta name="description" content="Indian Reality TV Season Tracker: live follower analytics, rankings and contestant intel across KKK, Lock Upp, Alliance India, Traitors India and Bigg Boss.">
   <link rel="canonical" href="https://realitytv-intel.vercel.app/index.html">
 
   <!-- Open Graph / social share preview -->
-  <meta property="og:title" content="Reality TV Intel — Dashboard">
+  <meta property="og:title" content="Reality TV Intel Dashboard">
   <meta property="og:description" content="Live follower analytics, rankings, and contestant intel across India's biggest reality TV shows.">
   <meta property="og:image" content="https://realitytv-intel.vercel.app/img/logo-banner.png">
   <meta property="og:url" content="https://realitytv-intel.vercel.app/index.html">
   <meta property="og:type" content="website">
   <meta name="twitter:card" content="summary_large_image">
-  <meta name="twitter:title" content="Reality TV Intel — Dashboard">
+  <meta name="twitter:title" content="Reality TV Intel Dashboard">
   <meta name="twitter:description" content="Live follower analytics, rankings, and contestant intel across India's biggest reality TV shows.">
   <meta name="twitter:image" content="https://realitytv-intel.vercel.app/img/logo-banner.png">
   <meta name="theme-color" content="#08080F">
@@ -43,7 +43,7 @@
   {
     "@context": "https://schema.org",
     "@type": "WebPage",
-    "name": "Reality TV Intel — Dashboard",
+    "name": "Reality TV Intel Dashboard",
     "url": "https://realitytv-intel.vercel.app/index.html",
     "isPartOf": { "@type": "WebApplication", "name": "Reality TV Intel", "url": "https://realitytv-intel.vercel.app/" },
     "description": "Live follower analytics, rankings, and contestant intel across India's biggest reality TV shows."
@@ -59,13 +59,14 @@
   <header class="topbar">
 
     <div class="brand">
-      <a href="/" title="Back to the 3D experience"><img class="brand-icon" src="img/logo-icon.png" alt="Reality TV Intel logo"></a>
+      <a href="/" class="brand-home" title="Back to homepage"><img class="brand-icon" src="img/logo-icon.png" alt="Reality TV Intel logo"></a>
       <div>
         <h1 class="brand-name">Reality TV Intel</h1>
         <p class="brand-sub">Season Tracker</p>
       </div>
     </div>
 
+    <a href="/" class="home-link">← Home</a>
     <div class="live-badge"><div class="live-dot"></div>Live Season</div>
     <div class="tb-divider"></div>
 
@@ -142,7 +143,7 @@
         <div class="ph">
           <div>
             <div class="ph-title">🏠 Season <span>Overview</span></div>
-            <div class="ph-desc">All shows at a glance — click any card to view the full roster</div>
+            <div class="ph-desc">All shows at a glance. Click any card to view the full roster</div>
           </div>
           <div class="ph-act no-capture">
             <button class="btn b-gh b-sm admin-only"  onclick="hideRumoured()">Hide Rumoured</button>
@@ -182,7 +183,7 @@
         <div class="ph">
           <div>
             <div class="ph-title">🏆 Cross-Show <span>Rankings</span></div>
-            <div class="ph-desc">All contestants ranked by follower count — filter by show, status, or search by name</div>
+            <div class="ph-desc">All contestants ranked by follower count. Filter by show, status, or search by name</div>
           </div>
           <div class="ph-act no-capture">
             <!-- capture + CSV now in filter bar below -->
@@ -277,9 +278,9 @@
           <p>Data export and download features are available to administrators only.
           Click <strong>🔒 Admin</strong> in the top bar to log in.</p>
           <div style="margin-top:10px;display:flex;gap:8px;flex-wrap:wrap">
-            <span class="verdict verdict-yes">✓ Screenshots — public</span>
-            <span class="verdict verdict-yes">✓ Print / PDF — public</span>
-            <span class="verdict verdict-no">🔒 CSV / JSON — admin only</span>
+            <span class="verdict verdict-yes">✓ Screenshots: public</span>
+            <span class="verdict verdict-yes">✓ Print / PDF: public</span>
+            <span class="verdict verdict-no">🔒 CSV / JSON: admin only</span>
           </div>
           <div style="margin-top:12px;display:flex;gap:8px">
             <button class="btn b-pur b-sm" onclick="captureCurrentPanel()">📷 Take Screenshot</button>
@@ -338,7 +339,7 @@
             <div class="ecard admin-only" id="live-refresh-btn-all" onclick="refreshFollowersLive(null)">
               <div class="ecard-ico">🔄</div>
               <div class="ecard-t">Refresh Followers (Live)</div>
-              <div class="ecard-d">Pull real Instagram counts via Apify — updates "Current" only</div>
+              <div class="ecard-d">Pull real Instagram counts via Apify. Updates "Current" only</div>
             </div>
           </div>
 
@@ -379,7 +380,7 @@
                 • 📷 Screenshot any panel (2× HD PNG)<br>
                 • ☾ Toggle light / dark mode<br>
                 • 🖨 Print or save as PDF<br>
-                • Data is always fresh — loaded from GitHub on every visit
+                • Data is always fresh, loaded from GitHub on every visit
               </div>
             </div>
             <div class="msec" style="border:1px solid var(--bdr);border-radius:var(--r2)">
@@ -418,10 +419,10 @@
 
           <div class="clarify-box" style="margin-top:12px">
             <h3>📤 How to Upload data.js to GitHub</h3>
-            <p><strong>Option A — GitHub website (easiest):</strong><br>
+            <p><strong>Option A: GitHub website (easiest)</strong><br>
             Go to your repo → <code>public/data/data.js</code> → click the pencil ✏️ icon → click the upload icon → choose your downloaded file → click <strong>Commit changes</strong>.</p>
-            <p style="margin-top:8px"><strong>Option B — GitHub Desktop:</strong> Copy the downloaded file into your local repo folder, then commit and push in GitHub Desktop.</p>
-            <p style="margin-top:8px"><strong>Option C — Terminal:</strong></p>
+            <p style="margin-top:8px"><strong>Option B: GitHub Desktop.</strong> Copy the downloaded file into your local repo folder, then commit and push in GitHub Desktop.</p>
+            <p style="margin-top:8px"><strong>Option C: Terminal</strong></p>
             <pre>cp ~/Downloads/data.js /path/to/your/repo/public/data/data.js
 git add public/data/data.js
 git commit -m "Update data"
@@ -429,7 +430,7 @@ git push</pre>
           </div>
 
           <div class="dnote" style="margin-top:12px">
-            <strong>Note on Instagram auto-fetch:</strong> Public visitors don't see live-fetch controls — they're admin-only, since each run uses the site owner's Apify quota. Manual entry via Edit Mode or Bulk Import always works as a fallback. Live refresh is available in the <strong>↓ Export</strong> panel.
+            <strong>Note on Instagram auto-fetch:</strong> Public visitors don't see live-fetch controls. They're admin-only, since each run uses the site owner's Apify quota. Manual entry via Edit Mode or Bulk Import always works as a fallback. Live refresh is available in the <strong>↓ Export</strong> panel.
           </div>
         </div>
       </div>
@@ -581,7 +582,7 @@ git push</pre>
         <div class="fi"><label class="fl">Accent Colour</label><input type="color" id="ns-color" value="#4A9EFF" style="width:48px;height:34px;border:none;background:none;cursor:pointer;padding:0"></div>
         <div class="fi"></div>
         <div class="fi full"><label class="fl">Description</label><input class="finp" id="ns-desc" placeholder="Short tagline…"></div>
-        <div class="fi full"><label class="fl">Banner / Logo URL <span style="color:var(--mut);font-weight:400">(optional — shown at top of show page)</span></label><input class="finp" id="ns-banner" placeholder="https://… image URL, leave blank to hide"></div>
+        <div class="fi full"><label class="fl">Banner / Logo URL <span style="color:var(--mut);font-weight:400">(optional, shown at top of show page)</span></label><input class="finp" id="ns-banner" placeholder="https://… image URL, leave blank to hide"></div>
       </div>
     </div>
     <div class="mftr">
@@ -612,7 +613,7 @@ git push</pre>
 
       <div style="margin-bottom:16px">
         <div style="font-size:11px;font-weight:700;color:var(--txt);margin-bottom:6px">📊 Bulk Follower Import</div>
-        <div style="font-size:10px;color:var(--mut);margin-bottom:8px">One per line: <code style="background:var(--bdr);padding:1px 5px;border-radius:3px">@instagramHandle, showKey, newFollowers</code> — matched by exact Instagram handle, not name (avoids updating the wrong person when names are similar)</div>
+        <div style="font-size:10px;color:var(--mut);margin-bottom:8px">One per line: <code style="background:var(--bdr);padding:1px 5px;border-radius:3px">@instagramHandle, showKey, newFollowers</code>. Matched by exact Instagram handle, not name, to avoid updating the wrong person when names are similar</div>
         <textarea class="finp fta" id="bulk-import-txt"
           placeholder="@gauravkhannaofficial, kkk, 2.1M&#10;@rubinadilaik, kkk, 8.6M"
           style="min-height:90px;font-family:var(--mo);font-size:11px"></textarea>
@@ -690,7 +691,7 @@ git push</pre>
     </div>
     <div class="msec">
       <div class="dnote" style="margin-bottom:14px">
-        <strong id="copy-show-name"></strong> will be added as a new, separate entry in the show you pick below — everything (photo, bio, follower history, socials) copies over. Their original entry is untouched.
+        <strong id="copy-show-name"></strong> will be added as a new, separate entry in the show you pick below. Everything (photo, bio, follower history, socials) copies over. Their original entry is untouched.
       </div>
       <div id="copy-show-list" style="display:flex;flex-direction:column;gap:6px"></div>
     </div>

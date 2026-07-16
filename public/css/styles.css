@@ -364,6 +364,20 @@ select, input, textarea { font-family: var(--ff); }
 }
 
 /* Live badge */
+.home-link {
+  display: flex;
+  align-items: center;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--mut);
+  text-decoration: none;
+  flex-shrink: 0;
+  padding: 4px 2px;
+  transition: color .2s;
+}
+.home-link:hover { color: var(--txt); }
+@media (max-width: 720px) { .home-link { display: none; } }
+
 .live-badge {
   display: flex;
   align-items: center;

@@ -33,7 +33,7 @@ function exportJSON() {
   a.download = 'data.js';
   a.click();
   URL.revokeObjectURL(a.href);
-  toast('✓ data.js downloaded — upload to GitHub to publish');
+  toast('✓ data.js downloaded. Upload to GitHub to publish');
   if (typeof logActivity === 'function') logActivity('Exported data.js', Object.keys(window.SHOWS).length + ' shows', '📁');
 }
 
@@ -350,7 +350,7 @@ async function capture(elId, filename) {
     spinner.style.display = 'none';
     info.textContent  = `${Math.round(w)} × ${Math.round(h)}px · 2× retina`;
     btns.forEach(b => { if (b) b.disabled = false; });
-    toast('✓ Preview ready — choose Save, Copy or Print');
+    toast('✓ Preview ready. Choose Save, Copy or Print');
 
   } catch (e) {
     spinner.style.display = 'none';
@@ -419,11 +419,11 @@ async function copyCapture() {
       }
       try {
         await navigator.clipboard.write([new ClipboardItem({ 'image/png': blob })]);
-        toast('✓ Image copied to clipboard — paste anywhere');
+        toast('✓ Image copied to clipboard. Paste anywhere');
       } catch (e) {
         const url = URL.createObjectURL(blob);
         window.open(url, '_blank');
-        toast('Clipboard blocked — image opened in new tab (right-click to save)', 'warn');
+        toast('Clipboard blocked. Image opened in new tab (right-click to save)', 'warn');
       }
     }, 'image/png');
   } catch (e) {
@@ -435,7 +435,7 @@ function printCapture() {
   if (!_captureCanvas) { toast('No capture ready', 'err'); return; }
   const dataURL = _captureCanvas.toDataURL('image/png');
   const win     = window.open('', '_blank');
-  win.document.write(`<!DOCTYPE html><html><head><title>Print — Reality TV Intel</title>
+  win.document.write(`<!DOCTYPE html><html><head><title>Print: Reality TV Intel</title>
     <style>*{margin:0;padding:0}body{background:#fff}img{max-width:100%;height:auto;display:block}
     @media print{img{max-width:100%;page-break-inside:avoid}}</style>
     </head><body><img src="${dataURL}" onload="window.print();setTimeout(()=>window.close(),500)"></body></html>`);

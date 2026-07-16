@@ -115,7 +115,7 @@ export default async function handler(req, res) {
   }
   if (usernames.length > MAX_USERNAMES_PER_REQUEST) {
     res.status(400).json({
-      error: `Too many usernames in one request (${usernames.length}). Max is ${MAX_USERNAMES_PER_REQUEST} — split into batches.`
+      error: `Too many usernames in one request (${usernames.length}). Max is ${MAX_USERNAMES_PER_REQUEST}, split into batches.`
     });
     return;
   }
@@ -183,7 +183,7 @@ export default async function handler(req, res) {
     missing.forEach(u => results.push({
       username: u,
       followers: null,
-      error: 'Not present in Apify response — likely private account, wrong/renamed handle, deleted account, or Instagram blocked this specific lookup. Check Apify Console → this run → Log tab for the per-profile reason.',
+      error: 'Not present in Apify response. Likely private account, wrong/renamed handle, deleted account, or Instagram blocked this specific lookup. Check the Log tab for this run in Apify Console for the per-profile reason.',
       raw: null,
     }));
 
@@ -198,7 +198,7 @@ export default async function handler(req, res) {
       note: itemsArr.length === 0
         ? 'Apify run completed but returned zero dataset items. Check Apify Console → this actor → Runs tab.'
         : (results.filter(r => r.followers !== null).length === 0
-          ? 'Apify returned data, but field extraction found no userName values — check sampleRaw in the browser console.'
+          ? 'Apify returned data, but field extraction found no userName values. Check sampleRaw in the browser console.'
           : undefined),
     });
 

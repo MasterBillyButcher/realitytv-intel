@@ -69,7 +69,7 @@ function toggleAutosave(on) {
   if (on) {
     autosaveTimer = setInterval(() => { setLSDot('saving'); saveToLocalStorage(false); }, 30000);
     saveToLocalStorage(true);
-    toast('✓ Auto-save ON — saves every 30 seconds');
+    toast('✓ Auto-save ON: saves every 30 seconds');
   } else {
     setLSDot('idle');
     toast('Auto-save OFF', 'warn');
@@ -292,7 +292,7 @@ function renderActivityFeed() {
   if (!el) return;
   const log = getActivityLog();
   if (!log.length) {
-    el.innerHTML = '<div class="activity-empty">No activity yet — add or edit a contestant to get started</div>';
+    el.innerHTML = '<div class="activity-empty">No activity yet. Add or edit a contestant to get started</div>';
     return;
   }
   el.innerHTML = log.slice(0, 20).map(item => `
@@ -300,7 +300,7 @@ function renderActivityFeed() {
       <span class="activity-icon">${item.icon || '📝'}</span>
       <div class="activity-body">
         <span class="activity-action">${sanitizeHTML(item.action)}</span>
-        ${item.detail ? `<span class="activity-detail"> — ${sanitizeHTML(item.detail)}</span>` : ''}
+        ${item.detail ? `<span class="activity-detail"> · ${sanitizeHTML(item.detail)}</span>` : ''}
       </div>
       <span class="activity-time">${_agoLabel(item.ts)}</span>
     </div>`).join('');

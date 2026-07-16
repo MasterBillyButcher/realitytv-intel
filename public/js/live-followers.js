@@ -36,7 +36,7 @@ async function refreshFollowersLive(scopeKey) {
   const { targets, skippedHidden } = _collectRefreshTargets(scopeKey);
   if (!targets.length) {
     toast(skippedHidden
-      ? `No refreshable profiles — all ${skippedHidden} contestant(s) in scope are hidden. Unhide in 👁 Visibility first.`
+      ? `No refreshable profiles. All ${skippedHidden} contestant(s) in scope are hidden. Unhide in 👁 Visibility first.`
       : 'No Instagram handles found to refresh', 'warn');
     return;
   }
@@ -81,11 +81,11 @@ async function refreshFollowersLive(scopeKey) {
         console.log('[Live Followers] RAW sample from Apify (copy this if asking for help):', JSON.stringify(data.sampleRaw, null, 2));
       }
       if (data.tokensAttempted > 1) {
-        toast(`⚠ Your primary Apify key was out of quota or invalid — used backup key #${data.tokensAttempted} instead. Check your primary account's credit balance.`, 'warn');
+        toast(`⚠ Your primary Apify key was out of quota or invalid. Used backup key #${data.tokensAttempted} instead. Check your primary account's credit balance.`, 'warn');
       }
 
       if ((data.received || 0) === 0) {
-        toast('⚠ ' + (data.note || 'No usable data returned — check browser console (F12) for the raw Apify response.'), 'err');
+        toast('⚠ ' + (data.note || 'No usable data returned. Check browser console (F12) for the raw Apify response.'), 'err');
         failed.push(...batch.map(t => t.contestant.name));
         continue;
       }
@@ -125,8 +125,8 @@ async function refreshFollowersLive(scopeKey) {
   if (typeof renderRankings === 'function') renderRankings();
 
   let msg = `✓ Live-updated ${updated} contestant${updated !== 1 ? 's' : ''} in ${label}`;
-  if (updated > 0) msg += ' — now click ↓ Save JSON to download and push to GitHub';
-  if (failed.length) msg += ` — ${failed.length} failed: ${failed.slice(0, 3).join(', ')}${failed.length > 3 ? '…' : ''}`;
+  if (updated > 0) msg += '. Now click ↓ Save JSON to download and push to GitHub';
+  if (failed.length) msg += ` · ${failed.length} failed: ${failed.slice(0, 3).join(', ')}${failed.length > 3 ? '…' : ''}`;
   toast(msg, updated > 0 ? '' : 'warn');
 
   if (updated > 0) {
