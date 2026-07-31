@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://realitytv-intel.vercel.app/sitemap.xml
