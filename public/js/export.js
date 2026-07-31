@@ -42,7 +42,9 @@ async function publishLive() {
       if (res.status === 401) {
         toast('⚠ Your admin session expired — log in again, then publish.', 'warn');
       } else {
-        toast('⚠ Publish failed: ' + (data.error || res.status), 'warn');
+        const detail = data.databaseIssue ? ` (${data.databaseIssue}, connection: ${data.connectionDetected || 'unknown'})` : '';
+        toast('⚠ Publish failed: ' + (data.error || res.status) + detail, 'warn');
+        console.error('[Publish] Full diagnostic:', data);
       }
       return;
     }

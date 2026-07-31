@@ -60,8 +60,7 @@ Vercel → your project → **Settings → Environment Variables** — add these
 | `APIFY_TOKEN` | Live Instagram follower refresh | Supports multiple keys: `token1,token2,token3` (comma-separated, one per Apify account) — automatically fails over to the next if one runs dry on its monthly free credit |
 | `ADMIN_PASSWORD` | Admin login | Plaintext value, verified server-side only — never ships to the browser |
 | `ADMIN_SESSION_SECRET` | Signs the admin session cookie | Any long random string; you'll never type it again after setup |
-| `KV_REST_API_URL` | Live database read/write | Set automatically once you connect a Redis/KV store in Vercel's **Storage** tab — nothing to type in by hand |
-| `KV_REST_API_TOKEN` | Live database read/write | Same as above — auto-populated by Vercel |
+| `REDIS_URL` **or** `KV_REST_API_URL`+`KV_REST_API_TOKEN` | Live database read/write | Whichever your connected store provides — auto-detected, nothing to configure manually. Set automatically once you connect a database in Vercel's **Storage** tab |
 
 Admin auth is fully server-side: the password is checked by `api/verify-admin.js`, and login state is a signed `httpOnly` cookie the browser can't be tricked into forging from devtools.
 
@@ -154,7 +153,7 @@ Check <code>APIFY_TOKEN</code> is set in Vercel and the actor's been authorized 
 
 <details>
 <summary><b>"Publish Live" failing, or database status shows an error?</b></summary>
-Confirm <code>KV_REST_API_URL</code> and <code>KV_REST_API_TOKEN</code> are present in Vercel → Settings → Environment Variables — they're added automatically when you connect a Redis/KV store in the Storage tab, but only take effect after a redeploy. If your admin session simply expired, log back in via <b>🔒 Admin</b> and publish again.
+Confirm a database is actually connected in Vercel → Storage, and that you've redeployed since connecting it (the env vars only reach running functions after a redeploy). The database status line in <b>⚙ Shows</b> tells you exactly which connection type it detected (Redis or REST-based) and the specific error if the read/write is failing — that detail is also logged to the browser console on a failed publish. If your admin session simply expired, log back in via <b>🔒 Admin</b> and publish again.
 </details>
 
 ---

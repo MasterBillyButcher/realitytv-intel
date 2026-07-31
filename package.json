@@ -1,0 +1,9 @@
+{
+  "name": "reality-tv-intel",
+  "private": true,
+  "version": "1.0.0",
+  "description": "Serverless API dependencies only — the site itself is plain static HTML/CSS/JS, no build step.",
+  "dependencies": {
+    "redis": "4.7.0"
+  }
+}

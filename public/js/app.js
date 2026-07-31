@@ -1106,17 +1106,24 @@ async function checkDbStatus() {
   try {
     const res = await fetch('/api/data', { cache: 'no-cache' });
     const source = res.headers.get('X-Data-Source');
+    const connection = res.headers.get('X-Db-Connection');
+    const dbError = res.headers.get('X-Db-Error');
+    const connLabel = { 'redis-url': 'Redis (TCP)', 'rest': 'REST-based store', 'none': 'not detected' }[connection] || connection;
+
     if (res.ok && source === 'database') {
-      el.innerHTML = '<span style="color:var(--grn)">✓ Connected — live data is being served from the database</span>';
+      el.innerHTML = `<span style="color:var(--grn)">✓ Connected via ${sanitizeHTML(connLabel)} — live data is being served from the database</span>`;
+    } else if (res.ok && source === 'bundled-fallback' && connection === 'none') {
+      el.innerHTML = '<span style="color:var(--gld)">⚠ No database connection detected at all — currently serving the bundled backup file. Connect a database in Vercel → Storage, then redeploy.</span>';
     } else if (res.ok && source === 'bundled-fallback') {
-      el.innerHTML = '<span style="color:var(--gld)">⚠ Database is empty or not connected yet — currently serving the bundled backup file. Run the migration below.</span>';
+      el.innerHTML = `<span style="color:var(--gld)">⚠ ${sanitizeHTML(connLabel)} detected but the read failed${dbError ? ': ' + sanitizeHTML(dbError) : ''} — currently serving the bundled backup file.</span>`;
     } else if (res.status === 503) {
-      el.innerHTML = '<span style="color:var(--red)">✕ No data source is reachable at all — check KV_REST_API_URL / KV_REST_API_TOKEN are set in Vercel.</span>';
+      const data = await res.json().catch(() => ({}));
+      el.innerHTML = `<span style="color:var(--red)">✕ No data source reachable — connection: ${sanitizeHTML(data.connectionDetected || 'unknown')}${data.databaseIssue ? ', error: ' + sanitizeHTML(data.databaseIssue) : ''}</span>`;
     } else {
       el.innerHTML = '<span style="color:var(--mut)">Could not determine status (HTTP ' + res.status + ')</span>';
     }
   } catch (err) {
-    el.innerHTML = '<span style="color:var(--red)">✕ /api/data is unreachable — ' + err.message + '</span>';
+    el.innerHTML = '<span style="color:var(--red)">✕ /api/data is unreachable — ' + sanitizeHTML(err.message) + '</span>';
   }
 }
 
