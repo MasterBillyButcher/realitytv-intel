@@ -2,7 +2,8 @@
   "name": "reality-tv-intel",
   "private": true,
   "version": "1.0.0",
-  "description": "Serverless API dependencies only — the site itself is plain static HTML/CSS/JS, no build step.",
+  "type": "module",
+  "description": "Serverless API dependencies only — the site itself is plain static HTML/CSS/JS, no build step. type:module is required here: every api/*.js file already uses import/export syntax, and without this field Node would treat them as CommonJS the moment this file exists, breaking every endpoint at runtime.",
   "dependencies": {
     "redis": "4.7.0"
   }

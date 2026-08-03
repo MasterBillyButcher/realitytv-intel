@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Predictions & Leaderboard · Reality TV Intel</title>
+  <meta name="description" content="Predict what happens next across India's biggest reality TV shows — log in with Twitch, make your picks, and climb the leaderboard.">
+  <link rel="canonical" href="https://realitytv-intel.vercel.app/predictions.html">
+
+  <meta property="og:title" content="Predictions & Leaderboard · Reality TV Intel">
+  <meta property="og:description" content="Predict what happens next across India's biggest reality TV shows and climb the leaderboard.">
+  <meta property="og:image" content="https://realitytv-intel.vercel.app/img/logo-banner.jpg">
+  <meta property="og:url" content="https://realitytv-intel.vercel.app/predictions.html">
+  <meta property="og:type" content="website">
+  <meta name="theme-color" content="#08080F">
+
+  <link rel="icon" type="image/png" sizes="32x32" href="img/favicon-32.png">
+  <link rel="stylesheet" href="css/styles.css">
+  <link rel="stylesheet" href="css/predictions.css">
+</head>
+<body class="pg-predictions">
+
+  <header class="topbar">
+    <div class="brand">
+      <a href="/" title="Back to homepage"><img class="brand-icon" src="img/logo-icon.png" alt="Reality TV Intel logo"></a>
+      <div>
+        <h1 class="brand-name">Predictions</h1>
+        <p class="brand-sub">Pick it. Prove it. Climb the board.</p>
+      </div>
+    </div>
+    <a href="dashboard.html" class="pv-navlink">📊 Dashboard</a>
+    <div id="auth-area" class="pv-auth">
+      <button class="btn b-pur b-sm" id="login-btn" onclick="location.href='/api/auth/twitch/login'">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="vertical-align:-3px;margin-right:5px"><path d="M11.6 3.4H3.4v17.2h5.7v3.4h3.4l3.4-3.4h5.1L23.4 15V3.4h-11.8zM21.7 14.1l-3.4 3.4h-5.1l-3.4 3.4v-3.4H5.7V5.1h16v9z"/><path d="M18.3 8.6h-1.7v5.1h1.7V8.6zM13.7 8.6H12v5.1h1.7V8.6z"/></svg>
+        Log in with Twitch
+      </button>
+      <div id="user-chip" class="pv-user-chip" style="display:none" onclick="toggleUserMenu()">
+        <img id="user-avatar" class="pv-avatar-sm" src="" alt="">
+        <span id="user-name"></span>
+        <div id="user-menu" class="pv-user-menu">
+          <button class="btn b-gh b-sm" onclick="logout()">Log out</button>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main class="pv-main">
+
+    <!-- ══ PROFILE (logged-in users only) ══════════════════ -->
+    <section id="profile-section" class="pv-section" style="display:none">
+      <div class="pv-profile-card">
+        <img id="profile-avatar" class="pv-avatar-lg" src="" alt="">
+        <div class="pv-profile-info">
+          <div class="pv-profile-name" id="profile-name">—</div>
+          <div class="pv-profile-handle" id="profile-handle">—</div>
+          <div class="pv-profile-joined" id="profile-joined"></div>
+        </div>
+        <div class="pv-rank-badge" id="profile-rank-badge">
+          <div class="pv-rank-num" id="profile-rank">—</div>
+          <div class="pv-rank-lbl">Rank</div>
+        </div>
+      </div>
+      <div class="pv-stat-grid">
+        <div class="pv-stat"><div class="pv-stat-v" id="stat-points">0</div><div class="pv-stat-l">Points</div></div>
+        <div class="pv-stat"><div class="pv-stat-v" id="stat-events">0</div><div class="pv-stat-l">Events Entered</div></div>
+        <div class="pv-stat"><div class="pv-stat-v" id="stat-correct">0</div><div class="pv-stat-l">Correct Picks</div></div>
+        <div class="pv-stat"><div class="pv-stat-v" id="stat-winrate">0%</div><div class="pv-stat-l">Win Rate</div></div>
+      </div>
+    </section>
+
+    <!-- ══ LOGGED-OUT PROMPT ═══════════════════════════════ -->
+    <section id="loggedout-prompt" class="pv-section pv-loggedout">
+      <div class="pv-loggedout-inner">
+        <div class="pv-loggedout-icon">🔮</div>
+        <h2>Think you know what happens next?</h2>
+        <p>Log in with Twitch to make predictions, track your record, and climb the leaderboard.</p>
+        <button class="btn b-pur" onclick="location.href='/api/auth/twitch/login'">Log in with Twitch →</button>
+      </div>
+    </section>
+
+    <!-- ══ OPEN PREDICTIONS ═════════════════════════════════ -->
+    <section class="pv-section">
+      <div class="pv-section-head">
+        <h2>🔥 Open Predictions</h2>
+        <span class="pv-section-sub">Pick before the countdown ends</span>
+      </div>
+      <div id="open-predictions" class="pv-pred-list">
+        <div class="pv-empty">Loading…</div>
+      </div>
+    </section>
+
+    <!-- ══ MY HISTORY (logged-in only) ══════════════════════ -->
+    <section id="history-section" class="pv-section" style="display:none">
+      <div class="pv-section-head">
+        <h2>📜 My Prediction History</h2>
+      </div>
+      <div id="history-list" class="pv-history-list"></div>
+    </section>
+
+    <!-- ══ LEADERBOARD ══════════════════════════════════════ -->
+    <section class="pv-section">
+      <div class="pv-section-head">
+        <h2>🏆 Leaderboard</h2>
+      </div>
+      <div id="leaderboard-list" class="pv-leaderboard">
+        <div class="pv-empty">Loading…</div>
+      </div>
+    </section>
+
+  </main>
+
+  <div id="pv-toast" class="pv-toast"></div>
+
+  <script src="js/predictions.js"></script>
+</body>
+</html>

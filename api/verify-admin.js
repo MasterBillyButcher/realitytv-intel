@@ -13,6 +13,13 @@
 
    DELETE             → clears the session cookie (logout).
 
+   Every attempt — success, wrong password, and rate-limited — is
+   written to the real server-side audit log (_audit.js), not just
+   the client-side activity feed. Rate limiting is distributed via
+   Redis (_ratelimit.js), not per-instance memory, so it holds up
+   under real concurrent traffic instead of being trivially routed
+   around by hitting different warm instances.
+
    REQUIRED ENV VARS — set in Vercel → Project → Settings →
    Environment Variables, never committed to the repo:
      ADMIN_PASSWORD        the real admin password
@@ -21,41 +28,14 @@
 
 import crypto from 'crypto';
 import { issueSessionCookie, clearSessionCookie, isValidAdminSession } from './_auth.js';
+import { checkRateLimit } from './_ratelimit.js';
+import { getClientIp } from './_ip.js';
+import { logAudit } from './_audit.js';
 
 function timingSafeStringEqual(a, b) {
   const aBuf = crypto.createHash('sha256').update(String(a)).digest();
   const bBuf = crypto.createHash('sha256').update(String(b)).digest();
   return crypto.timingSafeEqual(aBuf, bBuf);
-}
-
-/* ─── LOGIN ATTEMPT LIMITER ─────────────────────────────────
-   Best-effort, in-memory, per-warm-instance. This is NOT a real
-   distributed rate limit — Vercel functions are stateless across
-   cold starts and scale out across multiple instances, so a
-   determined attacker spreading requests across many invocations
-   can still get around this. It's here to stop the trivial case
-   (a script hammering one warm instance) cheaply, with zero new
-   infra or env vars. For real protection, put this behind Vercel
-   KV / Upstash Redis (shared counter) or Vercel's WAF rate-limit
-   rules — this comment is here so that upgrade isn't forgotten. */
-const LOGIN_ATTEMPTS = new Map(); // ip -> { count, windowStart }
-const WINDOW_MS = 5 * 60 * 1000;  // 5 minutes
-const MAX_ATTEMPTS = 8;           // per IP, per window
-
-function getClientIp(req) {
-  const fwd = req.headers['x-forwarded-for'];
-  return (fwd ? fwd.split(',')[0].trim() : req.socket?.remoteAddress) || 'unknown';
-}
-
-function isRateLimited(ip) {
-  const now = Date.now();
-  const entry = LOGIN_ATTEMPTS.get(ip);
-  if (!entry || now - entry.windowStart > WINDOW_MS) {
-    LOGIN_ATTEMPTS.set(ip, { count: 1, windowStart: now });
-    return false;
-  }
-  entry.count += 1;
-  return entry.count > MAX_ATTEMPTS;
 }
 
 export default async function handler(req, res) {
@@ -66,6 +46,7 @@ export default async function handler(req, res) {
 
   if (req.method === 'DELETE') {
     res.setHeader('Set-Cookie', clearSessionCookie());
+    logAudit({ actor: 'admin', actorType: 'admin', action: 'logout', ip: getClientIp(req) });
     res.status(200).json({ ok: true });
     return;
   }
@@ -76,7 +57,10 @@ export default async function handler(req, res) {
   }
 
   const ip = getClientIp(req);
-  if (isRateLimited(ip)) {
+
+  const { limited } = await checkRateLimit('admin-login', ip, { maxAttempts: 8, windowSeconds: 300 });
+  if (limited) {
+    await logAudit({ actor: 'admin', actorType: 'admin', action: 'login_rate_limited', ip, success: false });
     res.status(429).json({ error: 'Too many login attempts. Wait a few minutes and try again.' });
     return;
   }
@@ -97,12 +81,14 @@ export default async function handler(req, res) {
     // Deliberately generic — don't reveal whether the failure was a
     // missing field vs a wrong password, and no per-attempt detail
     // that would help someone iterate guesses.
+    await logAudit({ actor: 'admin', actorType: 'admin', action: 'login_failed', ip, success: false });
     res.status(401).json({ error: 'Incorrect password.' });
     return;
   }
 
   try {
     res.setHeader('Set-Cookie', issueSessionCookie());
+    await logAudit({ actor: 'admin', actorType: 'admin', action: 'login', ip, success: true });
     res.status(200).json({ ok: true });
   } catch (err) {
     res.status(500).json({ error: err.message });

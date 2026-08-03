@@ -1473,6 +1473,26 @@ tr[draggable="true"]:active { cursor: grabbing; }
 
 .msec { padding: 16px 20px; border-bottom: 1px solid var(--bdr); }
 .msec-t { font-size: 12px; font-weight: 800; letter-spacing: .12em; text-transform: uppercase; color: var(--mut); margin-bottom: 10px; }
+
+/* ─── PREDICTIONS ADMIN FORM ─────────────────────────────── */
+.pf-lbl { display: block; font-size: 10.5px; font-weight: 700; letter-spacing: .05em; text-transform: uppercase; color: var(--txt2); margin-bottom: 5px; }
+.pf-input { width: 100%; padding: 9px 12px; background: var(--sur); border: 1px solid var(--bdr2); border-radius: 8px; color: var(--txt); font-size: 13px; font-family: inherit; }
+.pf-input:focus { outline: none; border-color: var(--acc); }
+.pf-contestant-picker { display: grid; grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); gap: 8px; max-height: 260px; overflow-y: auto; padding: 10px; background: var(--sur); border: 1px solid var(--bdr); border-radius: 8px; }
+.pf-contestant-chip { display: flex; align-items: center; gap: 7px; padding: 6px 9px; background: var(--card); border: 1px solid var(--bdr2); border-radius: 100px; cursor: pointer; font-size: 12px; color: var(--txt2); transition: border-color .15s, color .15s; }
+.pf-contestant-chip:hover { border-color: var(--acc); }
+.pf-contestant-chip.pf-chip-selected { border-color: var(--gld); background: rgba(245,166,35,.1); color: var(--txt); }
+.pf-contestant-chip img { width: 20px; height: 20px; border-radius: 50%; object-fit: cover; flex-shrink: 0; }
+.pf-selected-options { display: flex; flex-wrap: wrap; gap: 6px; }
+.pf-selected-chip { display: flex; align-items: center; gap: 6px; padding: 5px 10px; background: rgba(245,166,35,.12); border: 1px solid rgba(245,166,35,.35); border-radius: 100px; font-size: 12px; color: var(--gld); }
+.pf-selected-chip button { background: none; border: none; color: var(--gld); cursor: pointer; font-size: 13px; line-height: 1; padding: 0; }
+.pf-admin-pred-card { padding: 14px; background: var(--card); border: 1px solid var(--bdr); border-radius: 10px; margin-bottom: 10px; }
+.pf-admin-pred-q { font-size: 13px; font-weight: 700; color: var(--txt); margin-bottom: 4px; }
+.pf-admin-pred-meta { font-size: 11px; color: var(--txt2); margin-bottom: 10px; }
+.pf-admin-pred-opts { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 10px; }
+.pf-admin-opt-btn { padding: 5px 12px; font-size: 11.5px; background: var(--sur); border: 1px solid var(--bdr2); border-radius: 100px; color: var(--txt2); cursor: pointer; }
+.pf-admin-opt-btn:hover { border-color: var(--grn); color: var(--txt); }
+.pf-admin-opt-btn.pf-was-correct { border-color: var(--grn); color: var(--grn); background: rgba(0,200,150,.08); }
 .msec:last-of-type { border-bottom: none; }
 
 .mftr {

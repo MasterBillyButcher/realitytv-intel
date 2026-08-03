@@ -13,6 +13,7 @@ let showEditKey  = null;
 
 window._growthOrder = window._growthOrder || {};
 window._growthSort  = window._growthSort  || {};
+window._growthScope = window._growthScope || {}; // 'active' (default) or 'all' — per show
 
 /* ─── SHOW VISIBILITY HELPERS ───────────────────────────── */
 function isShowHidden(key) { return HIDDEN_SHOWS.has(key); }
@@ -655,6 +656,11 @@ function renderCards(key) {
 
 /* ─── GROWTH SORT STATE ─────────────────────────────────── */
 function getGrowthSortKey(key) { return window._growthSort[key] || 'growth-desc'; }
+function getGrowthScope(key) { return window._growthScope[key] || 'active'; }
+function setGrowthScope(key, val) {
+  window._growthScope[key] = val;
+  renderGrowth(key);
+}
 function setGrowthSort(key, val) {
   window._growthSort[key] = val;
   renderGrowth(key);
@@ -663,7 +669,14 @@ function setGrowthSort(key, val) {
 
 /* ─── GROWTH TABLE ──────────────────────────────────────── */
 function buildGrowthHTML(key) {
-  const raw = (window.DB[key] || []).filter(c => !isH(key, c.id));
+  const scope = getGrowthScope(key);
+  const isAdmin = document.body.classList.contains('admin-active');
+  // Non-admins can only ever see active contestants, regardless of the
+  // scope toggle — "All" (including hidden/eliminated) is an admin-only
+  // view, same as the Last Checked / Growth(Last→Now) columns below.
+  const raw = scope === 'all' && isAdmin
+    ? (window.DB[key] || [])
+    : (window.DB[key] || []).filter(c => !isH(key, c.id));
   if (!raw.length) {
     return `<div style="color:var(--mut);padding:40px 20px;text-align:center;font-size:13px">
       No visible contestants. Add via <strong>+ Add</strong> or enable <strong>Edit Mode</strong>.
@@ -727,10 +740,10 @@ function buildGrowthHTML(key) {
       ondragleave="growthDragLeave(event)">
       <td style="font-weight:700">${eC(c.name, 'name')}</td>
       <td>${eC(c.follBefore, 'follBefore')}</td>
-      <td>${eC(c.follLast,   'follLast')}</td>
+      ${isAdmin ? `<td>${eC(c.follLast, 'follLast')}</td>` : ''}
       <td>${eC(c.follCur,    'follCur')}</td>
-      <td class="${neg1 ? 'neg' : hi1 ? 'hi' : md1 ? 'md' : ''}">${g1.diff}</td>
-      <td class="${neg1 ? 'neg' : hi1 ? 'hi' : md1 ? 'md' : ''}">${g1.rate}</td>
+      ${isAdmin ? `<td class="${neg1 ? 'neg' : hi1 ? 'hi' : md1 ? 'md' : ''}">${g1.diff}</td>` : ''}
+      ${isAdmin ? `<td class="${neg1 ? 'neg' : hi1 ? 'hi' : md1 ? 'md' : ''}">${g1.rate}</td>` : ''}
       <td>${g2.diff}</td>
       <td style="color:${g2col}">${g2.rate}</td>
     </tr>`;
@@ -754,6 +767,12 @@ function buildGrowthHTML(key) {
     ).join('')}
     ${sortVal === 'custom' ? '<span style="font-size:10px;color:var(--mut);margin-left:4px">↕ Drag rows to reorder</span>' : ''}
     ${hasCustom ? `<button class="btn b-gh b-xs" onclick="resetGrowthOrder('${key}')">✕ Reset order</button>` : ''}
+    ${isAdmin ? `
+    <span style="width:1px;height:16px;background:var(--bdr2);margin:0 4px"></span>
+    <span class="sort-label">Show</span>
+    <button class="sort-pill${scope === 'active' ? ' active' : ''}" onclick="setGrowthScope('${key}','active')" title="Only active (non-eliminated) contestants">👁 Active only</button>
+    <button class="sort-pill${scope === 'all' ? ' active' : ''}" onclick="setGrowthScope('${key}','all')" title="Every contestant, including eliminated/hidden">🌐 All contestants</button>
+    ` : ''}
   </div>
   <div class="gtbl-wrap" id="gtbl-inner-${key}">
     <div class="gtbl-title">${s?.emoji || ''} ${s?.label || key.toUpperCase()}: Instagram Follower Growth Analysis</div>
@@ -761,10 +780,10 @@ function buildGrowthHTML(key) {
       <thead><tr>
         <th style="min-width:200px">Contestant ↕</th>
         <th>Before Show</th>
-        <th>Last Checked</th>
+        ${isAdmin ? '<th>Last Checked</th>' : ''}
         <th>Current ✓</th>
-        <th>Growth (Last→Now)</th>
-        <th>Growth Rate %</th>
+        ${isAdmin ? '<th>Growth (Last→Now)</th>' : ''}
+        ${isAdmin ? '<th>Growth Rate %</th>' : ''}
         <th>Total Growth</th>
         <th>Total Rate %</th>
       </tr></thead>
@@ -1135,6 +1154,37 @@ async function migrateToDatabase() {
   await publishLive();
   checkDbStatus();
 }
+
+/** One-click end-to-end check of the new users/predictions/leaderboard
+ * foundation (_store.js) against the real, connected database. Renders
+ * a step-by-step pass/fail report so a broken layer is obvious before
+ * anything gets built on top of it. */
+async function runStoreSelftest() {
+  const el = document.getElementById('selftest-result');
+  if (!el) return;
+  el.innerHTML = '<span style="color:var(--txt2)">Running…</span>';
+  try {
+    const res = await fetch('/api/_store-selftest', { credentials: 'include', cache: 'no-cache' });
+    const data = await res.json().catch(() => ({}));
+    if (!data.results) {
+      el.innerHTML = `<span style="color:var(--red)">✕ No response from self-test endpoint (HTTP ${res.status})</span>`;
+      return;
+    }
+    const rows = data.results.map(r =>
+      `<div style="display:flex;gap:8px;align-items:flex-start;font-size:11px;padding:3px 0">
+        <span style="color:${r.ok ? 'var(--grn)' : 'var(--red)'}">${r.ok ? '✓' : '✕'}</span>
+        <span style="color:var(--txt2)">${sanitizeHTML(r.step)}${r.detail ? ' — <span style="color:var(--mut)">' + sanitizeHTML(typeof r.detail === 'string' ? r.detail : JSON.stringify(r.detail)) + '</span>' : ''}</span>
+      </div>`
+    ).join('');
+    const summary = data.allPassed
+      ? '<div style="color:var(--grn);font-weight:700;margin-bottom:4px">✓ All checks passed — the foundation is solid</div>'
+      : `<div style="color:var(--red);font-weight:700;margin-bottom:4px">✕ Something failed — see below${data.error ? ': ' + sanitizeHTML(data.error) : ''}</div>`;
+    el.innerHTML = summary + rows;
+  } catch (err) {
+    el.innerHTML = `<span style="color:var(--red)">✕ Request failed — ${sanitizeHTML(err.message)}</span>`;
+  }
+}
+
 
 function openShowEdit(key) {
   showEditKey = key;

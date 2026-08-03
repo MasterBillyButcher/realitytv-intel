@@ -10,13 +10,13 @@
   <!-- Open Graph / social share preview -->
   <meta property="og:title" content="Reality TV Intel Dashboard">
   <meta property="og:description" content="Live follower analytics, rankings, and contestant intel across India's biggest reality TV shows.">
-  <meta property="og:image" content="https://realitytv-intel.vercel.app/img/logo-banner.png">
+  <meta property="og:image" content="https://realitytv-intel.vercel.app/img/logo-banner.jpg">
   <meta property="og:url" content="https://realitytv-intel.vercel.app/dashboard.html">
   <meta property="og:type" content="website">
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:title" content="Reality TV Intel Dashboard">
   <meta name="twitter:description" content="Live follower analytics, rankings, and contestant intel across India's biggest reality TV shows.">
-  <meta name="twitter:image" content="https://realitytv-intel.vercel.app/img/logo-banner.png">
+  <meta name="twitter:image" content="https://realitytv-intel.vercel.app/img/logo-banner.jpg">
   <meta name="theme-color" content="#08080F">
 
   <!-- Favicon -->
@@ -67,6 +67,7 @@
     </div>
 
     <a href="/" class="home-link">← Home</a>
+    <a href="predictions.html" class="home-link">🔮 Predictions</a>
     <div class="live-badge"><div class="live-dot"></div>Live Season</div>
     <div class="tb-divider"></div>
 
@@ -126,6 +127,7 @@
       <div class="sb-item"        data-panel="rankings"   onclick="showPanel('rankings')">🏆 Rankings</div>
       <div class="sb-item"        data-panel="growth-all" onclick="showPanel('growth-all')">📈 All Growth</div>
       <div class="sb-item admin-only" data-panel="export" onclick="showPanel('export')">↓ Export</div>
+      <div class="sb-item admin-only" data-panel="predictions" onclick="showPanel('predictions'); if(typeof loadAdminPredictions==='function') loadAdminPredictions('open');">🔮 Predictions</div>
       <div class="sb-item admin-only" data-panel="help"   onclick="showPanel('help')">❓ Help</div>
       <div class="sb-sec" style="margin-top:6px">Shows</div>
       <div id="sidebar-shows"></div>
@@ -354,6 +356,69 @@
         </div>
       </div>
 
+      <!-- ══ PREDICTIONS ═════════════════════════════════ -->
+      <div class="panel" id="panel-predictions">
+        <div class="ph">
+          <div>
+            <div class="ph-title">🔮 <span>Predictions</span></div>
+            <div class="ph-sub">Pick a show, pick contestants, create a prediction. Users vote once you publish it.</div>
+          </div>
+        </div>
+
+        <div class="msec" style="border:1px solid var(--bdr);border-radius:var(--r2);margin-bottom:20px">
+          <div class="msec-t">➕ New Prediction</div>
+
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px">
+            <div>
+              <label class="pf-lbl">Show</label>
+              <select id="pf-show" class="pf-input" onchange="onPredictionShowChange()"><option value="">— choose a show —</option></select>
+            </div>
+            <div>
+              <label class="pf-lbl">Display as</label>
+              <select id="pf-displaymode" class="pf-input">
+                <option value="name">Name list</option>
+                <option value="photo">Photo grid</option>
+              </select>
+            </div>
+          </div>
+
+          <label class="pf-lbl">Question</label>
+          <input type="text" id="pf-question" class="pf-input" placeholder="e.g. Who gets evicted this week?" style="margin-bottom:12px">
+
+          <label class="pf-lbl">Options — pick contestants from the show above, or use custom options</label>
+          <div id="pf-contestant-picker" class="pf-contestant-picker">
+            <span style="color:var(--mut);font-size:12px">Choose a show to see its contestants</span>
+          </div>
+          <div style="display:flex;gap:8px;margin:8px 0 12px">
+            <input type="text" id="pf-custom-option" class="pf-input" placeholder="Or type a custom option (e.g. Yes / No) and press Enter" style="flex:1">
+          </div>
+          <div id="pf-selected-options" class="pf-selected-options"></div>
+
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:14px 0">
+            <div>
+              <label class="pf-lbl">Closes at (optional)</label>
+              <input type="datetime-local" id="pf-closesat" class="pf-input">
+            </div>
+            <div>
+              <label class="pf-lbl">Points for a correct pick</label>
+              <input type="number" id="pf-points" class="pf-input" value="10" min="0">
+            </div>
+          </div>
+
+          <button class="btn b-gld" onclick="createPredictionFromForm()">🔮 Create Prediction</button>
+        </div>
+
+        <div class="msec">
+          <div class="msec-t">📋 Manage Existing</div>
+          <div style="display:flex;gap:8px;margin-bottom:12px">
+            <button class="btn b-gh b-sm" onclick="loadAdminPredictions('open')">Open</button>
+            <button class="btn b-gh b-sm" onclick="loadAdminPredictions('closed')">Closed (awaiting result)</button>
+            <button class="btn b-gh b-sm" onclick="loadAdminPredictions('resolved')">Resolved</button>
+          </div>
+          <div id="admin-predictions-list"></div>
+        </div>
+      </div>
+
       <!-- ══ HELP ═══════════════════════════════════════ -->
       <div class="panel" id="panel-help">
         <div class="ph">
@@ -575,8 +640,12 @@
     <div class="msec" style="border:1px solid var(--bdr);border-radius:var(--r2)">
       <div class="msec-t">🗄️ Live Database</div>
       <div id="db-status" style="font-size:12px;color:var(--txt2);margin-bottom:10px">Checking…</div>
-      <button class="btn b-gld b-sm" onclick="migrateToDatabase()">⬆ Migrate current data to database</button>
-      <div style="font-size:11px;color:var(--mut);margin-top:6px">One-time setup — copies everything currently loaded on this page into the live database. After this, use 🚀 Publish Live for every future update.</div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap">
+        <button class="btn b-gld b-sm" onclick="migrateToDatabase()">⬆ Migrate current data to database</button>
+        <button class="btn b-gh b-sm" onclick="runStoreSelftest()">🧪 Run foundation self-test</button>
+      </div>
+      <div style="font-size:11px;color:var(--mut);margin-top:6px">Migrate = one-time setup, copies everything currently loaded into the live database. Self-test = verifies the new users/predictions/leaderboard foundation actually works on your real database — creates test data, checks it, then deletes it again.</div>
+      <div id="selftest-result" style="margin-top:10px"></div>
     </div>
     <div class="msec">
       <div id="show-list"></div>
@@ -761,6 +830,7 @@
 <!-- 6. Data loader — reads live from /api/data (the database), falling
      back to the bundled data.js only if the database is unreachable
      or not migrated yet. Strict JSON.parse, never eval. Boots the app. -->
+<script src="js/predictions-admin.js"></script>
 <script src="js/dataloader.js"></script>
 
 <!-- ══ BOOT ══════════════════════════════════════════════ -->

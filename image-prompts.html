@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Reality TV Intel — Image Asset Prompts</title>
+<style>
+  :root {
+    --bg: #08080F; --card: #13131F; --card2: #17172A;
+    --bdr: rgba(255,255,255,.08); --bdr2: rgba(255,255,255,.14);
+    --txt: #F0F0FF; --txt2: #9090B8; --mut: #5A5A82;
+    --acc: #4A9EFF; --pur: #8B5CF6; --gld: #F5A623; --grn: #00C896; --red: #EF4444;
+  }
+  * { box-sizing: border-box; }
+  body { background: var(--bg); color: var(--txt); font-family: 'Segoe UI', system-ui, sans-serif; margin: 0; padding: 0 20px 80px; line-height: 1.6; }
+  .wrap { max-width: 880px; margin: 0 auto; }
+  header { padding: 48px 0 32px; border-bottom: 1px solid var(--bdr); margin-bottom: 36px; }
+  h1 { font-size: 30px; font-weight: 900; margin: 0 0 8px; background: linear-gradient(90deg, var(--acc), var(--pur), var(--gld)); -webkit-background-clip: text; background-clip: text; color: transparent; }
+  .lede { color: var(--txt2); font-size: 15px; max-width: 640px; }
+  .howto { background: var(--card); border: 1px solid var(--bdr2); border-radius: 12px; padding: 18px 22px; margin: 20px 0 40px; font-size: 13.5px; color: var(--txt2); }
+  .howto b { color: var(--txt); }
+  .howto ul { margin: 8px 0 0; padding-left: 20px; }
+  .toc { background: var(--card); border: 1px solid var(--bdr); border-radius: 12px; padding: 20px 24px; margin-bottom: 40px; }
+  .toc-t { font-size: 11px; font-weight: 800; letter-spacing: .1em; text-transform: uppercase; color: var(--mut); margin-bottom: 10px; }
+  .toc a { display: block; color: var(--txt2); text-decoration: none; font-size: 13.5px; padding: 4px 0; }
+  .toc a:hover { color: var(--acc); }
+  .toc .grp { color: var(--gld); font-weight: 700; font-size: 11px; letter-spacing: .06em; text-transform: uppercase; margin-top: 12px; }
+
+  section.group { margin: 48px 0 20px; }
+  .group-title { font-size: 20px; font-weight: 900; color: var(--gld); border-bottom: 2px solid var(--gld); display: inline-block; padding-bottom: 4px; margin-bottom: 6px; }
+  .group-sub { color: var(--txt2); font-size: 13px; margin-bottom: 20px; }
+
+  .asset { background: var(--card); border: 1px solid var(--bdr2); border-radius: 14px; padding: 24px 26px; margin-bottom: 22px; }
+  .asset-head { display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 8px; margin-bottom: 10px; }
+  .asset-name { font-size: 16px; font-weight: 800; color: var(--txt); }
+  .asset-file { font-family: monospace; font-size: 11.5px; color: var(--acc); background: rgba(74,158,255,.1); padding: 3px 9px; border-radius: 100px; }
+  .spec-row { display: flex; gap: 16px; flex-wrap: wrap; font-size: 12px; color: var(--txt2); margin-bottom: 14px; }
+  .spec-row span b { color: var(--txt); }
+  .used-in { font-size: 12.5px; color: var(--txt2); margin-bottom: 14px; }
+  .used-in b { color: var(--txt); }
+  .prompt-lbl { font-size: 10.5px; font-weight: 800; letter-spacing: .1em; text-transform: uppercase; color: var(--mut); margin-bottom: 6px; }
+  .prompt-box { background: var(--card2); border: 1px solid var(--bdr); border-left: 3px solid var(--pur); border-radius: 8px; padding: 16px 18px; font-size: 13.5px; color: #D8D8F0; white-space: pre-wrap; font-family: 'Courier New', monospace; line-height: 1.65; position: relative; }
+  .copy-btn { position: absolute; top: 10px; right: 10px; background: var(--pur); color: #fff; border: none; padding: 5px 12px; border-radius: 100px; font-size: 11px; cursor: pointer; font-family: inherit; }
+  .copy-btn:hover { background: #7c4de0; }
+  .neg { margin-top: 10px; font-size: 12px; color: var(--red); }
+  .neg b { color: var(--txt); }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header>
+  <h1>Reality TV Intel — Image Asset Prompts</h1>
+  <p class="lede">Every visual asset the site currently needs, with a ready-to-paste, highly detailed prompt for each. Written to a single consistent visual system (dark background, glowing blue/purple/gold accents, the same "TV studio in space" language as the 3D landing page) so whatever you generate matches everything else, whichever tool you use.</p>
+</header>
+
+<div class="howto">
+  <b>How to use this:</b>
+  <ul>
+    <li>Copy a prompt, run it in your image generator of choice, upload the result back here in chat.</li>
+    <li>Each entry lists the exact filename and dimensions the site expects — matching those means it drops in with zero code changes.</li>
+    <li>Prompts deliberately avoid baking in UI text except where noted (banners) — everything else should be a clean image with no lettering, since real text is rendered by the site itself on top.</li>
+    <li>If a generator gives you extra padding/whitespace or an off-ratio result, crop to the listed dimensions before uploading.</li>
+  </ul>
+</div>
+
+<div class="toc">
+  <div class="toc-t">Contents</div>
+  <div class="grp">Brand &amp; Icons</div>
+  <a href="#logo-icon">1. Primary Logo Icon</a>
+  <a href="#favicon">2. Favicon Set (derived from #1)</a>
+  <div class="grp">Social / Sharing</div>
+  <a href="#og-main">3. Main Site Social Banner</a>
+  <a href="#og-predictions">4. Predictions Page Social Banner</a>
+  <div class="grp">3D Landing Page</div>
+  <a href="#loader">5. Loading Screen Mark</a>
+  <div class="grp">Predictions &amp; Leaderboard</div>
+  <a href="#empty-predictions">6. Empty State — No Open Predictions</a>
+  <a href="#empty-leaderboard">7. Empty State — Empty Leaderboard</a>
+  <a href="#login-hero">8. Logged-Out Prompt Illustration</a>
+  <a href="#winner-badge">9. Correct-Pick / Winner Badge</a>
+  <div class="grp">Dashboard &amp; Fallbacks</div>
+  <a href="#avatar-placeholder">10. Contestant Photo Placeholder</a>
+  <a href="#404">11. 404 / Not Found Illustration</a>
+</div>
+
+<!-- ═══════════════════════════════════════ -->
+<section class="group">
+  <div class="group-title">Brand &amp; Icons</div>
+  <div class="group-sub">The core mark everything else derives from. Get this one right first.</div>
+
+  <div class="asset" id="logo-icon">
+    <div class="asset-head">
+      <div class="asset-name">1. Primary Logo Icon</div>
+      <div class="asset-file">logo-icon.png</div>
+    </div>
+    <div class="spec-row">
+      <span>Size: <b>512×512px</b></span>
+      <span>Format: <b>PNG, transparent background</b></span>
+      <span>Shape: <b>square, safe-area centered (icon should read clearly even cropped to a circle)</b></span>
+    </div>
+    <div class="used-in">Used in: <b>browser tab favicon, nav bar brand mark, Twitch-login-style app icon, apple-touch-icon, OG banners</b> — this is the single most-seen asset on the site, appears at sizes from 16px to 512px.</div>
+    <div class="prompt-lbl">Prompt</div>
+    <div class="prompt-box">A minimal, modern app icon logo mark for a reality TV analytics and predictions platform called "Reality TV Intel." Dark near-black background (#08080F). The mark itself: a stylized geometric fusion of a television/broadcast signal shape and a rising bar chart, rendered as a glowing crystalline gem or faceted icosahedron shape — angular, low-poly, semi-transparent glass-like material, backlit with an inner glow. Color gradient across the mark from electric blue (#4A9EFF) through violet-purple (#8B5CF6) to warm amber-gold (#F5A623), glowing/emissive, soft outer bloom/glow halo around the edges. Subtle fine particle sparkles scattered around the mark. Style: premium sci-fi UI iconography, similar to a high-end streaming service or esports league logo — NOT cartoonish, NOT a literal TV set illustration, NOT flat 2D corporate clip-art. Sharp, crisp vector-like edges with soft glow, centered composition with generous padding, works at small sizes. Square canvas, transparent background outside the mark, no text or lettering anywhere in the image.</div>
+    <div class="neg"><b>Avoid:</b> photorealistic TV/camera equipment, cartoon mascots, any text/letters/numbers baked into the icon, drop shadows that look like Microsoft Office clip-art, gradient banding, busy/cluttered detail that disappears at 16px.</div>
+  </div>
+
+  <div class="asset" id="favicon">
+    <div class="asset-head">
+      <div class="asset-name">2. Favicon Set</div>
+      <div class="asset-file">favicon-16/32/48/64/192/512.png, apple-touch-icon.png</div>
+    </div>
+    <div class="spec-row">
+      <span>Sizes: <b>16, 32, 48, 64, 192, 512px square</b> (apple-touch-icon: 180×180)</span>
+      <span>Format: <b>PNG</b></span>
+    </div>
+    <div class="used-in">Used in: <b>browser tabs, bookmarks, mobile home-screen icons, PWA manifest.</b> No separate prompt needed — these are all the same Logo Icon (#1) above, simply exported/resized at each dimension. Generate #1 once at high resolution (at least 512×512, ideally larger), then downscale for each size. At 16px, simplicity matters more than detail — if the generated icon has fine detail that disappears at that size, that's expected and fine; the browser tab icon is a secondary use case.</div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════ -->
+<section class="group">
+  <div class="group-title">Social / Sharing</div>
+  <div class="group-sub">What shows up when a link to the site is shared on WhatsApp, Twitter/X, Discord, iMessage, etc.</div>
+
+  <div class="asset" id="og-main">
+    <div class="asset-head">
+      <div class="asset-name">3. Main Site Social Banner</div>
+      <div class="asset-file">logo-banner.png</div>
+    </div>
+    <div class="spec-row">
+      <span>Size: <b>1200×630px</b> (standard OG image ratio)</span>
+      <span>Format: <b>PNG or JPG, under ~300KB</b></span>
+    </div>
+    <div class="used-in">Used in: <b>og:image / twitter:image meta tags on the homepage and dashboard</b> — this is the preview image when the site link is pasted anywhere. A placeholder version already exists (procedurally generated); this prompt is for a proper designed replacement.</div>
+    <div class="prompt-lbl">Prompt</div>
+    <div class="prompt-box">A premium social-media preview banner, 1200x630px landscape, for a reality TV analytics and fan-predictions platform. Deep space-black background (#08080F) with a subtle dark purple-to-black gradient. Scene: floating glowing glass orbs of varying sizes drift across the frame in electric blue (#4A9EFF), violet (#8B5CF6), amber-gold (#F5A623), and rose-pink (#E53E6A), each with soft bloom/glow and faint reflective highlights, like an abstract "TV studio in space" — echoing a data-visualization / growth-chart aesthetic (some orbs subtly suggest rising bar-chart silhouettes made of light). Sparse fine starfield particles in the background. Composition: mostly empty, uncluttered lower-left two-thirds of the frame reserved as clean negative space for text overlay (this area must stay free of major visual elements so text stays readable) — the glowing orbs and detail should cluster toward the upper-right and edges. Cinematic, moody, high-end streaming-service key-art quality. No text, letters, numbers, or logos anywhere in the image — pure atmospheric background art only, text will be added separately on top.</div>
+    <div class="neg"><b>Avoid:</b> any text or lettering, stock-photo people/TV sets/cameras, bright/light background (must stay dark), busy detail in the lower-left region where the wordmark and tagline will be overlaid, cartoon style.</div>
+  </div>
+
+  <div class="asset" id="og-predictions">
+    <div class="asset-head">
+      <div class="asset-name">4. Predictions Page Social Banner</div>
+      <div class="asset-file">logo-banner-predictions.png</div>
+    </div>
+    <div class="spec-row">
+      <span>Size: <b>1200×630px</b></span>
+      <span>Format: <b>PNG or JPG, under ~300KB</b></span>
+    </div>
+    <div class="used-in">Used in: <b>og:image on predictions.html</b> — a distinct preview so sharing a prediction/leaderboard link looks different from sharing the main dashboard, signaling "this is the fan/community page," not the analytics tool.</div>
+    <div class="prompt-lbl">Prompt</div>
+    <div class="prompt-box">A premium social-media preview banner, 1200x630px landscape, for the predictions and leaderboard section of a reality TV fan platform. Same visual family as a "TV studio in space" dark theme: deep near-black background (#08080F), glowing orbs and particles in electric blue, violet-purple, and amber-gold. This version's central motif: a glowing translucent crystal ball or oracle-sphere shape (representing "predictions") sitting slightly right-of-center, with faint wisps of light/energy swirling inside it in violet (#8B5CF6) and gold (#F5A623), plus a subtle upward-trending glowing line/graph arcing behind it suggesting a leaderboard or ranking climb. Small glowing particle trail suggesting motion/energy rising from bottom-left toward the orb. Cinematic lighting, soft bloom, high production value — like key art for a competitive esports or fantasy-sports app. Composition: keep the lower-left third of the frame clean and uncluttered for text overlay. No text, letters, numbers, or UI elements baked into the image.</div>
+    <div class="neg"><b>Avoid:</b> any text/lettering, literal fortune-teller/tarot-card imagery (too on-the-nose/cheesy), bright background, clutter in the text-overlay zone.</div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════ -->
+<section class="group">
+  <div class="group-title">3D Landing Page</div>
+  <div class="group-sub">The immersive entry experience already runs on procedural 3D (Three.js), not static images — this is the one supporting asset it could use.</div>
+
+  <div class="asset" id="loader">
+    <div class="asset-head">
+      <div class="asset-name">5. Loading Screen Mark</div>
+      <div class="asset-file">logo-icon.png (reused)</div>
+    </div>
+    <div class="spec-row">
+      <span>Size: <b>reuses the 512×512 Logo Icon</b></span>
+    </div>
+    <div class="used-in">Used in: <b>the loading screen shown while the 3D scene initializes.</b> No new asset needed — the loader already displays the Logo Icon (#1) with a CSS pulse animation. If you want a dedicated animated version later (a looping glow pulse baked into the image itself, for example), that would be a separate request — for now, getting #1 right covers this too.</div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════ -->
+<section class="group">
+  <div class="group-title">Predictions &amp; Leaderboard</div>
+  <div class="group-sub">The newest part of the site — these fill the empty/edge-case states so the page never looks broken or unfinished before there's real data in it.</div>
+
+  <div class="asset" id="empty-predictions">
+    <div class="asset-head">
+      <div class="asset-name">6. Empty State — No Open Predictions</div>
+      <div class="asset-file">empty-predictions.png</div>
+    </div>
+    <div class="spec-row">
+      <span>Size: <b>~500×400px</b></span>
+      <span>Format: <b>PNG, transparent background</b></span>
+    </div>
+    <div class="used-in">Used in: <b>predictions.html, shown when there are currently no open predictions to vote on.</b> Currently this state just shows plain text — a small illustration would make an empty page feel intentional instead of broken.</div>
+    <div class="prompt-lbl">Prompt</div>
+    <div class="prompt-box">A small, minimal decorative illustration for an empty-state UI panel, transparent background. Subject: a single dimly-glowing crystal ball or oracle orb, mostly dormant/idle (soft faint glow, not bright), floating alone with a few small particle motes drifting near it, rendered in the same dark sci-fi aesthetic as the rest of the brand — muted violet-purple (#8B5CF6) and steel-blue (#4A9EFF) tones, low opacity/subdued so it reads as "waiting" or "quiet" rather than broken or sad. Simple, uncluttered, centered composition with lots of negative space around it. Soft glow, no harsh edges. No text or lettering.</div>
+    <div class="neg"><b>Avoid:</b> sad faces, broken/cracked imagery, bright colors (this should feel calm/waiting, not alarming), any text.</div>
+  </div>
+
+  <div class="asset" id="empty-leaderboard">
+    <div class="asset-head">
+      <div class="asset-name">7. Empty State — Empty Leaderboard</div>
+      <div class="asset-file">empty-leaderboard.png</div>
+    </div>
+    <div class="spec-row">
+      <span>Size: <b>~500×400px</b></span>
+      <span>Format: <b>PNG, transparent background</b></span>
+    </div>
+    <div class="used-in">Used in: <b>predictions.html leaderboard section, shown before anyone has scored any points yet.</b></div>
+    <div class="prompt-lbl">Prompt</div>
+    <div class="prompt-box">A small, minimal decorative illustration for an empty-state UI panel, transparent background. Subject: a glowing trophy or ranked-podium shape rendered in the same faceted low-poly glass style as the brand mark, in amber-gold (#F5A623) with a soft warm glow, sitting alone and slightly dim/waiting (not triumphant/bright — this represents "no winner yet," an invitation, not a celebration). A few small particle sparkles nearby. Simple, centered, generous negative space, soft bloom lighting, dark-theme-friendly (must look good on a near-black #08080F background). No text or lettering, no numbers, no medal ribbons with writing on them.</div>
+    <div class="neg"><b>Avoid:</b> any text/numbers, overly celebratory/bright rendering (nothing's been won yet), stock-photo trophy renders, confetti.</div>
+  </div>
+
+  <div class="asset" id="login-hero">
+    <div class="asset-head">
+      <div class="asset-name">8. Logged-Out Prompt Illustration</div>
+      <div class="asset-file">login-prompt.png</div>
+    </div>
+    <div class="spec-row">
+      <span>Size: <b>~600×400px</b></span>
+      <span>Format: <b>PNG, transparent background</b></span>
+    </div>
+    <div class="used-in">Used in: <b>predictions.html, the "Log in with Twitch to make predictions" card shown to visitors who aren't logged in yet.</b> Currently just an emoji + text — a proper illustration would make this feel like a real invitation rather than a placeholder.</div>
+    <div class="prompt-lbl">Prompt</div>
+    <div class="prompt-box">A welcoming, premium illustration for a "log in to participate" call-to-action card, transparent background. Subject: a glowing crystal-ball/oracle orb (matching the predictions brand icon) actively awake and radiant this time — brighter, more energetic glow than the empty-state version — with swirling light trails in violet (#8B5CF6), electric blue (#4A9EFF), and gold (#F5A623) spiraling around it, suggesting active energy and invitation to engage. A few upward-drifting particle sparks below it suggesting "something is about to happen." Dynamic but still clean and centered, generous negative space around the subject so it reads well at moderate size next to text. Dark-theme-friendly, soft cinematic glow, premium sci-fi/streaming key-art quality. No text or lettering, no Twitch logo or any third-party brand marks (Twitch's own logo is added separately by the site, this illustration should be brand-neutral).</div>
+    <div class="neg"><b>Avoid:</b> any text, the actual Twitch logo/purple-controller icon (that's added separately in code), literal human figures, cluttered composition.</div>
+  </div>
+
+  <div class="asset" id="winner-badge">
+    <div class="asset-head">
+      <div class="asset-name">9. Correct-Pick / Winner Badge</div>
+      <div class="asset-file">badge-correct.png</div>
+    </div>
+    <div class="spec-row">
+      <span>Size: <b>128×128px</b></span>
+      <span>Format: <b>PNG, transparent background</b></span>
+    </div>
+    <div class="used-in">Used in: <b>optional enhancement for a user's prediction history — a small badge/checkmark icon next to predictions they got right,</b> as a more polished alternative to the plain ✓ checkmark currently used.</div>
+    <div class="prompt-lbl">Prompt</div>
+    <div class="prompt-box">A small circular achievement badge icon, transparent background, 128x128px. A glowing checkmark rendered in the same faceted glass/crystal material as the brand mark, in emerald-green (#00C896) with a soft outer glow, set inside a thin glowing ring border. Premium, minimal, sci-fi UI badge style — like an achievement unlock icon in a high-end game or app. Centered, simple, crisp edges with soft bloom. No text.</div>
+    <div class="neg"><b>Avoid:</b> gold star clip-art style, text, ribbons, overly busy detail (this needs to read clearly at small sizes next to a line of text).</div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════ -->
+<section class="group">
+  <div class="group-title">Dashboard &amp; Fallbacks</div>
+  <div class="group-sub">Supporting assets used when real data (a contestant's photo) is missing, or the page itself can't be found.</div>
+
+  <div class="asset" id="avatar-placeholder">
+    <div class="asset-head">
+      <div class="asset-name">10. Contestant Photo Placeholder</div>
+      <div class="asset-file">avatar-placeholder.png</div>
+    </div>
+    <div class="spec-row">
+      <span>Size: <b>400×400px</b></span>
+      <span>Format: <b>PNG, transparent or dark-solid background</b></span>
+    </div>
+    <div class="used-in">Used in: <b>anywhere a contestant photo fails to load or is missing</b> (roster cards, growth table, prediction option chips). Currently falls back to text initials on a colored circle — this would replace that with a proper silhouette graphic. Note: the site's existing initials-fallback already works correctly and this is a nice-to-have polish item, not a functional gap.</div>
+    <div class="prompt-lbl">Prompt</div>
+    <div class="prompt-box">A generic person-silhouette avatar placeholder icon, 400x400px, circular composition. A simple, elegant abstract human bust silhouette (head-and-shoulders, no facial features, no identifiable characteristics — fully generic/anonymous) rendered as a soft glowing outline/gradient shape in muted violet-blue (#8B5CF6 to #4A9EFF gradient), on a solid dark background (#13131F) matching the site's card color, with a very subtle inner glow. Minimal, clean, professional — should look intentional as a "photo pending" placeholder, not like an error state. No text.</div>
+    <div class="neg"><b>Avoid:</b> any identifiable facial features (must stay fully generic), text like "no photo" or "?", cartoon style, bright colors.</div>
+  </div>
+
+  <div class="asset" id="404">
+    <div class="asset-head">
+      <div class="asset-name">11. 404 / Not Found Illustration</div>
+      <div class="asset-file">404-illustration.png</div>
+    </div>
+    <div class="spec-row">
+      <span>Size: <b>~600×500px</b></span>
+      <span>Format: <b>PNG, transparent background</b></span>
+    </div>
+    <div class="used-in">Used in: <b>a dedicated 404 page (not yet built — this is for if/when one is added)</b> for broken links or mistyped URLs.</div>
+    <div class="prompt-lbl">Prompt</div>
+    <div class="prompt-box">A minimal illustration for a "page not found" error state, transparent background. Subject: one of the brand's glowing glass orbs (in muted blue-violet tones, #4A9EFF to #8B5CF6) drifting off-course, rendered slightly faded/dimmed compared to the normal vibrant brand orbs, with a faint broken or dotted light-trail behind it suggesting it's lost its path, plus a few scattered dim particles. Melancholic but not distressing — calm, quiet, slightly wistful mood. Same dark sci-fi aesthetic as the rest of the brand, centered composition, generous negative space, soft glow. No text, no numbers, no literal "404" imagery, no broken-glass or shattered-screen visuals (too harsh/negative for the brand tone).</div>
+    <div class="neg"><b>Avoid:</b> literal "404" numerals, shattered/broken glass imagery, sad faces, bright alarming colors (red/orange error tones) — this should feel like the calm dark brand aesthetic, just wistful.</div>
+  </div>
+</section>
+
+</div>
+<script>
+document.querySelectorAll('.asset').forEach(asset => {
+  const box = asset.querySelector('.prompt-box');
+  if (!box) return;
+  const btn = document.createElement('button');
+  btn.className = 'copy-btn';
+  btn.textContent = 'Copy';
+  btn.onclick = () => {
+    navigator.clipboard.writeText(box.textContent.trim()).then(() => {
+      btn.textContent = 'Copied!';
+      setTimeout(() => { btn.textContent = 'Copy'; }, 1500);
+    });
+  };
+  box.style.position = 'relative';
+  box.appendChild(btn);
+});
+</script>
+</body>
+</html>

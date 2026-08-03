@@ -95,6 +95,7 @@ function _renderApp() {
   if (typeof rebuildExportPanel   === 'function') rebuildExportPanel();
   if (typeof renderActivityFeed   === 'function') renderActivityFeed();
   if (typeof _populateRankFilters === 'function') _populateRankFilters();
+  if (typeof populatePredictionShowDropdown === 'function') populatePredictionShowDropdown();
 
   try {
     const t = localStorage.getItem('realityTV2026_theme') || 'dark';

@@ -1,5 +1,5 @@
 <div align="center">
-<img src="img/logo-banner.png" alt="Reality TV Intel" width="600"/>
+<img src="public/img/logo-banner.png" alt="Reality TV Intel" width="600"/>
 </div>
 
 <div align="center">
