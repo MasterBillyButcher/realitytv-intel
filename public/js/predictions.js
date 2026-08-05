@@ -12,6 +12,7 @@
 ═══════════════════════════════════════════════════════════ */
 
 let currentUser = null;
+let isAdmin = false;
 let serverTimeOffsetMs = 0; // corrected "now" = Date.now() + serverTimeOffsetMs
 let openPredictions = [];
 let countdownTimer = null;
@@ -42,6 +43,101 @@ document.addEventListener('click', e => {
 async function logout() {
   await fetch('/api/auth/session', { method: 'DELETE', credentials: 'include' });
   location.reload();
+}
+
+/** Checks the ADMIN session (separate cookie from the Twitch user
+ * session above) — this is what makes admin status consistent across
+ * both pages. Previously predictions.html never checked this at all,
+ * so being logged in as admin on the dashboard meant nothing here:
+ * no badge, no inline controls, nothing. Uses the same
+ * /api/verify-admin endpoint the dashboard itself uses, so there's
+ * exactly one source of truth for "is this session an admin session." */
+async function loadAdminStatus() {
+  try {
+    const res = await fetch('/api/verify-admin', { credentials: 'include', cache: 'no-cache' });
+    const data = await res.json();
+    isAdmin = !!data.authenticated;
+    document.getElementById('admin-badge').style.display = isAdmin ? 'flex' : 'none';
+    if (isAdmin) {
+      document.getElementById('admin-resolve-section').style.display = 'flex';
+      loadAdminClosedPredictions();
+    }
+  } catch (err) {
+    console.warn('[predictions] Admin status check failed:', err.message);
+  }
+}
+
+/** Closed-but-unresolved predictions, admin-only — completes the
+ * lifecycle that "Close voting" above starts. Without this, resolving
+ * a prediction was only possible from the dashboard, which is exactly
+ * the "admin in dashboard isn't admin here" gap this page is meant to
+ * close for good. */
+async function loadAdminClosedPredictions() {
+  const el = document.getElementById('admin-resolve-list');
+  if (!el) return;
+  el.innerHTML = '<div class="pv-empty">Loading…</div>';
+  try {
+    const res = await fetch('/api/predictions?status=closed', { credentials: 'include', cache: 'no-cache' });
+    const data = await res.json();
+    const predictions = data.predictions || [];
+    if (!predictions.length) {
+      document.getElementById('admin-resolve-section').style.display = 'none';
+      return;
+    }
+    document.getElementById('admin-resolve-section').style.display = 'flex';
+    el.innerHTML = predictions.map(renderAdminResolveCard).join('');
+  } catch (err) {
+    el.innerHTML = '<div class="pv-empty">Couldn\'t load — ' + escapeHtml(err.message) + '</div>';
+  }
+}
+
+function renderAdminResolveCard(p) {
+  const totalVotes = Object.values(p.counts || {}).reduce((a, b) => a + Number(b), 0);
+  const optsHtml = p.options.map(o => {
+    const count = Number(p.counts?.[o.value] || 0);
+    return `<button class="pv-admin-mini-btn" data-resolve-pred="${p.id}" data-resolve-choice="${escapeHtml(o.value)}" data-resolve-label="${escapeHtml(o.label)}">
+      Mark "${escapeHtml(o.label)}" correct (${count})
+    </button>`;
+  }).join('');
+
+  return `<div class="pv-pred-card">
+    <div class="pv-pred-top">
+      <div>
+        ${p.showKey ? `<div class="pv-pred-show">${escapeHtml(p.showKey)}</div>` : ''}
+        <div class="pv-pred-q">${escapeHtml(p.question)}</div>
+      </div>
+      <div class="pv-countdown pv-closed">${totalVotes} votes</div>
+    </div>
+    <div class="pv-admin-controls" style="border-top:none;margin-top:0;padding-top:0">
+      <span class="pv-admin-controls-lbl">Resolve</span>
+      ${optsHtml}
+    </div>
+  </div>`;
+}
+
+document.getElementById('admin-resolve-list')?.addEventListener('click', e => {
+  const btn = e.target.closest('[data-resolve-pred]');
+  if (!btn) return;
+  const { resolvePred, resolveChoice, resolveLabel } = btn.dataset;
+  resolvePredictionInline(resolvePred, resolveChoice, resolveLabel);
+});
+
+async function resolvePredictionInline(predictionId, correctOption, label) {
+  if (!confirm(`Mark "${label}" as correct? This scores every matching entry and can't be undone.`)) return;
+  try {
+    const res = await fetch('/api/predictions-admin', {
+      method: 'POST', credentials: 'include',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ id: predictionId, action: 'resolve', correctOption }),
+    });
+    const data = await res.json();
+    if (!res.ok) { toast(data.error || 'Failed to resolve', 'warn'); return; }
+    toast(`✓ Resolved — ${data.winners.length} of ${data.totalEntries} entries scored`);
+    loadAdminClosedPredictions();
+    loadLeaderboard(); // scores just changed — refresh so it's not stale
+  } catch (err) {
+    toast('Failed to resolve — ' + err.message, 'warn');
+  }
 }
 
 /* ─── AUTH / PROFILE ─────────────────────────────────────── */
@@ -108,14 +204,14 @@ function renderHistory(history) {
     return;
   }
   el.innerHTML = history.map(h => {
-    let icon = '⏳', ptsClass = 'pv-pending', ptsText = 'Pending';
+    let iconHtml = '⏳', ptsClass = 'pv-pending', ptsText = 'Pending';
     if (h.status === 'resolved') {
-      icon = h.wasCorrect ? '✓' : '✕';
+      iconHtml = h.wasCorrect ? '<img src="img/predictions/icon-checkmark.png" alt="Correct">' : '<span style="color:var(--red);font-size:18px">✕</span>';
       ptsClass = h.wasCorrect ? 'pv-win' : 'pv-loss';
       ptsText = h.wasCorrect ? '+' + h.pointsEarned : '0';
     }
     return `<div class="pv-history-row">
-      <div class="pv-history-icon">${icon}</div>
+      <div class="pv-history-icon">${iconHtml}</div>
       <div class="pv-history-body">
         <div class="pv-history-q">${escapeHtml(h.question)}</div>
         <div class="pv-history-meta">You picked <strong>${escapeHtml(h.pick)}</strong>${h.status === 'resolved' ? ' · answer: ' + escapeHtml(h.correctOption) : ' · awaiting result'}</div>
@@ -195,6 +291,12 @@ function renderPredictionCard(p) {
     ? 'Log in with Twitch to make a pick'
     : (p.myPick ? "You've already picked — check back after this resolves" : 'Tap an option to lock in your pick');
 
+  const adminControls = isAdmin ? `
+    <div class="pv-admin-controls">
+      <span class="pv-admin-controls-lbl">Admin</span>
+      <button class="pv-admin-mini-btn" data-admin-action="close" data-admin-pred="${p.id}">🔒 Close voting</button>
+    </div>` : '';
+
   return `<div class="pv-pred-card" data-card="${p.id}">
     <div class="pv-pred-top">
       <div>
@@ -205,7 +307,36 @@ function renderPredictionCard(p) {
     </div>
     <div class="${isPhotoMode ? 'pv-options-photo' : 'pv-options'}">${optionsHtml}</div>
     <div class="pv-pred-hint">${hint}</div>
+    ${adminControls}
   </div>`;
+}
+
+// Delegated handler for the inline admin controls above — separate
+// from the voting delegation since these live inside .pv-admin-controls,
+// not .pv-option, and only ever render when isAdmin is true.
+document.getElementById('open-predictions')?.addEventListener('click', e => {
+  const btn = e.target.closest('[data-admin-action]');
+  if (!btn) return;
+  const { adminAction, adminPred } = btn.dataset;
+  if (adminAction === 'close') closePredictionInline(adminPred);
+});
+
+async function closePredictionInline(predictionId) {
+  if (!confirm('Close voting on this prediction? No more picks will be accepted.')) return;
+  try {
+    const res = await fetch('/api/predictions-admin', {
+      method: 'POST', credentials: 'include',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ id: predictionId, action: 'close' }),
+    });
+    const data = await res.json();
+    if (!res.ok) { toast(data.error || 'Failed to close voting', 'warn'); return; }
+    toast('✓ Voting closed — resolve it below in Awaiting Resolution');
+    loadPredictions();
+    loadAdminClosedPredictions();
+  } catch (err) {
+    toast('Failed to close voting — ' + err.message, 'warn');
+  }
 }
 
 async function submitVote(predictionId, choice) {
@@ -276,7 +407,7 @@ function renderLeaderboard(rows) {
   el.innerHTML = rows.map(r => `
     <div class="pv-lb-row ${currentUser && r.userId === currentUser.id ? 'pv-lb-me' : ''}">
       <div class="pv-lb-rank">${r.rank}</div>
-      ${r.avatarUrl ? `<img class="pv-lb-avatar" src="${r.avatarUrl}" alt="">` : '<div class="pv-lb-avatar"></div>'}
+      <img class="pv-lb-avatar" src="${r.avatarUrl || 'img/avatar-placeholder.png'}" alt="" onerror="this.src='img/avatar-placeholder.png'">
       <div class="pv-lb-name">${escapeHtml(r.displayName)}</div>
       <div class="pv-lb-score">${r.score}</div>
     </div>
@@ -290,5 +421,5 @@ function renderLeaderboard(rows) {
   if (params.get('login') === 'cancelled') { toast('Login cancelled', 'warn'); history.replaceState(null, '', location.pathname); }
 
   await loadSession(); // must resolve first so predictions render with myPick correctly attributed
-  await Promise.all([loadPredictions(), loadLeaderboard()]);
+  await Promise.all([loadPredictions(), loadLeaderboard(), loadAdminStatus()]);
 })();
