@@ -1,0 +1,41 @@
+{
+  "shows": [
+    {
+      "id": "kkk",
+      "name": "KKK",
+      "slug": "kkk",
+      "description": "Reality competition series tracked by RealityTV Intel.",
+      "active": true
+    },
+    {
+      "id": "lock-upp",
+      "name": "Lock Upp",
+      "slug": "lock-upp",
+      "description": "Reality competition series tracked by RealityTV Intel.",
+      "active": true
+    },
+    {
+      "id": "alliance-india",
+      "name": "Alliance India",
+      "slug": "alliance-india",
+      "description": "Reality competition series tracked by RealityTV Intel.",
+      "active": true
+    },
+    {
+      "id": "traitors-india",
+      "name": "Traitors India",
+      "slug": "traitors-india",
+      "description": "Reality competition series tracked by RealityTV Intel.",
+      "active": true
+    },
+    {
+      "id": "bigg-boss",
+      "name": "Bigg Boss",
+      "slug": "bigg-boss",
+      "description": "Reality competition series tracked by RealityTV Intel.",
+      "active": true
+    }
+  ],
+  "contestants": [],
+  "publishedAt": null
+}
