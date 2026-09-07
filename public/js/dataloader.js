@@ -1,5 +1,5 @@
 /* ═══════════════════════════════════════════════════════════
-   dataloader.js  —  Reality TV Intel 2026
+   dataloader.js — Reality TV Intel 2026
    Loads data from the live database (/api/data), falling back to the
    bundled copy only if the database is unreachable or hasn't been
    migrated yet. Both go through JSON.parse, never eval.
@@ -20,9 +20,9 @@ function _applyDataJSON(text) {
   const parsed = JSON.parse(text); // throws on malformed/malicious content — never executes it
   if (!parsed || typeof parsed !== 'object') throw new Error('data payload did not contain a JSON object');
   if (parsed.SHOWS) window.SHOWS = parsed.SHOWS;
-  if (parsed.DB)    window.DB    = parsed.DB;
+  if (parsed.DB) window.DB = parsed.DB;
   if (Array.isArray(parsed.HIDDEN_SHOWS_INIT)) window.HIDDEN_SHOWS_INIT = parsed.HIDDEN_SHOWS_INIT;
-  if (Array.isArray(parsed.HIDDEN_INIT))       window.HIDDEN_INIT       = parsed.HIDDEN_INIT;
+  if (Array.isArray(parsed.HIDDEN_INIT)) window.HIDDEN_INIT = parsed.HIDDEN_INIT;
 }
 
 let _lastAppliedText = null;
@@ -88,12 +88,12 @@ function _renderApp() {
     if (typeof buildShowPanel === 'function') buildShowPanel(k);
   });
 
-  if (typeof rebuildSidebar       === 'function') rebuildSidebar();
-  if (typeof renderAll            === 'function') renderAll();
-  if (typeof renderOverview       === 'function') renderOverview();
-  if (typeof updateStats          === 'function') updateStats();
-  if (typeof rebuildExportPanel   === 'function') rebuildExportPanel();
-  if (typeof renderActivityFeed   === 'function') renderActivityFeed();
+  if (typeof rebuildSidebar === 'function') rebuildSidebar();
+  if (typeof renderAll === 'function') renderAll();
+  if (typeof renderOverview === 'function') renderOverview();
+  if (typeof updateStats === 'function') updateStats();
+  if (typeof rebuildExportPanel === 'function') rebuildExportPanel();
+  if (typeof renderActivityFeed === 'function') renderActivityFeed();
   if (typeof _populateRankFilters === 'function') _populateRankFilters();
 
   try {

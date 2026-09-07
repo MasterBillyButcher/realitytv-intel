@@ -1,18 +1,18 @@
 /* ═══════════════════════════════════════════════════════════
-   app.js  —  Reality TV Intel 2026
+   app.js — Reality TV Intel 2026
    Rendering · Navigation · CRUD · Sort · Growth logic.
 ═══════════════════════════════════════════════════════════ */
 
 /* ─── STATE ─────────────────────────────────────────────── */
-let HIDDEN       = new Set();
-let HIDDEN_SHOWS = new Set();   // show keys hidden from public view
-let editMode     = false;
-let editTarget   = null;
-let _copySource  = null; // { key, id } — contestant pending a copy-to-show action
-let showEditKey  = null;
+let HIDDEN = new Set();
+let HIDDEN_SHOWS = new Set(); // show keys hidden from public view
+let editMode = false;
+let editTarget = null;
+let _copySource = null; // { key, id } — contestant pending a copy-to-show action
+let showEditKey = null;
 
 window._growthOrder = window._growthOrder || {};
-window._growthSort  = window._growthSort  || {};
+window._growthSort = window._growthSort || {};
 window._growthScope = window._growthScope || {}; // 'active' (default) or 'all' — per show
 
 /* ─── SHOW VISIBILITY HELPERS ───────────────────────────── */
@@ -26,7 +26,7 @@ function toggleShowHidden(key) {
   if (typeof _autoPersist === 'function') _autoPersist();
   const nowHidden = isShowHidden(key);
   toast(nowHidden
-    ? `👁 "${window.SHOWS[key]?.label}" hidden from public`
+    ? `"${window.SHOWS[key]?.label}" hidden from public`
     : `✓ "${window.SHOWS[key]?.label}" now visible`,
     nowHidden ? 'warn' : '');
 }
@@ -61,8 +61,8 @@ function setTheme(theme, persist = true) {
   document.body.classList.toggle('theme-light', next === 'light');
   const btn = document.getElementById('themeBtn');
   if (btn) {
-    btn.innerHTML = next === 'light' ? '☀ Light Mode' : '☾ Dark Mode';
-    btn.title     = next === 'light' ? 'Switch to dark mode' : 'Switch to light mode';
+    btn.innerHTML = next === 'light' ? 'Light Mode' : 'Dark Mode';
+    btn.title = next === 'light' ? 'Switch to dark mode' : 'Switch to light mode';
   }
   if (persist) {
     localStorage.setItem(THEME_KEY, next);
@@ -72,7 +72,7 @@ function setTheme(theme, persist = true) {
 function toggleTheme() {
   const next = getCurrentTheme() === 'dark' ? 'light' : 'dark';
   setTheme(next);
-  toast(next === 'light' ? '☀ Light mode' : '☾ Dark mode');
+  toast(next === 'light' ? 'Light mode' : 'Dark mode');
 }
 
 /* ─── FOLLOWER UTILS ────────────────────────────────────── */
@@ -140,20 +140,20 @@ function contestantInitials(name) {
 }
 function badge(s) {
   const u = (s || '').toUpperCase();
-  if (u.includes('ELIMINATED'))                        return '<span class="bdg be">✗ ELIMINATED</span>';
-  if (u.includes('WILDCARD'))                          return '<span class="bdg bwc">★ WILDCARD</span>';
-  if (u.includes('CONFIRMED'))                         return '<span class="bdg bc">✓ CONFIRMED</span>';
+  if (u.includes('ELIMINATED')) return '<span class="bdg be">✗ ELIMINATED</span>';
+  if (u.includes('WILDCARD')) return '<span class="bdg bwc">★ WILDCARD</span>';
+  if (u.includes('CONFIRMED')) return '<span class="bdg bc">✓ CONFIRMED</span>';
   if (u.includes('RUMOURED') || u.includes('RUMORED')) return '<span class="bdg br">~ RUMOURED</span>';
-  if (u.includes('APPROACHED'))                        return '<span class="bdg ba">→ APPROACHED</span>';
+  if (u.includes('APPROACHED')) return '<span class="bdg ba">→ APPROACHED</span>';
   return `<span class="bdg bw">${sanitizeHTML(s || '')}</span>`;
 }
 function rowCls(s) {
   const u = (s || '').toUpperCase();
-  if (u.includes('ELIMINATED'))                        return 're';
-  if (u.includes('WILDCARD'))                          return 'rwc';
-  if (u.includes('CONFIRMED'))                         return 'rc';
+  if (u.includes('ELIMINATED')) return 're';
+  if (u.includes('WILDCARD')) return 'rwc';
+  if (u.includes('CONFIRMED')) return 'rc';
   if (u.includes('RUMOURED') || u.includes('RUMORED')) return 'rr';
-  if (u.includes('APPROACHED'))                        return 'ra';
+  if (u.includes('APPROACHED')) return 'ra';
   return '';
 }
 function isH(k, id) { return HIDDEN.has(k + '::' + id); }
@@ -219,28 +219,77 @@ function toast(msg, type = '') {
   t._t = setTimeout(() => t.classList.remove('show'), 3200);
 }
 
+/* ─── IN-APP CONFIRM DIALOG ──────────────────────────────
+   Replaces the native window.confirm() used for destructive actions
+   (delete, logout, clear data, etc). The native dialog is an
+   unstyled OS-level popup — on several mobile browsers/webviews it
+   renders as a jarring plain black box before the text paints in,
+   which read as a broken "black screen" flash. This is a themed
+   in-app modal instead, built from the same .mbg/.modal markup
+   already used elsewhere, so it never leaves the page's own look. */
+function appConfirm(message, opts = {}) {
+  return new Promise(resolve => {
+    let bg = document.getElementById('confirm-mbg');
+    if (!bg) {
+      bg = document.createElement('div');
+      bg.id = 'confirm-mbg';
+      bg.className = 'mbg';
+      bg.innerHTML = `
+        <div class="modal" style="max-width:380px">
+          <div class="mtitle" id="confirm-title">Are you sure?</div>
+          <div id="confirm-msg" style="font-size:13px;color:var(--txt2);line-height:1.6;margin:4px 0 18px"></div>
+          <div style="display:flex;gap:8px;justify-content:flex-end">
+            <button class="btn b-gh" id="confirm-cancel">Cancel</button>
+            <button class="btn b-warn" id="confirm-ok">Confirm</button>
+          </div>
+        </div>`;
+      document.body.appendChild(bg);
+      bg.addEventListener('click', e => { if (e.target === bg) settle(false); });
+    }
+    document.getElementById('confirm-title').textContent = opts.title || 'Are you sure?';
+    document.getElementById('confirm-msg').textContent = message;
+    const okBtn = document.getElementById('confirm-ok');
+    okBtn.textContent = opts.okLabel || 'Confirm';
+    okBtn.className = 'btn ' + (opts.danger === false ? 'b-gld' : 'b-warn');
+
+    function settle(result) {
+      bg.classList.remove('open');
+      document.removeEventListener('keydown', onKey);
+      okBtn.onclick = null;
+      cancelBtn.onclick = null;
+      resolve(result);
+    }
+    function onKey(e) { if (e.key === 'Escape') settle(false); if (e.key === 'Enter') settle(true); }
+    const cancelBtn = document.getElementById('confirm-cancel');
+    okBtn.onclick = () => settle(true);
+    cancelBtn.onclick = () => settle(false);
+    document.addEventListener('keydown', onKey);
+    bg.classList.add('open');
+  });
+}
+
 /* ─── PANEL NAVIGATION ──────────────────────────────────── */
 function showPanel(id) {
   document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
   const p = document.getElementById('panel-' + id);
   if (p) p.classList.add('active');
   document.querySelectorAll('.sb-item').forEach(s => s.classList.toggle('active', s.dataset.panel === id));
-  if (id === 'overview')   renderOverview();
-  if (id === 'rankings')   renderRankings();
+  if (id === 'overview') renderOverview();
+  if (id === 'rankings') renderRankings();
   if (id === 'growth-all') renderGrowthAll();
-  if (id === 'export')     rebuildExportPanel();
+  if (id === 'export') rebuildExportPanel();
 }
 
 /* ─── EDIT MODE ─────────────────────────────────────────── */
 function toggleEdit() {
   editMode = !editMode;
   const btn = document.getElementById('editBtn');
-  btn.textContent       = '✎ Edit Mode: ' + (editMode ? 'ON' : 'OFF');
-  btn.style.color       = editMode ? 'var(--acc)' : '';
+  btn.textContent = 'Edit Mode: ' + (editMode ? 'ON' : 'OFF');
+  btn.style.color = editMode ? 'var(--acc)' : '';
   btn.style.borderColor = editMode ? 'var(--acc)' : '';
   document.body.classList.toggle('edit-on', editMode);
   renderAll();
-  toast(editMode ? '✎ Edit Mode ON: click any field to edit' : '✓ Edit Mode OFF');
+  toast(editMode ? 'Edit Mode ON: click any field to edit' : '✓ Edit Mode OFF');
 }
 
 /* ─── SIDEBAR ───────────────────────────────────────────── */
@@ -274,22 +323,22 @@ function buildShowPanel(key) {
   div.innerHTML = `
     <div class="ph">
       <div>
-        <div class="ph-title show-title" style="color:${s.color}">${s.emoji || '◆'} ${s.label}</div>
+        <div class="ph-title show-title" style="color:${s.color}">${s.label}</div>
         <div class="ph-desc">${s.platform || 'TBC'} &middot; ${showDateLabel(s)} &middot; Host: ${s.host || 'TBC'} &middot; ${s.desc || ''}</div>
       </div>
       <div class="ph-act no-capture">
-        <button class="btn b-gld b-sm" onclick="capture('sw-${key}-main','${key}')">📷 Capture All</button>
-        <button class="btn b-gh b-sm"  onclick="exportCSV('${key}')">↓ CSV</button>
+        <button class="btn b-gld b-sm" onclick="capture('sw-${key}-main','${key}')">Capture All</button>
+        <button class="btn b-gh b-sm" onclick="exportCSV('${key}')">↓ CSV</button>
         <button class="btn b-acc b-sm admin-only" onclick="openAdd('${key}')">+ Add</button>
-        <button class="btn b-gh b-sm admin-only"  onclick="openShowEdit('${key}')">✎ Edit Show</button>
+        <button class="btn b-gh b-sm admin-only" onclick="openShowEdit('${key}')">Edit Show</button>
       </div>
     </div>
     ${s.bannerUrl ? `<div class="show-banner no-capture"><img src="${s.bannerUrl.replace(/"/g,'&quot;')}" alt="${sanitizeHTML(s.label)} banner" onerror="this.parentElement.style.display='none'"></div>` : ''}
     <div id="sw-${key}-main">
       <div class="tab-bar no-capture">
         <button class="tab-btn active" onclick="switchTab('${key}','roster')">Roster</button>
-        <button class="tab-btn"        onclick="switchTab('${key}','cards')">Card View</button>
-        <button class="tab-btn"        onclick="switchTab('${key}','growth')">📈 Growth</button>
+        <button class="tab-btn" onclick="switchTab('${key}','cards')">Card View</button>
+        <button class="tab-btn" onclick="switchTab('${key}','growth')">Growth</button>
       </div>
 
       <!-- ROSTER TAB -->
@@ -325,8 +374,8 @@ function buildShowPanel(key) {
             <button class="filter-reset-btn" onclick="resetFilters('${key}')" title="Clear all filters">✕ Clear</button>
           </div>
           <div class="filter-bar-right">
-            <button class="btn b-pur b-sm" onclick="openHideMgr('${key}')">👁 Show/Hide</button>
-            <button class="btn b-gld b-sm" onclick="capture('sw-${key}-tbl','${key}_Table')">📷 Capture</button>
+            <button class="btn b-pur b-sm" onclick="openHideMgr('${key}')">Show/Hide</button>
+            <button class="btn b-gld b-sm" onclick="capture('sw-${key}-tbl','${key}_Table')">Capture</button>
           </div>
         </div>
         <div id="sw-${key}-hid-notice"></div>
@@ -354,11 +403,11 @@ function buildShowPanel(key) {
       <!-- GROWTH TAB -->
       <div class="tab-pane" id="sw-${key}-growth">
         <div class="ph" style="margin-bottom:12px">
-          <div style="font-size:14px;font-weight:800">📈 Instagram Growth: ${s.label}</div>
+          <div style="font-size:14px;font-weight:800">Instagram Growth: ${s.label}</div>
           <div class="ph-act no-capture">
             <button class="shift-to-last-btn admin-only" onclick="shiftCurrentToLast('${key}')" title="Roll Current → Last Checked and set today's date on Last Checked field">⟳ Roll Current → Last Checked</button>
-            <button class="btn b-gld b-sm" onclick="capture('gtbl-inner-${key}','${key}_Growth')">📷 Capture</button>
-            <button class="btn b-gh b-sm"  onclick="exportGrowthCSV('${key}')">↓ CSV</button>
+            <button class="btn b-gld b-sm" onclick="capture('gtbl-inner-${key}','${key}_Growth')">Capture</button>
+            <button class="btn b-gh b-sm" onclick="exportGrowthCSV('${key}')">↓ CSV</button>
           </div>
         </div>
         <div class="dnote no-capture admin-only" style="margin-bottom:10px">
@@ -381,7 +430,7 @@ function switchTab(key, tab) {
   host.querySelectorAll('.tab-pane').forEach(p => p.classList.remove('active'));
   const pane = document.getElementById('sw-' + key + '-' + tab);
   if (pane) pane.classList.add('active');
-  if (tab === 'cards')  renderCards(key);
+  if (tab === 'cards') renderCards(key);
   if (tab === 'growth') renderGrowth(key);
 }
 
@@ -393,17 +442,16 @@ function renderOverview() {
   el.innerHTML = getShowKeys()
     .filter(k => isAdmin || !isShowHidden(k))
     .map(k => {
-      const s    = window.SHOWS[k];
+      const s = window.SHOWS[k];
       const rows = window.DB[k] || [];
-      const vis  = rows.filter(c => !isH(k, c.id));
+      const vis = rows.filter(c => !isH(k, c.id));
       const conf = vis.filter(c => (c.status || '').toUpperCase().includes('CONFIRMED')).length;
-      const rum  = vis.filter(c => (c.status || '').toUpperCase().includes('RUMOUR')).length;
+      const rum = vis.filter(c => (c.status || '').toUpperCase().includes('RUMOUR')).length;
       const hiddenShow = isShowHidden(k);
       return `<div class="ccard${hiddenShow ? ' show-card-hidden' : ''}" onclick="showPanel('show-${k}')" style="cursor:pointer">
         <div class="ccard-photo-wrap" style="aspect-ratio:2/1;border-top:3px solid ${s.color};background:linear-gradient(135deg,${s.color}22,${s.color}44);flex-direction:column;gap:6px">
-          <div style="font-size:32px">${s.emoji || '📺'}</div>
-          <div style="font-size:11px;font-weight:800;color:rgba(255,255,255,.75);letter-spacing:.06em;text-align:center;padding:0 8px">${s.label}</div>
-          ${hiddenShow ? `<div style="position:absolute;top:6px;right:6px;background:rgba(0,0,0,.7);color:var(--mut);font-size:9px;font-weight:700;padding:2px 7px;border-radius:999px;letter-spacing:.06em">HIDDEN</div>` : ''}
+          <div style="font-size:15px;font-weight:800;color:rgba(255,255,255,.9);letter-spacing:.04em;text-align:center;padding:0 12px">${s.label}</div>
+          ${hiddenShow ? `<div style="position:absolute;top:6px;right:6px;background:rgba(0,0,0,.7);color:var(--mut);font-size:9px;font-weight:700;padding:2px 7px;border-radius:6px;letter-spacing:.06em">HIDDEN</div>` : ''}
         </div>
         <div class="ccard-body">
           <div class="ccard-top-row">
@@ -417,7 +465,7 @@ function renderOverview() {
           <div class="crow"><span class="crow-l">Rumoured</span><span class="crow-r" style="color:var(--gld)">${rum}</span></div>
           <div class="ccard-footer">
             <button class="btn b-acc b-sm" style="flex:1;justify-content:center" onclick="event.stopPropagation();showPanel('show-${k}')">View Roster →</button>
-            ${isAdmin ? `<button class="btn ${hiddenShow ? 'b-grn' : 'b-warn'} b-sm no-capture" onclick="event.stopPropagation();toggleShowHidden('${k}')" title="${hiddenShow ? 'Publish show' : 'Hide show from public'}">${hiddenShow ? '✓ Publish' : '👁 Hide'}</button>` : ''}
+            ${isAdmin ? `<button class="btn ${hiddenShow ? 'b-grn' : 'b-warn'} b-sm no-capture" onclick="event.stopPropagation();toggleShowHidden('${k}')" title="${hiddenShow ? 'Publish show' : 'Hide show from public'}">${hiddenShow ? '✓ Publish' : 'Hide'}</button>` : ''}
           </div>
         </div>
       </div>`;
@@ -426,19 +474,19 @@ function renderOverview() {
 
 /* ─── STATS BAR ─────────────────────────────────────────── */
 function updateStats() {
-  const isAdmin    = document.body.classList.contains('admin-active');
+  const isAdmin = document.body.classList.contains('admin-active');
   /* "Shows" = published/active seasons only. Hidden shows never count
      here, even for admin — this stat represents what's actually live,
      not what exists in the database. Manage hidden shows via the
      sidebar or Overview cards, which do surface them to admin. */
   const publicKeys = getShowKeys().filter(k => !isShowHidden(k));
-  const visKeys    = getShowKeys().filter(k => isAdmin || !isShowHidden(k));
-  const allC       = visKeys.flatMap(k => (window.DB[k] || []).map(c => ({ ...c, _k: k })));
+  const visKeys = getShowKeys().filter(k => isAdmin || !isShowHidden(k));
+  const allC = visKeys.flatMap(k => (window.DB[k] || []).map(c => ({ ...c, _k: k })));
   setText('st-shows', publicKeys.length);
   setText('st-total', allC.length);
-  setText('st-conf',  allC.filter(c => (c.status || '').toUpperCase().includes('CONFIRMED')).length);
-  setText('st-rum',   allC.filter(c => (c.status || '').toUpperCase().includes('RUMOUR')).length);
-  setText('st-hid',   HIDDEN.size);
+  setText('st-conf', allC.filter(c => (c.status || '').toUpperCase().includes('CONFIRMED')).length);
+  setText('st-rum', allC.filter(c => (c.status || '').toUpperCase().includes('RUMOUR')).length);
+  setText('st-hid', HIDDEN.size);
   updateInstagramStats();
 }
 function setText(id, val) { const e = document.getElementById(id); if (e) e.textContent = val; }
@@ -452,9 +500,13 @@ function setText(id, val) { const e = document.getElementById(id); if (e) e.text
    plain "—" / "None" rather than 0, NaN, or a fabricated value. */
 function updateInstagramStats() {
   if (!document.getElementById('ig-total')) return; // not on this page
-  const isAdmin = document.body.classList.contains('admin-active');
-  const visKeys = getShowKeys().filter(k => isAdmin || !isShowHidden(k));
-  const allC = visKeys.flatMap(k => (window.DB[k] || []).map(c => ({ ...c, _k: k })));
+  // Hidden shows and hidden/eliminated contestants never count here,
+  // for anyone (including admin) — this strip represents what's
+  // actually being tracked, not everything that exists in the DB.
+  const visKeys = getShowKeys().filter(k => !isShowHidden(k));
+  const allC = visKeys.flatMap(k => (window.DB[k] || [])
+    .filter(c => !isH(k, c.id))
+    .map(c => ({ ...c, _k: k })));
 
   let totalFollowers = 0, totalCounted = 0;
   let most = null, mostVal = -1;
@@ -475,10 +527,10 @@ function updateInstagramStats() {
     }
   });
 
-  setText('ig-total', totalCounted ? fmtF(totalFollowers, 2) : '—');
+  setText('ig-total', totalCounted ? fmtF(totalFollowers, 2) : '-');
   setText('ig-total-sub', totalCounted ? `Across ${totalCounted} tracked contestant${totalCounted === 1 ? '' : 's'}` : 'No follower data yet');
 
-  setText('ig-most', most ? fmtF(mostVal, 2) : '—');
+  setText('ig-most', most ? fmtF(mostVal, 2) : '-');
   setText('ig-most-sub', most ? `${most.name} · ${window.SHOWS[most._k]?.label || most._k}` : 'No data yet');
 
   setText('ig-fastest', fastest ? '+' + fastest.g.rateRaw.toFixed(2) + '%' : 'None');
@@ -492,7 +544,7 @@ function updateInstagramStats() {
 function renderTable(key) {
   const tbody = document.getElementById('tb-' + key);
   if (!tbody || !window.DB[key]) return;
-  const hidden  = [];
+  const hidden = [];
   const isAdmin = document.body.classList.contains('admin-active');
 
   tbody.innerHTML = (window.DB[key] || []).map((c, i) => {
@@ -523,9 +575,9 @@ function renderTable(key) {
       <td><span class="tm" style="color:var(--blu)">${ed(c.follCur || 'N/V', key, c.id, 'follCur')}</span></td>
       <td class="no-capture">
         <div style="display:flex;gap:4px;align-items:center">
-          <button class="hide-btn${hid ? ' is-hid' : ''}" onclick="toggleH('${key}',${c.id})" title="${hid ? 'Show' : 'Hide'}">👁</button>
-          <button class="btn b-gh b-xs admin-only" onclick="openEdit('${key}',${c.id})">✎</button>
-          <button class="btn b-gh b-xs admin-only" onclick="openCopyToShow('${key}',${c.id})" title="Copy to another show">📋</button>
+          <button class="hide-btn${hid ? ' is-hid' : ''}" onclick="toggleH('${key}',${c.id})" title="${hid ? 'Show' : 'Hide'}">${hid ? 'Show' : 'Hide'}</button>
+          <button class="btn b-gh b-xs admin-only" onclick="openEdit('${key}',${c.id})">Edit</button>
+          <button class="btn b-gh b-xs admin-only" onclick="openCopyToShow('${key}',${c.id})" title="Copy to another show">Copy</button>
           <button class="btn b-red b-xs admin-only" onclick="delRow('${key}',${c.id})">✕</button>
         </div>
       </td>
@@ -535,7 +587,7 @@ function renderTable(key) {
   const notice = document.getElementById('sw-' + key + '-hid-notice');
   if (notice) {
     notice.innerHTML = hidden.length
-      ? `<div class="hid-notice no-capture">👁 <span class="hid-count">${hidden.length}</span> hidden:
+      ? `<div class="hid-notice no-capture"><span class="hid-count">${hidden.length}</span> hidden:
           <span style="color:var(--txt)">${hidden.join(', ')}</span>
           <button class="btn b-gh b-xs" onclick="showAllInShow('${key}')">Restore All</button>
         </div>` : '';
@@ -552,7 +604,7 @@ function filterTbl(key, q) {
 }
 /* ─── UNIFIED FILTER ────────────────────────────────────── */
 function filterTable(key) {
-  const q      = (document.querySelector(`.roster-search[data-search-key="${key}"]`)?.value || '').toLowerCase().trim();
+  const q = (document.querySelector(`.roster-search[data-search-key="${key}"]`)?.value || '').toLowerCase().trim();
   const status = (document.getElementById('fstat-' + key)?.value || '').toUpperCase().trim();
   const gender = (document.getElementById('fgender-' + key)?.value || '').toUpperCase().trim();
 
@@ -564,11 +616,11 @@ function filterTable(key) {
       return;
     }
     total++;
-    const name    = (tr.dataset.search || '').toLowerCase();
+    const name = (tr.dataset.search || '').toLowerCase();
     const tGender = (tr.dataset.gender || '').toUpperCase().trim();
     const tStatus = (tr.dataset.status || '').toUpperCase();
 
-    const matchQ = !q      || name.includes(q);
+    const matchQ = !q || name.includes(q);
     const matchS = !status || tStatus.includes(status);
     const matchG = !gender || tGender === gender;
 
@@ -581,15 +633,15 @@ function filterTable(key) {
   if (fc) {
     const hasFilter = q || status || gender;
     fc.style.display = hasFilter ? 'block' : 'none';
-    fc.textContent   = hasFilter ? `Showing ${visible} of ${total} contestants` : '';
+    fc.textContent = hasFilter ? `Showing ${visible} of ${total} contestants` : '';
   }
 }
 
 function resetFilters(key) {
   const searchEl = document.querySelector(`.roster-search[data-search-key="${key}"]`);
   if (searchEl) searchEl.value = '';
-  const statEl   = document.getElementById('fstat-'   + key);
-  if (statEl)   statEl.value   = '';
+  const statEl = document.getElementById('fstat-' + key);
+  if (statEl) statEl.value = '';
   const genderEl = document.getElementById('fgender-' + key);
   if (genderEl) genderEl.value = '';
   filterTable(key);
@@ -605,12 +657,12 @@ function sortT(key, col) {
   if (!tbody) return;
   const sk = key + '-' + col;
   _sortDirs[sk] = !_sortDirs[sk];
-  const asc  = _sortDirs[sk];
+  const asc = _sortDirs[sk];
 
   // Sort only visible (non-hidden) rows to avoid disturbing hide-manager state
-  const allRows    = Array.from(tbody.querySelectorAll('tr'));
-  const visible    = allRows.filter(r => !r.classList.contains('row-hidden'));
-  const hiddenRows = allRows.filter(r =>  r.classList.contains('row-hidden'));
+  const allRows = Array.from(tbody.querySelectorAll('tr'));
+  const visible = allRows.filter(r => !r.classList.contains('row-hidden'));
+  const hiddenRows = allRows.filter(r => r.classList.contains('row-hidden'));
 
   visible.sort((a, b) => {
     const at = a.cells[col]?.textContent.trim() || '';
@@ -639,35 +691,30 @@ function sortT(key, col) {
 function renderCards(key) {
   const el = document.getElementById('sw-' + key + '-cgrid');
   if (!el || !window.DB[key]) return;
-  const col     = window.SHOWS[key]?.color || '#4A9EFF';
+  const col = window.SHOWS[key]?.color || '#4A9EFF';
   const isAdmin = document.body.classList.contains('admin-active');
 
   el.innerHTML = (window.DB[key] || []).map((c, i) => {
-    const hid       = isH(key, c.id);
-    const g         = calcGrowth(c.follLast, c.follCur);
-    const g2        = calcGrowth(c.follBefore, c.follCur);
-    const gcol      = g.rateRaw !== null ? (g.rateRaw >= 0 ? 'var(--grn)' : '#CC4444') : 'var(--mut)';
-    const initials  = contestantInitials(c.name);
-    const photo     = String(c?.photo || '').trim();
+    const hid = isH(key, c.id);
+    const g = calcGrowth(c.follLast, c.follCur);
+    const g2 = calcGrowth(c.follBefore, c.follCur);
+    const gcol = g.rateRaw !== null ? (g.rateRaw >= 0 ? 'var(--grn)' : '#CC4444') : 'var(--mut)';
+    const initials = contestantInitials(c.name);
+    const photo = String(c?.photo || '').trim();
 
     const photoBlock = photo
       ? `<div class="ccard-photo-wrap" style="border-top:3px solid ${col}">
            <img class="ccard-photo-img" src="${photo.replace(/"/g, '&quot;')}" alt="${sanitizeHTML(c.name)}" loading="lazy"
              onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
-           <div class="ccard-photo-fallback" style="display:none;background:linear-gradient(150deg,${col}22,${col}55)">
-             <div class="ccard-initials">${initials}</div>
-             <div class="ccard-no-photo-meta">
-               <div class="ccard-no-photo-name">${sanitizeHTML(c.name)}</div>
-               <div class="ccard-no-photo-sub">${sanitizeHTML(c.profession || '')}</div>
+           <div class="ccard-photo-fallback" style="display:none">
+             <div class="ccard-avatar-ring" style="--avatar-col:${col}">
+               <div class="ccard-initials">${initials}</div>
              </div>
            </div>
          </div>`
-      : `<div class="ccard-photo-wrap ccard-photo-fallback" style="border-top:3px solid ${col};background:linear-gradient(150deg,${col}18,${col}40)">
-           <div class="ccard-initials">${initials}</div>
-           <div class="ccard-no-photo-meta">
-             <div class="ccard-no-photo-name">${sanitizeHTML(c.name)}</div>
-             <div class="ccard-no-photo-sub">${sanitizeHTML(c.profession || '')} · ${c.gender || ''}</div>
-             ${c.follCur && c.follCur !== 'N/V' ? `<div class="ccard-no-photo-foll" style="color:${col}">${displayFollower(c.follCur)} followers</div>` : ''}
+      : `<div class="ccard-photo-empty" style="border-top:3px solid ${col}">
+           <div class="ccard-avatar-ring" style="--avatar-col:${col}">
+             <div class="ccard-initials">${initials}</div>
            </div>
          </div>`;
 
@@ -690,10 +737,10 @@ function renderCards(key) {
         <div class="crow"><span class="crow-l">Instagram</span><span class="crow-r">${igLink(c.ig)}</span></div>
         ${c.knownFor ? `<div class="crow" style="align-items:flex-start"><span class="crow-l">Known For</span><span class="crow-r" style="color:var(--mut);white-space:normal;text-align:right">${sanitizeHTML(c.knownFor)}</span></div>` : ''}
         <div class="ccard-footer no-capture">
-          ${c.bio ? `<button class="btn b-pur b-sm" style="flex:1;justify-content:center" onclick="openBio('${key}',${c.id})">ℹ️ Profile</button>` : ''}
-          <button class="btn b-gh b-sm admin-only" style="flex:1;justify-content:center" onclick="openEdit('${key}',${c.id})">✎ Edit</button>
-          <button class="btn b-gh b-sm admin-only" style="flex:1;justify-content:center" onclick="openCopyToShow('${key}',${c.id})" title="Copy to another show">📋 Copy</button>
-          <button class="btn ${hid ? 'b-grn' : 'b-warn'} b-sm" onclick="toggleH('${key}',${c.id})">${hid ? '✓ Show' : '👁 Hide'}</button>
+          ${c.bio ? `<button class="btn b-pur b-sm" style="flex:1;justify-content:center" onclick="openBio('${key}',${c.id})">Profile</button>` : ''}
+          <button class="btn b-gh b-sm admin-only" style="flex:1;justify-content:center" onclick="openEdit('${key}',${c.id})">Edit</button>
+          <button class="btn b-gh b-sm admin-only" style="flex:1;justify-content:center" onclick="openCopyToShow('${key}',${c.id})" title="Copy to another show">Copy</button>
+          <button class="btn ${hid ? 'b-grn' : 'b-warn'} b-sm" onclick="toggleH('${key}',${c.id})">${hid ? '✓ Show' : 'Hide'}</button>
         </div>
       </div>
     </div>`;
@@ -719,14 +766,14 @@ function setGrowthSort(key, val) {
    default; each viewer can hide the ones they don't care about
    without affecting anyone else's view. */
 const GROWTH_COLS = [
-  { id: 'handle',      label: 'Insta Handle' },
-  { id: 'before',      label: 'Before Show' },
-  { id: 'last',        label: 'Last Checked' },
-  { id: 'current',     label: 'Current' },
-  { id: 'growthLast',  label: 'Growth (Last → Now)' },
-  { id: 'growthRate',  label: 'Growth Rate %' },
+  { id: 'handle', label: 'Insta Handle' },
+  { id: 'before', label: 'Before Show' },
+  { id: 'last', label: 'Last Checked' },
+  { id: 'current', label: 'Current' },
+  { id: 'growthLast', label: 'Growth (Last → Now)' },
+  { id: 'growthRate', label: 'Growth Rate %' },
   { id: 'totalGrowth', label: 'Total Growth' },
-  { id: 'totalRate',   label: 'Total Rate %' },
+  { id: 'totalRate', label: 'Total Rate %' },
 ];
 const GROWTH_COLS_KEY = 'rti_growth_hidden_cols';
 window._growthHiddenCols = window._growthHiddenCols || new Set(
@@ -778,49 +825,49 @@ function buildGrowthHTML(key) {
     </div>`;
   }
 
-  const sortVal     = getGrowthSortKey(key);
+  const sortVal = getGrowthSortKey(key);
   const customOrder = window._growthOrder[key];
 
   let data;
   if (sortVal === 'custom' && customOrder?.length) {
     const byId = Object.fromEntries(raw.map(c => [c.id, c]));
-    const ord  = customOrder.map(id => byId[id]).filter(Boolean);
+    const ord = customOrder.map(id => byId[id]).filter(Boolean);
     raw.forEach(c => { if (!customOrder.includes(c.id)) ord.push(c); });
     data = ord;
   } else {
     data = [...raw].sort((a, b) => {
-      const ga = calcGrowth(a.follLast,   a.follCur);
-      const gb = calcGrowth(b.follLast,   b.follCur);
+      const ga = calcGrowth(a.follLast, a.follCur);
+      const gb = calcGrowth(b.follLast, b.follCur);
       const ta = calcGrowth(a.follBefore, a.follCur);
       const tb = calcGrowth(b.follBefore, b.follCur);
       const cA = parseF(a.follCur) ?? 0;
       const cB = parseF(b.follCur) ?? 0;
       switch (sortVal) {
-        case 'growth-desc':    return (gb.rateRaw ?? -Infinity) - (ga.rateRaw ?? -Infinity);
-        case 'growth-asc':     return (ga.rateRaw ??  Infinity) - (gb.rateRaw ??  Infinity);
-        case 'total-desc':     return (tb.rateRaw ?? -Infinity) - (ta.rateRaw ?? -Infinity);
-        case 'total-asc':      return (ta.rateRaw ??  Infinity) - (tb.rateRaw ??  Infinity);
+        case 'growth-desc': return (gb.rateRaw ?? -Infinity) - (ga.rateRaw ?? -Infinity);
+        case 'growth-asc': return (ga.rateRaw ?? Infinity) - (gb.rateRaw ?? Infinity);
+        case 'total-desc': return (tb.rateRaw ?? -Infinity) - (ta.rateRaw ?? -Infinity);
+        case 'total-asc': return (ta.rateRaw ?? Infinity) - (tb.rateRaw ?? Infinity);
         case 'followers-desc': return cB - cA;
-        case 'followers-asc':  return cA - cB;
-        case 'name':           return a.name.localeCompare(b.name);
-        default:               return (gb.rateRaw ?? -Infinity) - (ga.rateRaw ?? -Infinity);
+        case 'followers-asc': return cA - cB;
+        case 'name': return a.name.localeCompare(b.name);
+        default: return (gb.rateRaw ?? -Infinity) - (ga.rateRaw ?? -Infinity);
       }
     });
   }
 
-  const s          = window.SHOWS[key];
-  const hasCustom  = customOrder?.length;
+  const s = window.SHOWS[key];
+  const hasCustom = customOrder?.length;
 
   const show = id => !isGrowthColHidden(id);
 
   const rows = data.map((c, idx) => {
-    const g1   = calcGrowth(c.follLast,   c.follCur);
-    const g2   = calcGrowth(c.follBefore, c.follCur);
+    const g1 = calcGrowth(c.follLast, c.follCur);
+    const g2 = calcGrowth(c.follBefore, c.follCur);
     const neg1 = g1.rateRaw !== null && g1.rateRaw < 0;
-    const hi1  = g1.rateRaw !== null && g1.rateRaw >= 5;
-    const md1  = g1.rateRaw !== null && g1.rateRaw >= 1 && g1.rateRaw < 5;
+    const hi1 = g1.rateRaw !== null && g1.rateRaw >= 5;
+    const md1 = g1.rateRaw !== null && g1.rateRaw >= 1 && g1.rateRaw < 5;
     const neg2 = g2.rateRaw !== null && g2.rateRaw < 0;
-    const hi2  = g2.rateRaw !== null && g2.rateRaw >= 50;
+    const hi2 = g2.rateRaw !== null && g2.rateRaw >= 50;
 
     function eC(val, f) {
       const isFoll = /^foll(Before|Last|Cur)$/.test(f);
@@ -836,14 +883,14 @@ function buildGrowthHTML(key) {
       ondrop="growthDrop(event,'${key}')"
       ondragleave="growthDragLeave(event)">
       <td style="font-weight:700">${eC(c.name, 'name')}</td>
-      ${show('handle')      ? `<td style="color:var(--mut)">${sanitizeHTML(c.ig || 'N/V')}</td>` : ''}
-      ${show('before')      ? `<td>${eC(c.follBefore, 'follBefore')}</td>` : ''}
-      ${show('last')        ? `<td>${eC(c.follLast, 'follLast')}</td>` : ''}
-      ${show('current')     ? `<td>${eC(c.follCur, 'follCur')}</td>` : ''}
-      ${show('growthLast')  ? `<td class="${neg1 ? 'neg' : hi1 ? 'hi' : md1 ? 'md' : ''}">${g1.diff}</td>` : ''}
-      ${show('growthRate')  ? `<td class="${neg1 ? 'neg' : hi1 ? 'hi' : md1 ? 'md' : ''}">${g1.rate}</td>` : ''}
+      ${show('handle') ? `<td>${igLink(c.ig)}</td>` : ''}
+      ${show('before') ? `<td>${eC(c.follBefore, 'follBefore')}</td>` : ''}
+      ${show('last') ? `<td>${eC(c.follLast, 'follLast')}</td>` : ''}
+      ${show('current') ? `<td>${eC(c.follCur, 'follCur')}</td>` : ''}
+      ${show('growthLast') ? `<td class="${neg1 ? 'neg' : hi1 ? 'hi' : md1 ? 'md' : ''}">${g1.diff}</td>` : ''}
+      ${show('growthRate') ? `<td class="${neg1 ? 'neg' : hi1 ? 'hi' : md1 ? 'md' : ''}">${g1.rate}</td>` : ''}
       ${show('totalGrowth') ? `<td class="${neg2 ? 'neg' : hi2 ? 'hi' : ''}">${g2.diff}</td>` : ''}
-      ${show('totalRate')   ? `<td class="${neg2 ? 'neg' : hi2 ? 'hi' : ''}">${g2.rate}</td>` : ''}
+      ${show('totalRate') ? `<td class="${neg2 ? 'neg' : hi2 ? 'hi' : ''}">${g2.rate}</td>` : ''}
     </tr>`;
   }).join('');
 
@@ -852,14 +899,14 @@ function buildGrowthHTML(key) {
   return `<div class="growth-sort-bar no-capture">
     <span class="sort-label">Sort by</span>
     ${[
-      ['growth-desc',    '📈', 'Highest Growth'],
-      ['growth-asc',     '📉', 'Lowest Growth'],
-      ['total-desc',     '🚀', 'Total Growth ↑'],
-      ['total-asc',      '⬇️', 'Total Growth ↓'],
-      ['followers-desc', '👥', 'Most Followers'],
-      ['followers-asc',  '👤', 'Fewest Followers'],
-      ['name',           '🔤', 'A–Z'],
-      ['custom',         '↕️', 'Custom'],
+      ['growth-desc', '', 'Highest Growth'],
+      ['growth-asc', '', 'Lowest Growth'],
+      ['total-desc', '', 'Total Growth ↑'],
+      ['total-asc', '⬇️', 'Total Growth ↓'],
+      ['followers-desc', '', 'Most Followers'],
+      ['followers-asc', '', 'Fewest Followers'],
+      ['name', '', 'A–Z'],
+      ['custom', '↕️', 'Custom'],
     ].map(([val, ico, lbl]) =>
       `<button class="sort-pill${sortVal === val ? ' active' : ''}"
         onclick="setGrowthSort('${key}','${val}')"
@@ -870,28 +917,28 @@ function buildGrowthHTML(key) {
     ${isAdmin ? `
     <span style="width:1px;height:16px;background:var(--bdr2);margin:0 4px"></span>
     <span class="sort-label">Show</span>
-    <button class="sort-pill${scope === 'active' ? ' active' : ''}" onclick="setGrowthScope('${key}','active')" title="Only active (non-eliminated) contestants">👁 Active only</button>
-    <button class="sort-pill${scope === 'all' ? ' active' : ''}" onclick="setGrowthScope('${key}','all')" title="Every contestant, including eliminated/hidden">🌐 All contestants</button>
+    <button class="sort-pill${scope === 'active' ? ' active' : ''}" onclick="setGrowthScope('${key}','active')" title="Only active (non-eliminated) contestants">Active only</button>
+    <button class="sort-pill${scope === 'all' ? ' active' : ''}" onclick="setGrowthScope('${key}','all')" title="Every contestant, including eliminated/hidden">All contestants</button>
     ` : ''}
     <span style="width:1px;height:16px;background:var(--bdr2);margin:0 4px"></span>
     <div class="growth-cols-wrap" style="position:relative">
-      <button class="btn b-gh b-xs" onclick="toggleGrowthColsMenu(this)" title="Choose which columns to display">⚏ Columns</button>
+      <button class="btn b-gh b-xs" onclick="toggleGrowthColsMenu(this)" title="Choose which columns to display">Columns</button>
       ${growthColumnsMenuHTML(colsMenuId)}
     </div>
   </div>
   <div class="gtbl-wrap" id="gtbl-inner-${key}">
-    <div class="gtbl-title">${s?.emoji || ''} ${s?.label || key.toUpperCase()}: Instagram Follower Growth Analysis</div>
+    <div class="gtbl-title">${s?.label || key.toUpperCase()}: Instagram Follower Growth Analysis</div>
     <table>
       <thead><tr>
         <th style="min-width:200px">Contestant ↕</th>
-        ${show('handle')      ? '<th>Insta Handle</th>' : ''}
-        ${show('before')      ? '<th>Before Show</th>' : ''}
-        ${show('last')        ? '<th>Last Checked</th>' : ''}
-        ${show('current')     ? '<th>Current ✓</th>' : ''}
-        ${show('growthLast')  ? '<th>Growth (Last→Now)</th>' : ''}
-        ${show('growthRate')  ? '<th>Growth Rate %</th>' : ''}
+        ${show('handle') ? '<th>Insta Handle</th>' : ''}
+        ${show('before') ? '<th>Before Show</th>' : ''}
+        ${show('last') ? '<th>Last Checked</th>' : ''}
+        ${show('current') ? '<th>Current ✓</th>' : ''}
+        ${show('growthLast') ? '<th>Growth (Last→Now)</th>' : ''}
+        ${show('growthRate') ? '<th>Growth Rate %</th>' : ''}
         ${show('totalGrowth') ? '<th>Total Growth</th>' : ''}
-        ${show('totalRate')   ? '<th>Total Rate %</th>' : ''}
+        ${show('totalRate') ? '<th>Total Rate %</th>' : ''}
       </tr></thead>
       <tbody>${rows}</tbody>
     </table>
@@ -976,9 +1023,9 @@ function growthDrop(e, key) {
   const tbody = target.closest('tbody');
   const srcId = parseInt(_dragSrc.dataset.id);
   const tgtId = parseInt(target.dataset.id);
-  const rows  = Array.from(tbody.querySelectorAll('tr'));
-  const ids   = rows.map(r => parseInt(r.dataset.id));
-  const si    = ids.indexOf(srcId), ti = ids.indexOf(tgtId);
+  const rows = Array.from(tbody.querySelectorAll('tr'));
+  const ids = rows.map(r => parseInt(r.dataset.id));
+  const si = ids.indexOf(srcId), ti = ids.indexOf(tgtId);
   ids.splice(si, 1); ids.splice(ti, 0, srcId);
   window._growthOrder[key] = ids;
   _dragSrc.style.opacity = '';
@@ -996,7 +1043,15 @@ function resetGrowthOrder(key) {
 function saveGrowthCell(key, id, f, val) {
   const c = (window.DB[key] || []).find(x => x.id === id);
   if (c) {
-    c[f] = /^foll(Before|Last|Cur)$/.test(f) ? normalizeFollowerInput(val) : sanitizeHTML(val.trim());
+    const isFoll = /^foll(Before|Last|Cur)$/.test(f);
+    const oldVal = c[f];
+    c[f] = isFoll ? normalizeFollowerInput(val) : sanitizeHTML(val.trim());
+    // Editing the Last Checked or Current number directly in the growth
+    // table is itself "checking" that number — stamp today's date on the
+    // matching date field automatically, same as the main edit form does.
+    const today = new Date().toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
+    if (f === 'follLast' && c[f] !== oldVal) c.follLastDate = today;
+    if (f === 'follCur'  && c[f] !== oldVal) c.follCurDate = today;
     renderGrowth(key);
     toast('✓ Updated: ' + f);
     if (typeof _autoPersist === 'function') _autoPersist();
@@ -1006,20 +1061,20 @@ function saveGrowthCell(key, id, f, val) {
 /* ─── SHIFT CURRENT → LAST CHECKED ──────────────────────── */
 /**
  * For every visible contestant in a show:
- *  - copies follCur → follLast
- *  - copies follCurDate (or today) → follLastDate
- *  - clears follCur and follCurDate so the admin can enter fresh values
+ * - copies follCur → follLast
+ * - copies follCurDate (or today) → follLastDate
+ * - clears follCur and follCurDate so the admin can enter fresh values
  */
 function shiftCurrentToLast(key) {
   const today = new Date().toLocaleDateString('en-GB', { day:'numeric', month:'short', year:'numeric' });
-  const data  = (window.DB[key] || []).filter(c => !isH(key, c.id));
+  const data = (window.DB[key] || []).filter(c => !isH(key, c.id));
   let shifted = 0;
   data.forEach(c => {
     if (c.follCur && c.follCur !== 'N/V') {
-      c.follLast     = c.follCur;
+      c.follLast = c.follCur;
       c.follLastDate = c.follCurDate || today;
-      c.follCur      = 'N/V';
-      c.follCurDate  = '';
+      c.follCur = 'N/V';
+      c.follCurDate = '';
       shifted++;
     }
   });
@@ -1047,10 +1102,10 @@ function renderGrowthAll() {
     .map(k => `
     <div style="margin-bottom:28px">
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;flex-wrap:wrap;gap:7px">
-        <div style="font-size:13px;font-weight:800;color:${window.SHOWS[k].color}">${window.SHOWS[k].emoji || ''} ${window.SHOWS[k].label}</div>
+        <div style="font-size:13px;font-weight:800;color:${window.SHOWS[k].color}">${window.SHOWS[k].label}</div>
         <div style="display:flex;gap:6px" class="no-capture">
-          <button class="btn b-gld b-sm" onclick="capture('gtbl-inner-${k}','${k}_Growth')">📷 Capture</button>
-          <button class="btn b-gh b-sm"  onclick="exportGrowthCSV('${k}')">↓ CSV</button>
+          <button class="btn b-gld b-sm" onclick="capture('gtbl-inner-${k}','${k}_Growth')">Capture</button>
+          <button class="btn b-gh b-sm" onclick="exportGrowthCSV('${k}')">↓ CSV</button>
         </div>
       </div>
       <div id="ggrow-${k}">${buildGrowthHTML(k)}</div>
@@ -1119,21 +1174,21 @@ function _populateRankFilters() {
 
 function filterRankings() {
   const status = (document.getElementById('rank-status-filter')?.value || '').toUpperCase().trim();
-  const show   = document.getElementById('rank-show-filter')?.value || '';
+  const show = document.getElementById('rank-show-filter')?.value || '';
   const gender = (document.getElementById('rank-gender-filter')?.value || '').toUpperCase().trim();
-  const q      = (document.getElementById('rank-search')?.value || '').toLowerCase().trim();
+  const q = (document.getElementById('rank-search')?.value || '').toLowerCase().trim();
 
   let visible = 0;
   document.querySelectorAll('#rank-tbody tr').forEach(tr => {
     const tStatus = (tr.dataset.status || '').toUpperCase();
     const tGender = (tr.dataset.gender || '').toUpperCase().trim();
-    const tName   = (tr.dataset.name   || '').toLowerCase();
-    const tShow   = tr.dataset.show || '';
+    const tName = (tr.dataset.name || '').toLowerCase();
+    const tShow = tr.dataset.show || '';
 
     const ok = (!status || tStatus.includes(status))
-            && (!show   || tShow === show)
+            && (!show || tShow === show)
             && (!gender || tGender === gender)
-            && (!q      || tName.includes(q));
+            && (!q || tName.includes(q));
     tr.style.display = ok ? '' : 'none';
     if (ok) visible++;
   });
@@ -1236,19 +1291,19 @@ async function checkDbStatus() {
     const connLabel = { 'redis-url': 'Redis (TCP)', 'rest': 'REST-based store', 'none': 'not detected' }[connection] || connection;
 
     if (res.ok && source === 'database') {
-      el.innerHTML = `<span style="color:var(--grn)">✓ Connected via ${sanitizeHTML(connLabel)} — live data is being served from the database</span>`;
+      el.innerHTML = `<span style="color:var(--grn)">✓ Connected via ${sanitizeHTML(connLabel)}. Live data is being served from the database.</span>`;
     } else if (res.ok && source === 'bundled-fallback' && connection === 'none') {
-      el.innerHTML = '<span style="color:var(--gld)">⚠ No database connection detected at all — currently serving the bundled backup file. Connect a database in Vercel → Storage, then redeploy.</span>';
+      el.innerHTML = '<span style="color:var(--gld)">No database connection detected at all. Currently serving the bundled backup file. Connect a database in Vercel Storage, then redeploy.</span>';
     } else if (res.ok && source === 'bundled-fallback') {
-      el.innerHTML = `<span style="color:var(--gld)">⚠ ${sanitizeHTML(connLabel)} detected but the read failed${dbError ? ': ' + sanitizeHTML(dbError) : ''} — currently serving the bundled backup file.</span>`;
+      el.innerHTML = `<span style="color:var(--gld)">${sanitizeHTML(connLabel)} detected but the read failed${dbError ? ': ' + sanitizeHTML(dbError) : ''}. Currently serving the bundled backup file.</span>`;
     } else if (res.status === 503) {
       const data = await res.json().catch(() => ({}));
-      el.innerHTML = `<span style="color:var(--red)">✕ No data source reachable — connection: ${sanitizeHTML(data.connectionDetected || 'unknown')}${data.databaseIssue ? ', error: ' + sanitizeHTML(data.databaseIssue) : ''}</span>`;
+      el.innerHTML = `<span style="color:var(--red)">✕ No data source reachable. Connection: ${sanitizeHTML(data.connectionDetected || 'unknown')}${data.databaseIssue ? ', error: ' + sanitizeHTML(data.databaseIssue) : ''}</span>`;
     } else {
       el.innerHTML = '<span style="color:var(--mut)">Could not determine status (HTTP ' + res.status + ')</span>';
     }
   } catch (err) {
-    el.innerHTML = '<span style="color:var(--red)">✕ /api/data is unreachable — ' + sanitizeHTML(err.message) + '</span>';
+    el.innerHTML = '<span style="color:var(--red)">✕ /api/data is unreachable: ' + sanitizeHTML(err.message) + '</span>';
   }
 }
 
@@ -1265,23 +1320,22 @@ function openShowEdit(key) {
   showEditKey = key;
   const s = window.SHOWS[key];
   if (!s) return;
-  document.getElementById('show-edit-title').textContent = '✎ Edit Show: ' + s.label;
-  document.getElementById('ns-name').value     = s.label || '';
-  document.getElementById('ns-key').value      = key;
-  document.getElementById('ns-key').disabled   = true;
+  document.getElementById('show-edit-title').textContent = 'Edit Show: ' + s.label;
+  document.getElementById('ns-name').value = s.label || '';
+  document.getElementById('ns-key').value = key;
+  document.getElementById('ns-key').disabled = true;
   document.getElementById('ns-platform').value = s.platform || '';
-  document.getElementById('ns-host').value     = s.host || '';
-  document.getElementById('ns-emoji').value    = s.emoji || '';
-  document.getElementById('ns-desc').value     = s.desc || '';
-  document.getElementById('ns-color').value    = s.color || '#4A9EFF';
-  document.getElementById('ns-banner').value   = s.bannerUrl || '';
+  document.getElementById('ns-host').value = s.host || '';
+  document.getElementById('ns-desc').value = s.desc || '';
+  document.getElementById('ns-color').value = s.color || '#4A9EFF';
+  document.getElementById('ns-banner').value = s.bannerUrl || '';
   if (s.releaseDate) document.getElementById('ns-date').value = s.releaseDate;
   document.getElementById('ns-add-btn').textContent = '✓ Update Show';
   document.getElementById('modal-shows').classList.add('open');
 }
 function resetShowForm() {
-  document.getElementById('show-edit-title').textContent = '⚙ Manage Shows';
-  ['ns-name','ns-key','ns-host','ns-date','ns-desc','ns-platform','ns-emoji','ns-banner'].forEach(id => {
+  document.getElementById('show-edit-title').textContent = 'Manage Shows';
+  ['ns-name','ns-key','ns-host','ns-date','ns-desc','ns-platform','ns-banner'].forEach(id => {
     const e = document.getElementById(id); if (e) { e.value = ''; e.disabled = false; }
   });
   document.getElementById('ns-color').value = '#4A9EFF';
@@ -1291,37 +1345,36 @@ function renderShowList() {
   const el = document.getElementById('show-list');
   if (!el) return;
   el.innerHTML = getShowKeys().map(k => {
-    const s      = window.SHOWS[k];
+    const s = window.SHOWS[k];
     const hidden = isShowHidden(k);
     return `<div class="show-item${hidden ? ' show-item-hidden' : ''}">
       <span class="show-dot" style="background:${s.color};${hidden ? 'opacity:.4' : ''}"></span>
       <div style="flex:1;${hidden ? 'opacity:.5' : ''}">
-        <div class="show-name">${s.emoji || ''} ${sanitizeHTML(s.label)}</div>
+        <div class="show-name">${sanitizeHTML(s.label)}</div>
         <div class="show-meta-sm">${sanitizeHTML(s.platform || '')} · ${showDateLabel(s)} · ${(window.DB[k] || []).length} contestants${hidden ? ' · <span style="color:var(--warn)">hidden from public</span>' : ''}</div>
       </div>
       <button class="btn ${hidden ? 'b-grn' : 'b-warn'} b-xs" onclick="toggleShowHidden('${k}')" title="${hidden ? 'Publish: make visible to public' : 'Hide from public view'}">
-        ${hidden ? '✓ Publish' : '👁 Hide'}
+        ${hidden ? '✓ Publish' : 'Hide'}
       </button>
-      <button class="btn b-gh b-xs" onclick="openShowEdit('${k}')">✎</button>
-      ${getShowKeys().length > 1 ? `<button class="btn b-red b-xs" onclick="removeShow('${k}')">🗑</button>` : ''}
+      <button class="btn b-gh b-xs" onclick="openShowEdit('${k}')">Edit</button>
+      ${getShowKeys().length > 1 ? `<button class="btn b-red b-xs" onclick="removeShow('${k}')">Delete</button>` : ''}
     </div>`;
   }).join('');
 }
 function addShow() {
   const name = document.getElementById('ns-name').value.trim();
-  const key  = showEditKey || document.getElementById('ns-key').value.trim().toLowerCase().replace(/[^a-z0-9]/g, '');
+  const key = showEditKey || document.getElementById('ns-key').value.trim().toLowerCase().replace(/[^a-z0-9]/g, '');
   if (!name || !key) { toast('Name and key required', 'err'); return; }
   if (!showEditKey && window.SHOWS[key]) { toast('Key already exists', 'err'); return; }
   const payload = {
-    label:       sanitizeHTML(name), key,
-    color:       document.getElementById('ns-color').value,
-    platform:    sanitizeHTML(document.getElementById('ns-platform').value),
-    host:        sanitizeHTML(document.getElementById('ns-host').value || 'TBC'),
+    label: sanitizeHTML(name), key,
+    color: document.getElementById('ns-color').value,
+    platform: sanitizeHTML(document.getElementById('ns-platform').value),
+    host: sanitizeHTML(document.getElementById('ns-host').value || 'TBC'),
     releaseDate: document.getElementById('ns-date').value || '',
-    date:        formatReleaseDate(document.getElementById('ns-date').value) || document.getElementById('ns-date').value || 'TBC',
-    desc:        sanitizeHTML(document.getElementById('ns-desc').value || ''),
-    emoji:       document.getElementById('ns-emoji').value || '📺',
-    bannerUrl:   document.getElementById('ns-banner').value.trim() || '',
+    date: formatReleaseDate(document.getElementById('ns-date').value) || document.getElementById('ns-date').value || 'TBC',
+    desc: sanitizeHTML(document.getElementById('ns-desc').value || ''),
+    bannerUrl: document.getElementById('ns-banner').value.trim() || '',
   };
   const errs = validateShow({ ...payload, key });
   if (errs.length) { toast(errs[0], 'err'); return; }
@@ -1338,12 +1391,12 @@ function addShow() {
   refreshShowUIs();
   closeModal('modal-shows');
   toast((editing ? '✓ Updated: ' : '✓ Created: ') + name);
-  if (typeof logActivity === 'function') logActivity(editing ? 'Updated show' : 'Created show', name, editing ? '✏️' : '📺');
+  if (typeof logActivity === 'function') logActivity(editing ? 'Updated show' : 'Created show', name, editing ? '' : '');
   if (typeof _autoPersist === 'function') _autoPersist();
 }
-function removeShow(key) {
+async function removeShow(key) {
   const lbl = window.SHOWS[key]?.label || key;
-  if (!confirm('Remove "' + lbl + '"? All data lost.')) return;
+  if (!await appConfirm('Remove "' + lbl + '"? All data lost.', { title: 'Remove show' })) return;
   delete window.SHOWS[key]; delete window.DB[key];
   const p = document.getElementById('panel-show-' + key); if (p) p.remove();
   rebuildSidebar(); renderOverview(); updateStats(); renderShowList();
@@ -1387,34 +1440,50 @@ function openEdit(key, id) {
   document.getElementById('modal-c').classList.add('open');
 }
 function saveContestant() {
-  const key  = document.getElementById('f-show').value;
+  const key = document.getElementById('f-show').value;
   const name = document.getElementById('f-name').value.trim();
   if (!name) { toast('Name required', 'err'); return; }
   if (!window.DB[key]) window.DB[key] = [];
   const obj = {
-    name:           sanitizeHTML(name),
-    gender:         document.getElementById('f-gender').value,
-    status:         document.getElementById('f-status').value,
-    profession:     sanitizeHTML(document.getElementById('f-profession').value),
-    tier:           sanitizeHTML(document.getElementById('f-tier').value),
-    ig:             sanitizeHTML(document.getElementById('f-ig').value),
-    photo:          document.getElementById('f-photo').value.trim(),
-    follBefore:     normalizeFollowerInput(document.getElementById('f-fb').value),
+    name: sanitizeHTML(name),
+    gender: document.getElementById('f-gender').value,
+    status: document.getElementById('f-status').value,
+    profession: sanitizeHTML(document.getElementById('f-profession').value),
+    tier: sanitizeHTML(document.getElementById('f-tier').value),
+    ig: sanitizeHTML(document.getElementById('f-ig').value),
+    photo: document.getElementById('f-photo').value.trim(),
+    follBefore: normalizeFollowerInput(document.getElementById('f-fb').value),
     follBeforeDate: sanitizeHTML(document.getElementById('f-fbd').value),
-    follLast:       normalizeFollowerInput(document.getElementById('f-fl').value),
-    follLastDate:   sanitizeHTML(document.getElementById('f-fld').value),
-    follCur:        normalizeFollowerInput(document.getElementById('f-fc').value),
-    follCurDate:    sanitizeHTML(document.getElementById('f-fcd').value),
-    knownFor:       sanitizeHTML(document.getElementById('f-kf').value),
-    history:        sanitizeHTML(document.getElementById('f-his').value),
+    follLast: normalizeFollowerInput(document.getElementById('f-fl').value),
+    follLastDate: sanitizeHTML(document.getElementById('f-fld').value),
+    follCur: normalizeFollowerInput(document.getElementById('f-fc').value),
+    follCurDate: sanitizeHTML(document.getElementById('f-fcd').value),
+    knownFor: sanitizeHTML(document.getElementById('f-kf').value),
+    history: sanitizeHTML(document.getElementById('f-his').value),
   };
   const errors = validateContestant(obj);
   if (errors.length) { toast(errors[0], 'err'); return; }
   const wasEdit = !!editTarget;
-  const previousStatus = wasEdit
-    ? ((window.DB[key] || []).find(c => c.id === editTarget.id)?.status || '').toUpperCase().trim()
-    : '';
+  const previous = wasEdit ? (window.DB[key] || []).find(c => c.id === editTarget.id) : null;
+  const previousStatus = (previous?.status || '').toUpperCase().trim();
   const newStatus = (obj.status || '').toUpperCase().trim();
+
+  // Auto-stamp Last Checked / Current Checked with today's date the moment
+  // the follower number actually changes, so the admin never has to
+  // remember to update the date by hand. If they typed a date of their own
+  // (different from what was already saved) that choice is respected
+  // instead of being overwritten.
+  const today = new Date().toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
+  if (obj.follLast !== (previous?.follLast || '') && obj.follLastDate === (previous?.follLastDate || '')) {
+    obj.follLastDate = today;
+  }
+  if (obj.follCur !== (previous?.follCur || '') && obj.follCurDate === (previous?.follCurDate || '')) {
+    obj.follCurDate = today;
+  }
+  if (!wasEdit) {
+    if (obj.follLast && obj.follLast !== 'N/V' && !obj.follLastDate) obj.follLastDate = today;
+    if (obj.follCur && obj.follCur !== 'N/V' && !obj.follCurDate) obj.follCurDate = today;
+  }
 
   if (editTarget && editTarget.key === key) {
     const idx = (window.DB[key] || []).findIndex(c => c.id === editTarget.id);
@@ -1451,22 +1520,22 @@ function saveContestant() {
   const autoHidden = newStatus === 'ELIMINATED' && previousStatus !== 'ELIMINATED';
   toast(
     (wasEdit ? '✓ Updated' : '✓ Added to ' + (window.SHOWS[key]?.label || key)) +
-    (autoHidden ? ', auto-hidden from Growth (eliminated). Unhide in 👁 Visibility if needed.' : '')
+    (autoHidden ? ', auto-hidden from Growth (eliminated). Unhide in Visibility if needed.' : '')
   );
   if (typeof logActivity === 'function') {
-    logActivity(wasEdit ? 'Edited contestant' : 'Added contestant', obj.name + ' · ' + (window.SHOWS[key]?.label || key), wasEdit ? '✏️' : '➕');
-    if (autoHidden) logActivity('Auto-hidden (eliminated)', obj.name + ' · ' + (window.SHOWS[key]?.label || key), '🙈');
+    logActivity(wasEdit ? 'Edited contestant' : 'Added contestant', obj.name + ' · ' + (window.SHOWS[key]?.label || key), wasEdit ? '' : '');
+    if (autoHidden) logActivity('Auto-hidden (eliminated)', obj.name + ' · ' + (window.SHOWS[key]?.label || key), '');
   }
   if (typeof _autoPersist === 'function') _autoPersist();
 }
-function delRow(key, id) {
-  if (!confirm('Delete this contestant?')) return;
+async function delRow(key, id) {
+  if (!await appConfirm('Delete this contestant? This cannot be undone.', { title: 'Delete contestant' })) return;
   const c = (window.DB[key] || []).find(x => x.id === id);
   window.DB[key] = (window.DB[key] || []).filter(c => c.id !== id);
   HIDDEN.delete(key + '::' + id);
   renderAll(); rebuildSidebar(); updateStats();
   toast('Removed', 'warn');
-  if (typeof logActivity === 'function') logActivity('Removed contestant', (c?.name || '?') + ' · ' + (window.SHOWS[key]?.label || key), '🗑️');
+  if (typeof logActivity === 'function') logActivity('Removed contestant', (c?.name || '?') + ' · ' + (window.SHOWS[key]?.label || key), '');
   if (typeof _autoPersist === 'function') _autoPersist();
 }
 
@@ -1486,12 +1555,12 @@ function openCopyToShow(key, id) {
   const otherShows = getShowKeys().filter(k => k !== key);
   const list = document.getElementById('copy-show-list');
   if (!otherShows.length) {
-    list.innerHTML = '<div style="color:var(--mut);font-size:12px;text-align:center;padding:20px 0">No other shows exist yet. Add one via ⚙ Shows first.</div>';
+    list.innerHTML = '<div style="color:var(--mut);font-size:12px;text-align:center;padding:20px 0">No other shows exist yet. Add one via Shows first.</div>';
   } else {
     list.innerHTML = otherShows.map(k => `
       <button class="btn b-gh" style="justify-content:flex-start;width:100%"
         onclick="confirmCopyToShow('${k}')">
-        ${window.SHOWS[k]?.emoji || ''} ${sanitizeHTML(window.SHOWS[k]?.label || k)}
+        ${sanitizeHTML(window.SHOWS[k]?.label || k)}
         <span style="margin-left:auto;color:var(--mut);font-size:11px">${(window.DB[k] || []).length} contestants</span>
       </button>`).join('');
   }
@@ -1519,7 +1588,7 @@ function confirmCopyToShow(targetKey) {
 
   renderAll(); rebuildSidebar(); updateStats();
   toast(`✓ Copied "${copy.name}" to ${window.SHOWS[targetKey]?.label || targetKey}. Original untouched`);
-  if (typeof logActivity === 'function') logActivity('Copied contestant', `${copy.name} · ${window.SHOWS[sourceKey]?.label || sourceKey} → ${window.SHOWS[targetKey]?.label || targetKey}`, '📋');
+  if (typeof logActivity === 'function') logActivity('Copied contestant', `${copy.name} · ${window.SHOWS[sourceKey]?.label || sourceKey} → ${window.SHOWS[targetKey]?.label || targetKey}`, '');
   if (typeof _autoPersist === 'function') _autoPersist();
 }
 
@@ -1535,7 +1604,7 @@ function openBio(key, id) {
   const c = (window.DB[key] || []).find(x => x.id === id);
   if (!c || !c.bio) return;
 
-  const col   = window.SHOWS[key]?.color || '#8B5CF6';
+  const col = window.SHOWS[key]?.color || '#8B5CF6';
   const photo = String(c.photo || '').trim();
 
   const photoWrap = document.getElementById('bio-photo-wrap');
@@ -1606,7 +1675,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
 /* ─── KEYBOARD SHORTCUTS ────────────────────────────────── */
 document.addEventListener('keydown', e => {
-  if ((e.ctrlKey || e.metaKey) && e.key === 's')              { e.preventDefault(); saveToLocalStorage(true); }
+  if ((e.ctrlKey || e.metaKey) && e.key === 's') { e.preventDefault(); saveToLocalStorage(true); }
   if ((e.ctrlKey || e.metaKey) && e.shiftKey && e.key === 'S') { e.preventDefault(); exportJSON(); }
   if ((e.ctrlKey || e.metaKey) && e.shiftKey && e.key === 'P') { e.preventDefault(); window.print(); }
   if (e.key === 'Escape') {
@@ -1620,15 +1689,15 @@ function buildMobileNav() {
   const el = document.getElementById('mobile-nav-links');
   if (!el) return;
   const items = [
-    { panel: 'overview',   label: '🏠 Overview' },
-    { panel: 'rankings',   label: '🏆 Rankings' },
-    { panel: 'growth-all', label: '📈 All Growth' },
-    { panel: 'export',     label: '↓ Export', adminOnly: true },
-    { panel: 'help',       label: '❓ Help',   adminOnly: true },
+    { panel: 'overview', label: 'Overview' },
+    { panel: 'rankings', label: 'Rankings' },
+    { panel: 'growth-all', label: 'All Growth' },
+    { panel: 'export', label: '↓ Export', adminOnly: true },
+    { panel: 'help', label: 'Help', adminOnly: true },
   ];
   const showItems = getShowKeys().map(k => ({
     panel: 'show-' + k,
-    label: (window.SHOWS[k].emoji || '') + ' ' + window.SHOWS[k].label,
+    label: window.SHOWS[k].label,
     color: window.SHOWS[k].color,
   }));
 

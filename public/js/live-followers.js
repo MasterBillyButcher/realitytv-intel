@@ -1,5 +1,5 @@
 /* ═══════════════════════════════════════════════════════════
-   live-followers.js  —  Reality TV Intel 2026
+   live-followers.js — Reality TV Intel 2026
    Admin-triggered live Instagram follower refresh via /api/followers
    (a Vercel serverless proxy — see api/followers.js for why this
    can't run purely client-side).
@@ -16,7 +16,7 @@ function _collectRefreshTargets(scopeKey) {
       // Hidden contestants (eliminated & auto-hidden, or hidden for any
       // other admin reason) are skipped entirely — no Apify credits
       // spent tracking someone who isn't shown in the Growth table.
-      // Unhide them in 👁 Visibility to bring them back into refreshes.
+      // Unhide them in Visibility to bring them back into refreshes.
       if (typeof isH === 'function' && isH(k, c.id)) { skippedHidden++; return; }
       const handle = String(c.ig || '').trim().replace(/^@/, '');
       if (handle && handle.toLowerCase() !== 'n/v') {
@@ -36,7 +36,7 @@ async function refreshFollowersLive(scopeKey) {
   const { targets, skippedHidden } = _collectRefreshTargets(scopeKey);
   if (!targets.length) {
     toast(skippedHidden
-      ? `No refreshable profiles. All ${skippedHidden} contestant(s) in scope are hidden. Unhide in 👁 Visibility first.`
+      ? `No refreshable profiles. All ${skippedHidden} contestant(s) in scope are hidden. Unhide in Visibility first.`
       : 'No Instagram handles found to refresh', 'warn');
     return;
   }
@@ -131,7 +131,7 @@ async function refreshFollowersLive(scopeKey) {
 
   if (updated > 0) {
     if (typeof saveToLocalStorage === 'function') saveToLocalStorage(false);
-    if (typeof logActivity === 'function') logActivity('Live follower refresh', `${updated} updated in ${label}`, '📡');
+    if (typeof logActivity === 'function') logActivity('Live follower refresh', `${updated} updated in ${label}`, '');
     _pulseSaveJsonButton();
   }
 }

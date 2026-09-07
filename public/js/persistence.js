@@ -1,5 +1,5 @@
 /* ═══════════════════════════════════════════════════════════
-   persistence.js  —  Reality TV Intel 2026
+   persistence.js — Reality TV Intel 2026
    LocalStorage · JSON import · Bulk follower import ·
    Activity log · Auto-save
 ═══════════════════════════════════════════════════════════ */
@@ -13,7 +13,7 @@ function toggleSaveBar() {
 }
 
 /* ─── LOCAL STORAGE ─────────────────────────────────────── */
-const LS_KEY      = 'realityTV2026_v2';
+const LS_KEY = 'realityTV2026_v2';
 let autosaveTimer = null;
 
 function setLSDot(state) {
@@ -25,12 +25,12 @@ function setLSDot(state) {
 function saveToLocalStorage(showToast = false) {
   try {
     const payload = JSON.stringify({
-      shows:       window.SHOWS,
-      db:          window.DB,
-      hidden:      [...HIDDEN],
+      shows: window.SHOWS,
+      db: window.DB,
+      hidden: [...HIDDEN],
       hiddenShows: [...(typeof HIDDEN_SHOWS !== 'undefined' ? HIDDEN_SHOWS : [])],
-      theme:       typeof getCurrentTheme === 'function' ? getCurrentTheme() : 'dark',
-      ts:          Date.now(),
+      theme: typeof getCurrentTheme === 'function' ? getCurrentTheme() : 'dark',
+      ts: Date.now(),
     });
     localStorage.setItem(LS_KEY, payload);
     setLSDot('saved');
@@ -42,13 +42,13 @@ function saveToLocalStorage(showToast = false) {
   }
 }
 
-function loadFromLocalStorage() {
+async function loadFromLocalStorage() {
   try {
     const raw = localStorage.getItem(LS_KEY);
     if (!raw) { toast('No saved data found', 'warn'); return; }
     const data = JSON.parse(raw);
-    const ago  = Math.round((Date.now() - (data.ts || 0)) / 60000);
-    if (!confirm(`Restore saved data from ${ago} minutes ago? This will overwrite the current session.`)) return;
+    const ago = Math.round((Date.now() - (data.ts || 0)) / 60000);
+    if (!await appConfirm(`Restore saved data from ${ago} minutes ago? This will overwrite the current session.`, { title: 'Restore saved data', okLabel: 'Restore', danger: false })) return;
     _applyImport(data);
     toast(`✓ Restored save from ${ago} minutes ago`);
   } catch (e) {
@@ -56,8 +56,8 @@ function loadFromLocalStorage() {
   }
 }
 
-function clearLocalStorage() {
-  if (!confirm('Clear all saved browser data? Cannot be undone.')) return;
+async function clearLocalStorage() {
+  if (!await appConfirm('Clear all saved browser data? Cannot be undone.', { title: 'Clear browser storage' })) return;
   localStorage.removeItem(LS_KEY);
   setLSDot('idle');
   toast('Browser storage cleared', 'warn');
@@ -81,11 +81,11 @@ function checkSavedData() {
   if (!raw) return;
   try {
     const data = JSON.parse(raw);
-    const ago  = Math.round((Date.now() - (data.ts || 0)) / 60000);
-    const dot  = document.getElementById('ls-dot');
+    const ago = Math.round((Date.now() - (data.ts || 0)) / 60000);
+    const dot = document.getElementById('ls-dot');
     if (dot) {
       dot.className = 'ls-dot saved';
-      dot.title     = `Saved data exists (${ago} min ago). Click Restore to load.`;
+      dot.title = `Saved data exists (${ago} min ago). Click Restore to load.`;
     }
   } catch (e) { /* ignore */ }
 }
@@ -97,7 +97,7 @@ function checkSavedData() {
     if (!raw) return;
     const data = JSON.parse(raw);
     if (data.shows) window.SHOWS = data.shows;
-    if (data.db)    window.DB    = data.db;
+    if (data.db) window.DB = data.db;
     else if (data.contestants) window.DB = data.contestants;
     if (data.hidden && typeof HIDDEN !== 'undefined') {
       HIDDEN.clear();
@@ -116,7 +116,7 @@ function checkSavedData() {
 /* ─── APPLY IMPORT (shared by JSON file + localStorage restore) ── */
 function _applyImport(data) {
   if (data.shows) window.SHOWS = data.shows;
-  if (data.db)    window.DB    = data.db;
+  if (data.db) window.DB = data.db;
   else if (data.contestants) window.DB = data.contestants;
   if (data.hidden) { HIDDEN.clear(); data.hidden.forEach(h => HIDDEN.add(h)); }
   if (data.hiddenShows && typeof HIDDEN_SHOWS !== 'undefined') {
@@ -134,9 +134,9 @@ function _applyImport(data) {
     (typeof getShowKeys === 'function' ? getShowKeys() : Object.keys(window.SHOWS))
       .forEach(k => { if (typeof buildShowPanel === 'function') buildShowPanel(k); });
     if (typeof rebuildSidebar === 'function') rebuildSidebar();
-    if (typeof renderAll      === 'function') renderAll();
+    if (typeof renderAll === 'function') renderAll();
     if (typeof renderOverview === 'function') renderOverview();
-    if (typeof updateStats    === 'function') updateStats();
+    if (typeof updateStats === 'function') updateStats();
   }
 }
 
@@ -166,15 +166,15 @@ function handleJSONDrop(e) {
   reader.readAsText(file);
 }
 
-function importJSONData(raw) {
+async function importJSONData(raw) {
   try {
     const data = JSON.parse(raw); // strict JSON only — no eval, ever
-    if (!confirm('Import this data file? It will replace all current data.')) return;
+    if (!await appConfirm('Import this data file? It will replace all current data.', { title: 'Import data file', okLabel: 'Import' })) return;
 
     /* Current schema: {_meta, SHOWS, DB, HIDDEN_SHOWS_INIT} */
     if (data.SHOWS && data.DB) {
       window.SHOWS = data.SHOWS;
-      window.DB    = data.DB;
+      window.DB = data.DB;
       if (Array.isArray(data.HIDDEN_SHOWS_INIT) && typeof HIDDEN_SHOWS !== 'undefined') {
         HIDDEN_SHOWS.clear();
         data.HIDDEN_SHOWS_INIT.forEach(k => HIDDEN_SHOWS.add(k));
@@ -192,13 +192,13 @@ function importJSONData(raw) {
           if (typeof buildShowPanel === 'function') buildShowPanel(k);
         });
         if (typeof rebuildSidebar === 'function') rebuildSidebar();
-        if (typeof renderAll      === 'function') renderAll();
+        if (typeof renderAll === 'function') renderAll();
         if (typeof renderOverview === 'function') renderOverview();
-        if (typeof updateStats    === 'function') updateStats();
+        if (typeof updateStats === 'function') updateStats();
       }
       closeModal('modal-import');
       toast('✓ data.js imported successfully');
-      logActivity('Imported data.js', Object.keys(window.SHOWS).length + ' shows', '📥');
+      logActivity('Imported data.js', Object.keys(window.SHOWS).length + ' shows', '');
       return;
     }
 
@@ -207,7 +207,7 @@ function importJSONData(raw) {
     _applyImport(data);
     closeModal('modal-import');
     toast('✓ Data imported successfully');
-    logActivity('Imported JSON', Object.keys(data.shows || {}).length + ' shows', '📥');
+    logActivity('Imported JSON', Object.keys(data.shows || {}).length + ' shows', '');
 
   } catch (e) {
     toast('Import failed: ' + e.message, 'err');
@@ -217,9 +217,9 @@ function importJSONData(raw) {
 
 /* ─── BULK FOLLOWER IMPORT ──────────────────────────────── */
 function bulkImportFollowers() {
-  const lines   = document.getElementById('bulk-import-txt').value.trim().split('\n');
-  const today   = new Date().toLocaleDateString('en-GB', { day:'numeric', month:'short', year:'numeric' });
-  let updated   = 0;
+  const lines = document.getElementById('bulk-import-txt').value.trim().split('\n');
+  const today = new Date().toLocaleDateString('en-GB', { day:'numeric', month:'short', year:'numeric' });
+  let updated = 0;
   const skipped = [];
 
   lines.forEach(line => {
@@ -237,7 +237,7 @@ function bulkImportFollowers() {
        warning. A handle match is exact or it fails loudly — no
        partial-credit matching that could pick the wrong contestant. */
     const handle = handleRaw.toLowerCase().replace(/^@/, '').trim();
-    const k       = showKey.toLowerCase().replace(/\s/g, '');
+    const k = showKey.toLowerCase().replace(/\s/g, '');
     if (!window.DB[k]) { skipped.push(`${line} (show "${k}" not found)`); return; }
 
     const c = window.DB[k].find(x =>
@@ -248,7 +248,7 @@ function bulkImportFollowers() {
     /* Update Current only — Last Checked is now only touched by the
        explicit "⟳ Roll Current → Last Checked" button in the Growth
        tab, never automatically on import. */
-    c.follCur     = normalizeFollowerInput(follRaw);
+    c.follCur = normalizeFollowerInput(follRaw);
     c.follCurDate = today;
     updated++;
   });
@@ -261,7 +261,7 @@ function bulkImportFollowers() {
 
   if (updated > 0) {
     saveToLocalStorage(false);
-    logActivity('Bulk follower update', `${updated} contestants updated`, '📊');
+    logActivity('Bulk follower update', `${updated} contestants updated`, '');
   }
 }
 
@@ -271,9 +271,9 @@ const MAX_ACTIVITY = 50;
 
 function logActivity(action, detail, icon) {
   try {
-    const raw  = localStorage.getItem(ACTIVITY_KEY);
+    const raw = localStorage.getItem(ACTIVITY_KEY);
     const list = raw ? JSON.parse(raw) : [];
-    list.unshift({ action, detail: detail || '', icon: icon || '📝', ts: Date.now() });
+    list.unshift({ action, detail: detail || '', icon: icon || '', ts: Date.now() });
     if (list.length > MAX_ACTIVITY) list.length = MAX_ACTIVITY;
     localStorage.setItem(ACTIVITY_KEY, JSON.stringify(list));
     renderActivityFeed();
@@ -297,7 +297,7 @@ function renderActivityFeed() {
   }
   el.innerHTML = log.slice(0, 20).map(item => `
     <div class="activity-item">
-      <span class="activity-icon">${item.icon || '📝'}</span>
+      <span class="activity-icon">${item.icon || ''}</span>
       <div class="activity-body">
         <span class="activity-action">${sanitizeHTML(item.action)}</span>
         ${item.detail ? `<span class="activity-detail"> · ${sanitizeHTML(item.detail)}</span>` : ''}
@@ -308,8 +308,8 @@ function renderActivityFeed() {
 
 function _agoLabel(ts) {
   const diff = Math.round((Date.now() - ts) / 1000);
-  if (diff < 60)    return diff + 's ago';
-  if (diff < 3600)  return Math.round(diff / 60) + 'm ago';
+  if (diff < 60) return diff + 's ago';
+  if (diff < 3600) return Math.round(diff / 60) + 'm ago';
   if (diff < 86400) return Math.round(diff / 3600) + 'h ago';
   return Math.round(diff / 86400) + 'd ago';
 }
@@ -323,9 +323,9 @@ function _autoPersist() {
 document.addEventListener('DOMContentLoaded', () => {
   /* Restore theme */
   try {
-    const raw    = localStorage.getItem(LS_KEY);
-    const saved  = raw ? JSON.parse(raw) : null;
-    const theme  = saved?.theme || localStorage.getItem('realityTV2026_theme') || 'dark';
+    const raw = localStorage.getItem(LS_KEY);
+    const saved = raw ? JSON.parse(raw) : null;
+    const theme = saved?.theme || localStorage.getItem('realityTV2026_theme') || 'dark';
     if (typeof setTheme === 'function') setTheme(theme, false);
   } catch (e) {
     if (typeof setTheme === 'function') setTheme('dark', false);

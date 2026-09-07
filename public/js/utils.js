@@ -1,5 +1,5 @@
 /* ═══════════════════════════════════════════════════════════
-   utils.js  —  Reality TV Intel 2026
+   utils.js — Reality TV Intel 2026
    Sanitization · Validation · Debounce · Throttle
    Loaded first — zero dependencies.
 ═══════════════════════════════════════════════════════════ */
@@ -135,7 +135,7 @@ function validateContestant(data) {
   const errors = [];
   const name = (data.name || '').trim();
 
-  if (!name)            errors.push('Name is required.');
+  if (!name) errors.push('Name is required.');
   if (name.length > 120) errors.push('Name must be 120 characters or fewer.');
 
   if (data.gender && !VALID_GENDERS.includes(data.gender))
@@ -170,8 +170,8 @@ function validateContestant(data) {
  */
 function validateShow(data) {
   const errors = [];
-  if (!String(data.label || '').trim())  errors.push('Show name is required.');
-  if (!String(data.key   || '').trim())  errors.push('Show key is required.');
+  if (!String(data.label || '').trim()) errors.push('Show name is required.');
+  if (!String(data.key || '').trim()) errors.push('Show key is required.');
   else if (!/^[a-z0-9]+$/i.test(data.key)) errors.push('Show key must be letters and numbers only.');
   if (data.color && !/^#[0-9a-f]{3,6}$/i.test(data.color))
     errors.push('Accent colour must be a valid hex like #E53E6A.');

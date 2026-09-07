@@ -1,5 +1,5 @@
 /* ═══════════════════════════════════════════════════════════
-   admin.js  —  Reality TV Intel 2026
+   admin.js — Reality TV Intel 2026
    Server-verified admin auth.
 
    SECURITY MODEL CHANGE from the previous version:
@@ -36,27 +36,27 @@ function activateAdmin() {
   document.body.classList.add('admin-active');
   const btn = document.getElementById('admin-toggle-btn');
   if (btn) {
-    btn.innerHTML = '🔓 Admin';
-    btn.onclick   = deactivateAdmin;
-    btn.title     = 'Click to log out of admin';
-    btn.style.color       = 'var(--gld)';
+    btn.innerHTML = 'Admin';
+    btn.onclick = deactivateAdmin;
+    btn.title = 'Click to log out of admin';
+    btn.style.color = 'var(--gld)';
     btn.style.borderColor = 'rgba(245,166,35,.4)';
   }
   const sw = document.getElementById('save-workflow');
   if (sw) sw.style.display = 'flex';
-  toast('🔓 Admin mode active', 'warn');
+  toast('Admin mode active', 'warn');
 
-  if (typeof rebuildSidebar     === 'function') rebuildSidebar();
-  if (typeof renderOverview     === 'function') renderOverview();
-  if (typeof updateStats        === 'function') updateStats();
-  if (typeof renderRankings     === 'function') renderRankings();
-  if (typeof renderGrowthAll    === 'function') renderGrowthAll();
+  if (typeof rebuildSidebar === 'function') rebuildSidebar();
+  if (typeof renderOverview === 'function') renderOverview();
+  if (typeof updateStats === 'function') updateStats();
+  if (typeof renderRankings === 'function') renderRankings();
+  if (typeof renderGrowthAll === 'function') renderGrowthAll();
   if (typeof _populateRankFilters === 'function') _populateRankFilters();
-  if (typeof renderAll          === 'function') renderAll();
+  if (typeof renderAll === 'function') renderAll();
 }
 
 async function deactivateAdmin() {
-  if (!confirm('Log out of admin mode?')) return;
+  if (!await appConfirm('Log out of admin mode?', { title: 'Log out', okLabel: 'Log out', danger: false })) return;
 
   try {
     await fetch('/api/verify-admin', { method: 'DELETE', credentials: 'same-origin' });
@@ -69,26 +69,26 @@ async function deactivateAdmin() {
   document.body.classList.remove('admin-active');
   editMode = false;
   const eb = document.getElementById('editBtn');
-  if (eb) { eb.textContent = '✎ Edit: OFF'; eb.style.color = ''; eb.style.borderColor = ''; }
+  if (eb) { eb.textContent = 'Edit: OFF'; eb.style.color = ''; eb.style.borderColor = ''; }
   document.body.classList.remove('edit-on');
   const btn = document.getElementById('admin-toggle-btn');
   if (btn) {
-    btn.innerHTML = '🔒 Admin';
-    btn.onclick   = openAdminLogin;
-    btn.style.color       = '';
+    btn.innerHTML = 'Admin';
+    btn.onclick = openAdminLogin;
+    btn.style.color = '';
     btn.style.borderColor = '';
   }
   const sw = document.getElementById('save-workflow');
   if (sw) sw.style.display = 'none';
-  toast('🔒 Logged out of admin mode');
+  toast('Logged out of admin mode');
 
-  if (typeof rebuildSidebar     === 'function') rebuildSidebar();
-  if (typeof renderOverview     === 'function') renderOverview();
-  if (typeof updateStats        === 'function') updateStats();
-  if (typeof renderRankings     === 'function') renderRankings();
-  if (typeof renderGrowthAll    === 'function') renderGrowthAll();
+  if (typeof rebuildSidebar === 'function') rebuildSidebar();
+  if (typeof renderOverview === 'function') renderOverview();
+  if (typeof updateStats === 'function') updateStats();
+  if (typeof renderRankings === 'function') renderRankings();
+  if (typeof renderGrowthAll === 'function') renderGrowthAll();
   if (typeof _populateRankFilters === 'function') _populateRankFilters();
-  if (typeof renderAll          === 'function') renderAll();
+  if (typeof renderAll === 'function') renderAll();
 }
 
 /* ── Login modal ──────────────────────────────────────────── */
@@ -105,18 +105,18 @@ function closeAdminLogin() {
 }
 
 async function submitAdminLogin() {
-  const pw  = document.getElementById('admin-pw-input').value;
+  const pw = document.getElementById('admin-pw-input').value;
   const err = document.getElementById('admin-login-err');
   const btn = document.getElementById('admin-login-btn');
 
   if (!pw) { err.textContent = 'Password required.'; return; }
 
-  btn.disabled    = true;
+  btn.disabled = true;
   btn.textContent = 'Checking…';
   err.textContent = '';
 
   try {
-    const res  = await fetch('/api/verify-admin', {
+    const res = await fetch('/api/verify-admin', {
       method: 'POST',
       credentials: 'same-origin',
       headers: { 'Content-Type': 'application/json' },
@@ -135,7 +135,7 @@ async function submitAdminLogin() {
   } catch (e) {
     err.textContent = 'Auth error: ' + e.message;
   } finally {
-    btn.disabled    = false;
+    btn.disabled = false;
     btn.textContent = 'Unlock Admin Mode';
   }
 }

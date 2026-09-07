@@ -1,5 +1,5 @@
 /* ═══════════════════════════════════════════════════════════
-   export.js  —  Reality TV Intel 2026
+   export.js — Reality TV Intel 2026
    CSV · JSON · Bulk import · Screenshot capture
 ═══════════════════════════════════════════════════════════ */
 
@@ -40,18 +40,18 @@ async function publishLive() {
     const data = await res.json().catch(() => ({}));
     if (!res.ok) {
       if (res.status === 401) {
-        toast('⚠ Your admin session expired — log in again, then publish.', 'warn');
+        toast('Your admin session expired. Log in again, then publish.', 'warn');
       } else {
         const detail = data.databaseIssue ? ` (${data.databaseIssue}, connection: ${data.connectionDetected || 'unknown'})` : '';
-        toast('⚠ Publish failed: ' + (data.error || res.status) + detail, 'warn');
+        toast('Publish failed: ' + (data.error || res.status) + detail, 'warn');
         console.error('[Publish] Full diagnostic:', data);
       }
       return;
     }
-    toast('✓ Published — live for everyone within ~20s');
-    if (typeof logActivity === 'function') logActivity('Published live', Object.keys(window.SHOWS).length + ' shows', '🚀');
+    toast('✓ Published: live for everyone within ~20s');
+    if (typeof logActivity === 'function') logActivity('Published live', Object.keys(window.SHOWS).length + ' shows', '');
   } catch (err) {
-    toast('⚠ Publish failed — check your connection and try again', 'warn');
+    toast('Publish failed. Check your connection and try again.', 'warn');
     console.error('[Publish]', err);
   } finally {
     _publishing = false;
@@ -72,13 +72,13 @@ function exportJSON() {
      just bad data. Pure JSON can only ever be parsed as data. */
   const payload = _buildDataPayload();
   const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' });
-  const a    = document.createElement('a');
-  a.href     = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
   a.download = 'data-backup-' + new Date().toISOString().slice(0,10) + '.json';
   a.click();
   URL.revokeObjectURL(a.href);
-  toast('✓ Backup downloaded (this is not published — use Publish Live for that)');
-  if (typeof logActivity === 'function') logActivity('Downloaded backup', Object.keys(window.SHOWS).length + ' shows', '📁');
+  toast('✓ Backup downloaded (this is not published, use Publish Live for that)');
+  if (typeof logActivity === 'function') logActivity('Downloaded backup', Object.keys(window.SHOWS).length + ' shows', '');
 }
 
 /* ─── CSV HELPERS ───────────────────────────────────────── */
@@ -91,8 +91,8 @@ function csvRow(arr) {
 
 function downloadCSV(filename, rows) {
   const blob = new Blob([rows], { type: 'text/csv;charset=utf-8;' });
-  const a    = document.createElement('a');
-  a.href     = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
   a.download = filename;
   a.click();
   URL.revokeObjectURL(a.href);
@@ -100,7 +100,7 @@ function downloadCSV(filename, rows) {
 
 /* ─── SINGLE SHOW CSV ───────────────────────────────────── */
 function exportCSV(key) {
-  const s    = window.SHOWS[key];
+  const s = window.SHOWS[key];
   const data = (window.DB[key] || []).filter(c => !isH(key, c.id));
   if (!data.length) { toast('No visible contestants to export', 'warn'); return; }
 
@@ -140,7 +140,7 @@ function exportAllCSV() {
 
 /* ─── GROWTH CSV (single show) ──────────────────────────── */
 function exportGrowthCSV(key) {
-  const s    = window.SHOWS[key];
+  const s = window.SHOWS[key];
   const data = (window.DB[key] || []).filter(c => !isH(key, c.id));
   if (!data.length) { toast('No visible contestants to export', 'warn'); return; }
 
@@ -148,7 +148,7 @@ function exportGrowthCSV(key) {
     'Growth','Growth %','Total Growth','Total %'];
   let out = csvRow(hdrs);
   data.forEach((c, i) => {
-    const g1 = calcGrowth(c.follLast,   c.follCur);
+    const g1 = calcGrowth(c.follLast, c.follCur);
     const g2 = calcGrowth(c.follBefore, c.follCur);
     out += csvRow([i + 1, c.name, c.ig, c.follBefore, c.follLast, c.follCur,
       g1.diff, g1.rate, g2.diff, g2.rate]);
@@ -164,7 +164,7 @@ function exportAllGrowth() {
   let out = csvRow(hdrs);
   getShowKeys().filter(k => !isShowHidden(k)).forEach(k => {
     (window.DB[k] || []).filter(c => !isH(k, c.id)).forEach((c, i) => {
-      const g1 = calcGrowth(c.follLast,   c.follCur);
+      const g1 = calcGrowth(c.follLast, c.follCur);
       const g2 = calcGrowth(c.follBefore, c.follCur);
       out += csvRow([window.SHOWS[k]?.label || k, i + 1, c.name, c.ig,
         c.follBefore, c.follLast, c.follCur,
@@ -178,8 +178,8 @@ function exportAllGrowth() {
 /* ─── RANKINGS CSV ──────────────────────────────────────── */
 function exportRankCSV() {
   const hdrs = ['Rank','Name','Show','Status','Followers','Tier','Known For'];
-  let out    = csvRow(hdrs);
-  const all  = [];
+  let out = csvRow(hdrs);
+  const all = [];
   Object.keys(window.DB).filter(k => !isShowHidden(k)).forEach(k =>
     (window.DB[k] || []).filter(c => !isH(k, c.id)).forEach(c =>
       all.push({ ...c, _k: k, _sl: window.SHOWS[k]?.label })
@@ -202,14 +202,14 @@ function rebuildExportPanel() {
   const el = document.getElementById('per-show-exp');
   if (!el) return;
   el.innerHTML = getShowKeys().map(k =>
-    `<button class="btn b-gld b-sm" onclick="capture('sw-${k}-tbl','${k}_Table')">📷 ${window.SHOWS[k].emoji || ''} ${window.SHOWS[k].label} Table</button>
-     <button class="btn b-gh b-sm"  onclick="capture('sw-${k}-gtbl','${k}_Growth')">📈 ${window.SHOWS[k].label} Growth</button>
-     <button class="btn b-pur b-sm admin-only" onclick="refreshFollowersLive('${k}')">🔄 ${window.SHOWS[k].label} (Live)</button>`
+    `<button class="btn b-gld b-sm" onclick="capture('sw-${k}-tbl','${k}_Table')">${window.SHOWS[k].label} Table</button>
+     <button class="btn b-gh b-sm" onclick="capture('sw-${k}-gtbl','${k}_Growth')">${window.SHOWS[k].label} Growth</button>
+     <button class="btn b-pur b-sm admin-only" onclick="refreshFollowersLive('${k}')">${window.SHOWS[k].label} (Live)</button>`
   ).join('');
 }
 
 /* ─── SCREENSHOT / CAPTURE ──────────────────────────────── */
-let _captureCanvas   = null;
+let _captureCanvas = null;
 let _captureFilename = 'capture';
 
 const HIDE_IN_CAPTURE = [
@@ -224,28 +224,28 @@ async function capture(elId, filename) {
   if (!el) { toast('Element not found: ' + elId, 'err'); return; }
   _captureFilename = (filename || elId).replace(/[^a-z0-9_\-]/gi, '_');
 
-  const bg      = document.getElementById('cap-modal-bg');
-  const img     = document.getElementById('cap-preview-img');
+  const bg = document.getElementById('cap-modal-bg');
+  const img = document.getElementById('cap-preview-img');
   const spinner = document.getElementById('cap-spinner');
-  const info    = document.getElementById('cap-info');
-  const btns    = [
+  const info = document.getElementById('cap-info');
+  const btns = [
     document.getElementById('cap-save-png'),
     document.getElementById('cap-save-jpg'),
     document.getElementById('cap-copy'),
     document.getElementById('cap-print'),
   ];
 
-  img.style.display     = 'none';
+  img.style.display = 'none';
   spinner.style.display = 'flex';
-  info.textContent      = 'Generating…';
+  info.textContent = 'Generating…';
   btns.forEach(b => { if (b) b.disabled = true; });
   bg.classList.add('open');
   _captureCanvas = null;
 
   let hiddenAncestors = [];
-  let hiddenEls  = [];
-  let wasHidden  = false;
-  let origStyle  = '';
+  let hiddenEls = [];
+  let wasHidden = false;
+  let origStyle = '';
 
   try {
     /* Walk up from el to <body>, forcing any hidden ancestor visible.
@@ -313,19 +313,19 @@ async function capture(elId, filename) {
        width we snapshot at matches the width we crop to — prevents
        html2canvas reflowing the responsive grid into extra columns
        that then get sliced off. */
-    const fullWidth  = el.scrollWidth;
+    const fullWidth = el.scrollWidth;
     const fullHeight = el.scrollHeight;
 
     const canvas = await html2canvas(el, {
       backgroundColor: document.body.classList.contains('theme-light') ? '#F0F2F8' : '#08080F',
-      scale:           2,
-      useCORS:         true,
-      logging:         false,
-      width:           fullWidth,
-      height:          fullHeight,
-      windowWidth:     fullWidth,
-      windowHeight:    fullHeight,
-      ignoreElements:  node => {
+      scale: 2,
+      useCORS: true,
+      logging: false,
+      width: fullWidth,
+      height: fullHeight,
+      windowWidth: fullWidth,
+      windowHeight: fullHeight,
+      ignoreElements: node => {
         const tag = (node.tagName || '').toLowerCase();
         if (tag === 'button') return true;
         const cls = String(node.className || '');
@@ -354,11 +354,11 @@ async function capture(elId, filename) {
           if (origNode.nodeType !== 1 || cloneNode.nodeType !== 1) return;
           const cs = getComputedStyle(origNode);
           cloneNode.style.backgroundColor = cs.backgroundColor;
-          cloneNode.style.color           = cs.color;
-          if (cs.borderTopWidth !== '0px')    cloneNode.style.borderTopColor    = cs.borderTopColor;
+          cloneNode.style.color = cs.color;
+          if (cs.borderTopWidth !== '0px') cloneNode.style.borderTopColor = cs.borderTopColor;
           if (cs.borderBottomWidth !== '0px') cloneNode.style.borderBottomColor = cs.borderBottomColor;
-          if (cs.borderLeftWidth !== '0px')   cloneNode.style.borderLeftColor   = cs.borderLeftColor;
-          if (cs.borderRightWidth !== '0px')  cloneNode.style.borderRightColor  = cs.borderRightColor;
+          if (cs.borderLeftWidth !== '0px') cloneNode.style.borderLeftColor = cs.borderLeftColor;
+          if (cs.borderRightWidth !== '0px') cloneNode.style.borderRightColor = cs.borderRightColor;
 
           const oChildren = origNode.children;
           const cChildren = cloneNode.children;
@@ -389,10 +389,10 @@ async function capture(elId, filename) {
     _captureCanvas = canvas;
     const w = canvas.width / 2, h = canvas.height / 2;
 
-    img.src           = dataURL;
+    img.src = dataURL;
     img.style.display = 'block';
     spinner.style.display = 'none';
-    info.textContent  = `${Math.round(w)} × ${Math.round(h)}px · 2× retina`;
+    info.textContent = `${Math.round(w)} × ${Math.round(h)}px · 2× retina`;
     btns.forEach(b => { if (b) b.disabled = false; });
     toast('✓ Preview ready. Choose Save, Copy or Print');
 
@@ -437,12 +437,12 @@ function saveCapture(fmt) {
   if (!_captureCanvas) { toast('No capture ready', 'err'); return; }
   try {
     const date = _dateStamp();
-    const a    = document.createElement('a');
+    const a = document.createElement('a');
     if (fmt === 'jpg') {
-      a.href     = _captureCanvas.toDataURL('image/jpeg', 0.95);
+      a.href = _captureCanvas.toDataURL('image/jpeg', 0.95);
       a.download = _captureFilename + '_' + date + '.jpg';
     } else {
-      a.href     = _captureCanvas.toDataURL('image/png');
+      a.href = _captureCanvas.toDataURL('image/png');
       a.download = _captureFilename + '_' + date + '.png';
     }
     a.click();
@@ -478,7 +478,7 @@ async function copyCapture() {
 function printCapture() {
   if (!_captureCanvas) { toast('No capture ready', 'err'); return; }
   const dataURL = _captureCanvas.toDataURL('image/png');
-  const win     = window.open('', '_blank');
+  const win = window.open('', '_blank');
   win.document.write(`<!DOCTYPE html><html><head><title>Print: Reality TV Intel</title>
     <style>*{margin:0;padding:0}body{background:#fff}img{max-width:100%;height:auto;display:block}
     @media print{img{max-width:100%;page-break-inside:avoid}}</style>
