@@ -36,7 +36,8 @@ function activateAdmin() {
   document.body.classList.add('admin-active');
   const btn = document.getElementById('admin-toggle-btn');
   if (btn) {
-    btn.innerHTML = 'Admin';
+    const label = document.getElementById('adminBtnLabel');
+    if (label) label.textContent = 'Admin'; else btn.innerHTML = 'Admin';
     btn.onclick = deactivateAdmin;
     btn.title = 'Click to log out of admin';
     btn.style.color = 'var(--gld)';
@@ -69,11 +70,16 @@ async function deactivateAdmin() {
   document.body.classList.remove('admin-active');
   editMode = false;
   const eb = document.getElementById('editBtn');
-  if (eb) { eb.textContent = 'Edit: OFF'; eb.style.color = ''; eb.style.borderColor = ''; }
+  const ebLabel = document.getElementById('editBtnLabel');
+  if (eb) {
+    if (ebLabel) ebLabel.textContent = 'Edit: OFF'; else eb.textContent = 'Edit: OFF';
+    eb.style.color = ''; eb.style.borderColor = '';
+  }
   document.body.classList.remove('edit-on');
   const btn = document.getElementById('admin-toggle-btn');
   if (btn) {
-    btn.innerHTML = 'Admin';
+    const label = document.getElementById('adminBtnLabel');
+    if (label) label.textContent = 'Admin'; else btn.innerHTML = 'Admin';
     btn.onclick = openAdminLogin;
     btn.style.color = '';
     btn.style.borderColor = '';

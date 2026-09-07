@@ -61,7 +61,9 @@ function setTheme(theme, persist = true) {
   document.body.classList.toggle('theme-light', next === 'light');
   const btn = document.getElementById('themeBtn');
   if (btn) {
-    btn.innerHTML = next === 'light' ? 'Light Mode' : 'Dark Mode';
+    const label = document.getElementById('themeBtnLabel');
+    const text = next === 'light' ? 'Light Mode' : 'Dark Mode';
+    if (label) label.textContent = text; else btn.innerHTML = text;
     btn.title = next === 'light' ? 'Switch to dark mode' : 'Switch to light mode';
   }
   if (persist) {
@@ -284,7 +286,9 @@ function showPanel(id) {
 function toggleEdit() {
   editMode = !editMode;
   const btn = document.getElementById('editBtn');
-  btn.textContent = 'Edit Mode: ' + (editMode ? 'ON' : 'OFF');
+  const label = document.getElementById('editBtnLabel');
+  if (label) label.textContent = 'Edit Mode: ' + (editMode ? 'ON' : 'OFF');
+  else btn.textContent = 'Edit Mode: ' + (editMode ? 'ON' : 'OFF'); // fallback if markup changes
   btn.style.color = editMode ? 'var(--acc)' : '';
   btn.style.borderColor = editMode ? 'var(--acc)' : '';
   document.body.classList.toggle('edit-on', editMode);
@@ -748,7 +752,7 @@ function renderCards(key) {
 }
 
 /* ─── GROWTH SORT STATE ─────────────────────────────────── */
-function getGrowthSortKey(key) { return window._growthSort[key] || 'growth-desc'; }
+function getGrowthSortKey(key) { return window._growthSort[key] || 'gain-desc'; }
 function getGrowthScope(key) { return window._growthScope[key] || 'active'; }
 function setGrowthScope(key, val) {
   window._growthScope[key] = val;
@@ -843,6 +847,10 @@ function buildGrowthHTML(key) {
       const cA = parseF(a.follCur) ?? 0;
       const cB = parseF(b.follCur) ?? 0;
       switch (sortVal) {
+        case 'gain-desc': return (gb.diffRaw ?? -Infinity) - (ga.diffRaw ?? -Infinity);
+        case 'gain-asc': return (ga.diffRaw ?? Infinity) - (gb.diffRaw ?? Infinity);
+        case 'totalgain-desc': return (tb.diffRaw ?? -Infinity) - (ta.diffRaw ?? -Infinity);
+        case 'totalgain-asc': return (ta.diffRaw ?? Infinity) - (tb.diffRaw ?? Infinity);
         case 'growth-desc': return (gb.rateRaw ?? -Infinity) - (ga.rateRaw ?? -Infinity);
         case 'growth-asc': return (ga.rateRaw ?? Infinity) - (gb.rateRaw ?? Infinity);
         case 'total-desc': return (tb.rateRaw ?? -Infinity) - (ta.rateRaw ?? -Infinity);
@@ -850,7 +858,7 @@ function buildGrowthHTML(key) {
         case 'followers-desc': return cB - cA;
         case 'followers-asc': return cA - cB;
         case 'name': return a.name.localeCompare(b.name);
-        default: return (gb.rateRaw ?? -Infinity) - (ga.rateRaw ?? -Infinity);
+        default: return (gb.diffRaw ?? -Infinity) - (ga.diffRaw ?? -Infinity);
       }
     });
   }
@@ -898,21 +906,33 @@ function buildGrowthHTML(key) {
 
   return `<div class="growth-sort-bar no-capture">
     <span class="sort-label">Sort by</span>
-    ${[
-      ['growth-desc', '', 'Highest Growth'],
-      ['growth-asc', '', 'Lowest Growth'],
-      ['total-desc', '', 'Total Growth ↑'],
-      ['total-asc', '⬇️', 'Total Growth ↓'],
-      ['followers-desc', '', 'Most Followers'],
-      ['followers-asc', '', 'Fewest Followers'],
-      ['name', '', 'A–Z'],
-      ['custom', '↕️', 'Custom'],
-    ].map(([val, ico, lbl]) =>
-      `<button class="sort-pill${sortVal === val ? ' active' : ''}"
-        onclick="setGrowthSort('${key}','${val}')"
-        title="${lbl}">${ico} ${lbl}</button>`
-    ).join('')}
-    ${sortVal === 'custom' ? '<span style="font-size:10px;color:var(--mut);margin-left:4px">↕ Drag rows to reorder</span>' : ''}
+    <select class="sort-select" onchange="setGrowthSort('${key}', this.value)">
+      <optgroup label="Follower Gain (this period)">
+        <option value="gain-desc"${sortVal === 'gain-desc' ? ' selected' : ''}>Highest gain first</option>
+        <option value="gain-asc"${sortVal === 'gain-asc' ? ' selected' : ''}>Lowest gain first</option>
+      </optgroup>
+      <optgroup label="Growth Rate %  (this period)">
+        <option value="growth-desc"${sortVal === 'growth-desc' ? ' selected' : ''}>Highest rate first</option>
+        <option value="growth-asc"${sortVal === 'growth-asc' ? ' selected' : ''}>Lowest rate first</option>
+      </optgroup>
+      <optgroup label="Total Gain (since before show)">
+        <option value="totalgain-desc"${sortVal === 'totalgain-desc' ? ' selected' : ''}>Highest total gain first</option>
+        <option value="totalgain-asc"${sortVal === 'totalgain-asc' ? ' selected' : ''}>Lowest total gain first</option>
+      </optgroup>
+      <optgroup label="Total Rate % (since before show)">
+        <option value="total-desc"${sortVal === 'total-desc' ? ' selected' : ''}>Highest total rate first</option>
+        <option value="total-asc"${sortVal === 'total-asc' ? ' selected' : ''}>Lowest total rate first</option>
+      </optgroup>
+      <optgroup label="Follower Count">
+        <option value="followers-desc"${sortVal === 'followers-desc' ? ' selected' : ''}>Most followers first</option>
+        <option value="followers-asc"${sortVal === 'followers-asc' ? ' selected' : ''}>Fewest followers first</option>
+      </optgroup>
+      <optgroup label="Other">
+        <option value="name"${sortVal === 'name' ? ' selected' : ''}>Name, A to Z</option>
+        <option value="custom"${sortVal === 'custom' ? ' selected' : ''}>Custom order (drag to arrange)</option>
+      </optgroup>
+    </select>
+    ${sortVal === 'custom' ? '<span style="font-size:10px;color:var(--mut);margin-left:4px">Drag rows to reorder</span>' : ''}
     ${hasCustom ? `<button class="btn b-gh b-xs" onclick="resetGrowthOrder('${key}')">✕ Reset order</button>` : ''}
     ${isAdmin ? `
     <span style="width:1px;height:16px;background:var(--bdr2);margin:0 4px"></span>
@@ -930,7 +950,7 @@ function buildGrowthHTML(key) {
     <div class="gtbl-title">${s?.label || key.toUpperCase()}: Instagram Follower Growth Analysis</div>
     <table>
       <thead><tr>
-        <th style="min-width:200px">Contestant ↕</th>
+        <th style="min-width:200px">Contestant</th>
         ${show('handle') ? '<th>Insta Handle</th>' : ''}
         ${show('before') ? '<th>Before Show</th>' : ''}
         ${show('last') ? '<th>Last Checked</th>' : ''}

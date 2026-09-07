@@ -316,9 +316,15 @@ async function capture(elId, filename) {
     const fullWidth = el.scrollWidth;
     const fullHeight = el.scrollHeight;
 
-    const canvas = await html2canvas(el, {
+    // High-resolution capture: 4x pixel density so every number, glyph and
+    // border in a screenshot is crisp even zoomed in or printed large.
+    // html2canvas can hit a browser canvas-size ceiling on very large
+    // panels at 4x (mobile Safari especially), so if that happens, retry
+    // once at a safer 3x rather than failing the capture outright.
+    let canvas, usedScale = 4;
+    const runCapture = (scale) => html2canvas(el, {
       backgroundColor: document.body.classList.contains('theme-light') ? '#F0F2F8' : '#08080F',
-      scale: 2,
+      scale,
       useCORS: true,
       logging: false,
       width: fullWidth,
@@ -340,8 +346,8 @@ async function capture(elId, filename) {
            (var(--gtbl-row), var(--acc), etc.) when rendering its cloned
            document — this is a long-standing, documented limitation,
            not something its options can toggle off. The Growth table
-           leans heavily on custom properties for its cyan theme, which
-           is the most likely reason it renders blank while Roster/Card
+           leans heavily on custom properties for its theme, which is
+           the most likely reason it renders blank while Roster/Card
            View (which use fewer var()-dependent backgrounds) succeed.
 
            Fix: walk the ORIGINAL (still-live, still-styled) tree and the
@@ -374,6 +380,14 @@ async function capture(elId, filename) {
       },
     });
 
+    try {
+      canvas = await runCapture(4);
+    } catch (highResErr) {
+      console.warn('[Capture] 4x capture failed, retrying at 3x:', highResErr.message);
+      usedScale = 3;
+      canvas = await runCapture(3);
+    }
+
     let dataURL;
     try {
       dataURL = canvas.toDataURL('image/png');
@@ -387,12 +401,14 @@ async function capture(elId, filename) {
       throw new Error('One or more images couldn\'t be captured due to a cross-origin restriction (CORS). Try again after re-hosting any photo URLs that block this.');
     }
     _captureCanvas = canvas;
-    const w = canvas.width / 2, h = canvas.height / 2;
+    const w = canvas.width / usedScale, h = canvas.height / usedScale;
+    const approxBytes = Math.round((dataURL.length - 'data:image/png;base64,'.length) * 0.75);
+    const approxMB = (approxBytes / (1024 * 1024)).toFixed(1);
 
     img.src = dataURL;
     img.style.display = 'block';
     spinner.style.display = 'none';
-    info.textContent = `${Math.round(w)} × ${Math.round(h)}px · 2× retina`;
+    info.textContent = `${Math.round(w)} × ${Math.round(h)}px · ${usedScale}× resolution · ~${approxMB}MB`;
     btns.forEach(b => { if (b) b.disabled = false; });
     toast('✓ Preview ready. Choose Save, Copy or Print');
 
