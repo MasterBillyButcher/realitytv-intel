@@ -294,15 +294,24 @@ async function capture(elId, filename) {
        state as if it were the original. Restoration then runs in order
        and the second entry silently overwrites the correct restore with
        "hidden" again — which is exactly why the tab bar and delete
-       button were staying invisible after every capture. */
+       button were staying invisible after every capture.
+
+       Uses display:none, NOT visibility:hidden. visibility:hidden makes
+       an element invisible but leaves its box in the layout — the
+       browser still reserves its full height for it. For a bar of
+       admin-only controls (sort dropdown, Refresh Followers, Columns
+       menu) sitting right above the table, that leftover reserved
+       space is exactly the blank strip that was showing up below the
+       real content in captures — worse for admins specifically because
+       admin mode has more chrome in that bar to leave a gap for. */
     const seen = new Set();
     HIDE_IN_CAPTURE.forEach(sel => {
       el.querySelectorAll(sel).forEach(node => {
         if (seen.has(node)) return;
         seen.add(node);
         if (getComputedStyle(node).display !== 'none') {
-          hiddenEls.push({ node, v: node.style.visibility });
-          node.style.visibility = 'hidden';
+          hiddenEls.push({ node, v: node.style.display });
+          node.style.display = 'none';
         }
       });
     });
@@ -316,16 +325,29 @@ async function capture(elId, filename) {
     const fullWidth = el.scrollWidth;
     const fullHeight = el.scrollHeight;
 
-    // Push resolution as high as the browser's canvas memory will allow.
-    // PNG is lossless, so there's no "quality" knob to turn — pixel count
-    // is the only lever for genuinely maximum-detail captures, and that's
-    // also naturally what produces a several-MB file instead of a
-    // compact one (a flat-colour table like Growth would otherwise
-    // compress down small even at high scale, since PNG is very
-    // efficient on large solid-colour areas). Cascade down only if the
-    // browser's own canvas-size ceiling is hit (mobile Safari especially).
-    let canvas, usedScale = 6;
-    const scaleCascade = [6, 4, 2];
+    // Target a genuinely 4K–8K wide output regardless of how many
+    // columns happen to be visible (fewer columns = a narrower table
+    // in CSS pixels, so a *fixed* multiplier like "always 6x" would
+    // under- or over-shoot depending on that). Solve for the scale that
+    // lands the output width at ~5760px (the midpoint of 3840–7680),
+    // then clamp so it can never fall outside that 4K–8K band even for
+    // an unusually narrow or wide table.
+    const TARGET_WIDTH_PX = 5760;
+    const MIN_SCALE = 3840 / fullWidth;
+    const MAX_SCALE = 7680 / fullWidth;
+    const idealScale = TARGET_WIDTH_PX / fullWidth;
+    const targetScale = Math.min(Math.max(idealScale, MIN_SCALE), MAX_SCALE);
+
+    // PNG is lossless, so there's no "quality" knob to turn — pixel
+    // count is the only lever for genuinely maximum-detail captures,
+    // and that's also naturally what produces a several-MB file
+    // instead of a compact one (a flat-colour table like Growth would
+    // otherwise compress down small even at high scale, since PNG is
+    // very efficient on large solid-colour areas). Cascade down only
+    // if the browser's own canvas-size ceiling is hit (mobile Safari
+    // especially) — each fallback still targets the same 4K floor.
+    let canvas, usedScale = targetScale;
+    const scaleCascade = [targetScale, targetScale * 0.75, targetScale * 0.5, MIN_SCALE];
     const runCapture = (scale) => html2canvas(el, {
       backgroundColor: document.body.classList.contains('theme-light') ? '#F0F2F8' : '#08080F',
       scale,
@@ -431,7 +453,7 @@ async function capture(elId, filename) {
     /* ALWAYS restore hidden chrome — even if html2canvas threw.
        This is what was making tabs/buttons disappear permanently
        after a failed capture. */
-    hiddenEls.forEach(({ node, v }) => { node.style.visibility = v; });
+    hiddenEls.forEach(({ node, v }) => { node.style.display = v; });
     if (wasHidden) el.setAttribute('style', origStyle);
     // Restore ancestor panels/tabs we force-opened, innermost first —
     // order doesn't actually matter for correctness here since each
