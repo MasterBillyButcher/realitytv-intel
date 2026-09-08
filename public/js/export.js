@@ -316,12 +316,16 @@ async function capture(elId, filename) {
     const fullWidth = el.scrollWidth;
     const fullHeight = el.scrollHeight;
 
-    // High-resolution capture: 4x pixel density so every number, glyph and
-    // border in a screenshot is crisp even zoomed in or printed large.
-    // html2canvas can hit a browser canvas-size ceiling on very large
-    // panels at 4x (mobile Safari especially), so if that happens, retry
-    // once at a safer 3x rather than failing the capture outright.
-    let canvas, usedScale = 4;
+    // Push resolution as high as the browser's canvas memory will allow.
+    // PNG is lossless, so there's no "quality" knob to turn — pixel count
+    // is the only lever for genuinely maximum-detail captures, and that's
+    // also naturally what produces a several-MB file instead of a
+    // compact one (a flat-colour table like Growth would otherwise
+    // compress down small even at high scale, since PNG is very
+    // efficient on large solid-colour areas). Cascade down only if the
+    // browser's own canvas-size ceiling is hit (mobile Safari especially).
+    let canvas, usedScale = 6;
+    const scaleCascade = [6, 4, 2];
     const runCapture = (scale) => html2canvas(el, {
       backgroundColor: document.body.classList.contains('theme-light') ? '#F0F2F8' : '#08080F',
       scale,
@@ -380,13 +384,18 @@ async function capture(elId, filename) {
       },
     });
 
-    try {
-      canvas = await runCapture(4);
-    } catch (highResErr) {
-      console.warn('[Capture] 4x capture failed, retrying at 3x:', highResErr.message);
-      usedScale = 3;
-      canvas = await runCapture(3);
+    let lastErr;
+    for (const s of scaleCascade) {
+      try {
+        canvas = await runCapture(s);
+        usedScale = s;
+        break;
+      } catch (err) {
+        lastErr = err;
+        console.warn(`[Capture] ${s}x capture failed, trying next size down:`, err.message);
+      }
     }
+    if (!canvas) throw lastErr || new Error('Capture failed at every resolution tried');
 
     let dataURL;
     try {

@@ -42,12 +42,17 @@ async function refreshFollowersLive(scopeKey) {
   }
 
   const label = scopeKey ? (window.SHOWS[scopeKey]?.label || scopeKey) : 'all shows';
-  const btnIds = ['live-refresh-btn', 'live-refresh-btn-all'];
-  btnIds.forEach(id => {
-    const b = document.getElementById(id);
-    if (!b) return;
-    b.disabled = true; // real buttons (per-show export list)
-    b.classList.add('ecard-disabled'); // the Export panel's div-based card
+  // Every button that can trigger a live refresh — the single "all shows"
+  // card in the Export panel, plus one "⟳ Refresh Followers" button per
+  // show's Growth tab (all of which exist in the DOM simultaneously,
+  // since every show panel is built up front, not just the visible one).
+  const allRefreshBtns = [
+    document.getElementById('live-refresh-btn-all'),
+    ...document.querySelectorAll('.live-refresh-btn'),
+  ].filter(Boolean);
+  allRefreshBtns.forEach(b => {
+    b.disabled = true;
+    b.classList.add('ecard-disabled'); // no-op on real <button>s, needed for the Export panel's div-based card
   });
   toast(`⟳ Fetching live follower counts for ${targets.length} profile(s) in ${label}${skippedHidden ? ` (${skippedHidden} hidden, skipped)` : ''}…`);
 
@@ -113,9 +118,7 @@ async function refreshFollowersLive(scopeKey) {
       });
     }
   } finally {
-    btnIds.forEach(id => {
-      const b = document.getElementById(id);
-      if (!b) return;
+    allRefreshBtns.forEach(b => {
       b.disabled = false;
       b.classList.remove('ecard-disabled');
     });

@@ -579,10 +579,12 @@ function renderTable(key) {
       <td><span class="tm" style="color:var(--blu)">${ed(c.follCur || 'N/V', key, c.id, 'follCur')}</span></td>
       <td class="no-capture">
         <div style="display:flex;gap:4px;align-items:center">
-          <button class="hide-btn${hid ? ' is-hid' : ''}" onclick="toggleH('${key}',${c.id})" title="${hid ? 'Show' : 'Hide'}">${hid ? 'Show' : 'Hide'}</button>
-          <button class="btn b-gh b-xs admin-only" onclick="openEdit('${key}',${c.id})">Edit</button>
-          <button class="btn b-gh b-xs admin-only" onclick="openCopyToShow('${key}',${c.id})" title="Copy to another show">Copy</button>
-          <button class="btn b-red b-xs admin-only" onclick="delRow('${key}',${c.id})">✕</button>
+          <button class="hide-btn${hid ? ' is-hid' : ''}" onclick="toggleH('${key}',${c.id})" title="${hid ? 'Show' : 'Hide'}" aria-label="${hid ? 'Show' : 'Hide'} ${sanitizeHTML(c.name)}">${hid
+            ? '<svg class="btn-icon" viewBox="0 0 18 18"><path d="M2 9 Q9 3 16 9 Q9 15 2 9 Z"/><circle cx="9" cy="9" r="2.3"/><path d="M2.5 2.5 L15.5 15.5"/></svg>'
+            : '<svg class="btn-icon" viewBox="0 0 18 18"><path d="M2 9 Q9 3 16 9 Q9 15 2 9 Z"/><circle cx="9" cy="9" r="2.3"/></svg>'}</button>
+          <button class="btn b-gh b-xs admin-only" onclick="openEdit('${key}',${c.id})" title="Edit" aria-label="Edit ${sanitizeHTML(c.name)}"><svg class="btn-icon" viewBox="0 0 18 18"><path d="M11.5 3 L15 6.5 L6 15.5 L2.5 15.5 L2.5 12 Z M9.5 5 L13 8.5"/></svg></button>
+          <button class="btn b-gh b-xs admin-only" onclick="openCopyToShow('${key}',${c.id})" title="Copy to another show" aria-label="Copy ${sanitizeHTML(c.name)} to another show"><svg class="btn-icon" viewBox="0 0 18 18"><rect x="6.5" y="6.5" width="9" height="9" rx="1.3"/><path d="M11.5 6.5 L11.5 3.5 A1.3 1.3 0 0 0 10.2 2.5 L3.5 2.5 A1.3 1.3 0 0 0 2.5 3.5 L2.5 10.2 A1.3 1.3 0 0 0 3.5 11.5 L6.5 11.5"/></svg></button>
+          <button class="btn b-red b-xs admin-only" onclick="delRow('${key}',${c.id})" title="Delete" aria-label="Delete ${sanitizeHTML(c.name)}">✕</button>
         </div>
       </td>
     </tr>`;
@@ -741,10 +743,12 @@ function renderCards(key) {
         <div class="crow"><span class="crow-l">Instagram</span><span class="crow-r">${igLink(c.ig)}</span></div>
         ${c.knownFor ? `<div class="crow" style="align-items:flex-start"><span class="crow-l">Known For</span><span class="crow-r" style="color:var(--mut);white-space:normal;text-align:right">${sanitizeHTML(c.knownFor)}</span></div>` : ''}
         <div class="ccard-footer no-capture">
-          ${c.bio ? `<button class="btn b-pur b-sm" style="flex:1;justify-content:center" onclick="openBio('${key}',${c.id})">Profile</button>` : ''}
-          <button class="btn b-gh b-sm admin-only" style="flex:1;justify-content:center" onclick="openEdit('${key}',${c.id})">Edit</button>
-          <button class="btn b-gh b-sm admin-only" style="flex:1;justify-content:center" onclick="openCopyToShow('${key}',${c.id})" title="Copy to another show">Copy</button>
-          <button class="btn ${hid ? 'b-grn' : 'b-warn'} b-sm" onclick="toggleH('${key}',${c.id})">${hid ? '✓ Show' : 'Hide'}</button>
+          ${c.bio ? `<button class="btn b-pur b-sm" style="flex:1;justify-content:center" onclick="openBio('${key}',${c.id})"><svg class="btn-icon" viewBox="0 0 18 18"><circle cx="9" cy="6" r="3"/><path d="M3 15.5 A6 5 0 0 1 15 15.5"/></svg>Profile</button>` : ''}
+          <button class="btn b-gh b-sm admin-only" style="flex:1;justify-content:center" onclick="openEdit('${key}',${c.id})"><svg class="btn-icon" viewBox="0 0 18 18"><path d="M11.5 3 L15 6.5 L6 15.5 L2.5 15.5 L2.5 12 Z M9.5 5 L13 8.5"/></svg>Edit</button>
+          <button class="btn b-gh b-sm admin-only" style="flex:1;justify-content:center" onclick="openCopyToShow('${key}',${c.id})" title="Copy to another show"><svg class="btn-icon" viewBox="0 0 18 18"><rect x="6.5" y="6.5" width="9" height="9" rx="1.3"/><path d="M11.5 6.5 L11.5 3.5 A1.3 1.3 0 0 0 10.2 2.5 L3.5 2.5 A1.3 1.3 0 0 0 2.5 3.5 L2.5 10.2 A1.3 1.3 0 0 0 3.5 11.5 L6.5 11.5"/></svg>Copy</button>
+          <button class="btn ${hid ? 'b-grn' : 'b-warn'} b-sm" onclick="toggleH('${key}',${c.id})">${hid
+            ? '<svg class="btn-icon" viewBox="0 0 18 18"><path d="M2 9 Q9 3 16 9 Q9 15 2 9 Z"/><circle cx="9" cy="9" r="2.3"/></svg>Show'
+            : '<svg class="btn-icon" viewBox="0 0 18 18"><path d="M2 9 Q9 3 16 9 Q9 15 2 9 Z"/><circle cx="9" cy="9" r="2.3"/><path d="M2.5 2.5 L15.5 15.5"/></svg>Hide'}</button>
         </div>
       </div>
     </div>`;
@@ -941,6 +945,7 @@ function buildGrowthHTML(key) {
     <button class="sort-pill${scope === 'all' ? ' active' : ''}" onclick="setGrowthScope('${key}','all')" title="Every contestant, including eliminated/hidden">All contestants</button>
     ` : ''}
     <span style="width:1px;height:16px;background:var(--bdr2);margin:0 4px"></span>
+    ${isAdmin ? `<button class="btn b-gld b-xs live-refresh-btn" id="live-refresh-btn-${key}" onclick="refreshFollowersLive('${key}')" title="Fetch live Instagram follower counts for ${s?.label || key} right now">⟳ Refresh Followers</button>` : ''}
     <div class="growth-cols-wrap" style="position:relative">
       <button class="btn b-gh b-xs" onclick="toggleGrowthColsMenu(this)" title="Choose which columns to display">Columns</button>
       ${growthColumnsMenuHTML(colsMenuId)}
@@ -1664,6 +1669,13 @@ function renderAll() {
   renderOverview();
 }
 function refreshShowUIs() {
+  // Rebuilding the per-show panels below throws away the current DOM
+  // nodes entirely, including whichever one carried the .active class
+  // that makes .panel { display:block }. Without capturing and
+  // re-applying it, every panel ends up display:none and the content
+  // area goes fully blank until the user manually clicks a sidebar
+  // item — this was the "blank screen after any change" bug.
+  const activeId = document.querySelector('.panel.active')?.id;
   rebuildDynamicPanels();
   rebuildSidebar();
   populateShowSel();
@@ -1672,6 +1684,8 @@ function refreshShowUIs() {
   if (typeof renderShowList === 'function') renderShowList();
   if (typeof rebuildExportPanel === 'function') rebuildExportPanel();
   updateStats();
+  const restoreId = activeId && document.getElementById(activeId) ? activeId : 'panel-overview';
+  showPanel(restoreId.replace(/^panel-/, ''));
 }
 function rebuildDynamicPanels() {
   const host = document.getElementById('dynamic-panels');

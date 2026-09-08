@@ -459,6 +459,8 @@ body:not(.admin-active) #help-content { display: none !important; }
 .b-grn  { background: rgba(0,200,150,.12); border-color: rgba(0,200,150,.35); color: var(--grn); }
 .b-grn:hover { background: rgba(0,200,150,.22); }
 
+.btn:disabled { opacity: .5; cursor: not-allowed; pointer-events: none; }
+
 .b-gld  { background: rgba(245,166,35,.1);  border-color: rgba(245,166,35,.35); color: var(--gld); }
 .b-gld:hover { background: rgba(245,166,35,.2); }
 
@@ -1525,7 +1527,7 @@ tr[draggable="true"]:active { cursor: grabbing; }
   flex-wrap: wrap;
 }
 .hid-count { font-weight: 800; }
-.hide-btn  { background: var(--card2); border: 1px solid var(--bdr2); border-radius: 6px; cursor: pointer; font-size: 10.5px; font-weight: 700; color: var(--txt2); padding: 3px 8px; opacity: .75; transition: opacity var(--tr), color var(--tr); }
+.hide-btn  { background: var(--card2); border: 1px solid var(--bdr2); border-radius: 6px; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; width: 26px; height: 26px; padding: 0; color: var(--txt2); opacity: .75; transition: opacity var(--tr), color var(--tr); }
 .hide-btn:hover { opacity: 1; color: var(--txt); }
 .hide-btn.is-hid { opacity: 1; color: var(--warn); border-color: rgba(245,158,11,.35); }
 
