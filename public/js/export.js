@@ -203,7 +203,7 @@ function rebuildExportPanel() {
   if (!el) return;
   el.innerHTML = getShowKeys().map(k =>
     `<button class="btn b-gld b-sm" onclick="capture('sw-${k}-tbl','${k}_Table')">${window.SHOWS[k].label} Table</button>
-     <button class="btn b-gh b-sm" onclick="capture('sw-${k}-gtbl','${k}_Growth')">${window.SHOWS[k].label} Growth</button>
+     <button class="btn b-gh b-sm" onclick="capture('gtbl-inner-${k}','${k}_Growth')">${window.SHOWS[k].label} Growth</button>
      <button class="btn b-pur b-sm admin-only" onclick="refreshFollowersLive('${k}')">${window.SHOWS[k].label} (Live)</button>`
   ).join('');
 }
@@ -318,12 +318,28 @@ async function capture(elId, filename) {
 
     await new Promise(r => requestAnimationFrame(() => setTimeout(r, 200)));
 
-    /* Measure AFTER chrome is hidden and layout has settled, so the
-       width we snapshot at matches the width we crop to — prevents
-       html2canvas reflowing the responsive grid into extra columns
-       that then get sliced off. */
-    const fullWidth = el.scrollWidth;
-    const fullHeight = el.scrollHeight;
+    /* Measure the ACTUAL rendered content box, not el.scrollWidth /
+       el.scrollHeight. scrollHeight measures el's own content box,
+       which is not always the same thing as "how tall does the visible
+       content really look" — it can include space from a child's
+       collapsed/adjoining margin, a horizontal-scrollbar reservation
+       from .gtbl-wrap's overflow-x:auto, or sub-pixel rounding drift
+       between layout passes, none of which getBoundingClientRect() is
+       vulnerable to since it reports the true painted box directly.
+       This was the remaining source of the blank strip below captures
+       that hiding the sort bar's chrome (the earlier fix) didn't fully
+       eliminate — that fix was necessary but not sufficient. */
+    const elRect = el.getBoundingClientRect();
+    let contentBottom = elRect.top;
+    let contentRight = elRect.left;
+    Array.from(el.children).forEach(child => {
+      if (getComputedStyle(child).display === 'none') return;
+      const r = child.getBoundingClientRect();
+      if (r.bottom > contentBottom) contentBottom = r.bottom;
+      if (r.right > contentRight) contentRight = r.right;
+    });
+    const fullWidth = Math.ceil(Math.max(contentRight - elRect.left, elRect.width));
+    const fullHeight = Math.ceil(Math.max(contentBottom - elRect.top, 1));
 
     // Target a genuinely 4K–8K wide output regardless of how many
     // columns happen to be visible (fewer columns = a narrower table
