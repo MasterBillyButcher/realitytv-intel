@@ -246,6 +246,7 @@ async function capture(elId, filename) {
   let hiddenEls = [];
   let wasHidden = false;
   let origStyle = '';
+  let overflowEls = [];
 
   try {
     /* Walk up from el to <body>, forcing any hidden ancestor visible.
@@ -329,6 +330,37 @@ async function capture(elId, filename) {
        This was the remaining source of the blank strip below captures
        that hiding the sort bar's chrome (the earlier fix) didn't fully
        eliminate — that fix was necessary but not sufficient. */
+    /* html2canvas does not reliably paint content that overflows an
+       overflow-x:auto/scroll container (e.g. .gtbl-wrap around the
+       Growth table) — confirmed by direct testing: identical measured
+       geometry (same fullWidth/fullHeight/x/y) produced a correctly
+       painted capture when the container had been on-screen since page
+       load, and a capture with the overflowing columns silently cut off
+       when the SAME container had merely been hidden and re-shown just
+       before capture (exactly what happens capturing a show that isn't
+       the one currently on screen, e.g. from the Export panel). Setting
+       overflow to visible during the capture removes the scroll-clip
+       html2canvas is unreliable with entirely, instead of depending on
+       it to rasterize the clipped-off portion correctly. */
+    el.querySelectorAll('*').forEach(node => {
+      const cs = getComputedStyle(node);
+      if (cs.overflowX === 'auto' || cs.overflowX === 'scroll' ||
+          cs.overflowY === 'auto' || cs.overflowY === 'scroll') {
+        overflowEls.push({ node, x: node.style.overflowX, y: node.style.overflowY });
+        node.style.overflowX = 'visible';
+        node.style.overflowY = 'visible';
+      }
+    });
+    {
+      const cs = getComputedStyle(el);
+      if (cs.overflowX === 'auto' || cs.overflowX === 'scroll' ||
+          cs.overflowY === 'auto' || cs.overflowY === 'scroll') {
+        overflowEls.push({ node: el, x: el.style.overflowX, y: el.style.overflowY });
+        el.style.overflowX = 'visible';
+        el.style.overflowY = 'visible';
+      }
+    }
+
     const elRect = el.getBoundingClientRect();
     let contentBottom = elRect.top;
     let contentRight = elRect.left;
@@ -338,8 +370,38 @@ async function capture(elId, filename) {
       if (r.bottom > contentBottom) contentBottom = r.bottom;
       if (r.right > contentRight) contentRight = r.right;
     });
-    const fullWidth = Math.ceil(Math.max(contentRight - elRect.left, elRect.width));
-    const fullHeight = Math.ceil(Math.max(contentBottom - elRect.top, 1));
+    let fullWidth = Math.ceil(Math.max(contentRight - elRect.left, elRect.width));
+    let fullHeight = Math.ceil(Math.max(contentBottom - elRect.top, 1));
+
+    /* If a hidden ancestor got force-widened to 1400px above and the
+       content actually needs more than that (this table does — 1529px),
+       el's own box (and anything sized as a % of it, like .gtbl-title)
+       stays pinned at 1400 while the table overflows past it. The crop
+       width (fullWidth) already accounts for that overflow, but el's box
+       itself doesn't grow to match, so a banner/background meant to
+       span the full width falls short of the table's true right edge —
+       visible as a blank/background-colour wedge in that top corner.
+       Re-widen the forced ancestor to the now-known real content width
+       and re-measure once, so el's own box (not just the crop) actually
+       matches what the table needs. */
+    if (hiddenAncestors.length && fullWidth > elRect.width) {
+      const outer = hiddenAncestors[hiddenAncestors.length - 1].node;
+      const target = fullWidth + 40;
+      outer.style.setProperty('width', target + 'px', 'important');
+      outer.style.setProperty('min-width', target + 'px', 'important');
+      outer.style.setProperty('max-width', target + 'px', 'important');
+      await new Promise(r => requestAnimationFrame(() => setTimeout(r, 100)));
+      const elRect2 = el.getBoundingClientRect();
+      let contentBottom2 = elRect2.top, contentRight2 = elRect2.left;
+      Array.from(el.children).forEach(child => {
+        if (getComputedStyle(child).display === 'none') return;
+        const r = child.getBoundingClientRect();
+        if (r.bottom > contentBottom2) contentBottom2 = r.bottom;
+        if (r.right > contentRight2) contentRight2 = r.right;
+      });
+      fullWidth = Math.ceil(Math.max(contentRight2 - elRect2.left, elRect2.width));
+      fullHeight = Math.ceil(Math.max(contentBottom2 - elRect2.top, 1));
+    }
 
     // Target a genuinely 4K–8K wide output regardless of how many
     // columns happen to be visible (fewer columns = a narrower table
@@ -362,6 +424,30 @@ async function capture(elId, filename) {
     // very efficient on large solid-colour areas). Cascade down only
     // if the browser's own canvas-size ceiling is hit (mobile Safari
     // especially) — each fallback still targets the same 4K floor.
+    // windowWidth/windowHeight is the virtual browser window html2canvas
+    // lays the WHOLE cloned document out inside — it is not a crop size.
+    // Passing fullWidth/fullHeight here (the captured element's OWN
+    // natural/overflow size) used to force that entire virtual window to
+    // the table's width, which reflows every flex/percentage ancestor
+    // (the sidebar layout's `.content { flex: 1 1 0% }` in particular) to
+    // a different size than the real page has right now. The clone then
+    // renders the table at a different effective width/position than the
+    // fullWidth/fullHeight box we just measured and told html2canvas to
+    // crop, so the crop and the content stop lining up — the table paints
+    // short of the canvas (a blank strip of the `backgroundColor` fill
+    // below it) or past it (columns cut off on the right), depending on
+    // which way that particular page's flex math happens to move. Confirmed
+    // by forcing the window to the real page size instead: both symptoms
+    // disappear.
+    //
+    // Fix: keep the virtual window at (at least) the real page's actual
+    // size, so no ancestor reflows and el's position/size in the clone
+    // matches what fullWidth/fullHeight were measured from. width/height
+    // (the actual crop) still use fullWidth/fullHeight to include any
+    // horizontal/vertical overflow beyond el's own visible box.
+    const captureWindowWidth = Math.max(document.documentElement.scrollWidth, window.innerWidth, fullWidth);
+    const captureWindowHeight = Math.max(document.documentElement.scrollHeight, window.innerHeight, fullHeight);
+
     let canvas, usedScale = targetScale;
     const scaleCascade = [targetScale, targetScale * 0.75, targetScale * 0.5, MIN_SCALE];
     const runCapture = (scale) => html2canvas(el, {
@@ -371,8 +457,8 @@ async function capture(elId, filename) {
       logging: false,
       width: fullWidth,
       height: fullHeight,
-      windowWidth: fullWidth,
-      windowHeight: fullHeight,
+      windowWidth: captureWindowWidth,
+      windowHeight: captureWindowHeight,
       ignoreElements: node => {
         const tag = (node.tagName || '').toLowerCase();
         if (tag === 'button') return true;
@@ -470,6 +556,7 @@ async function capture(elId, filename) {
        This is what was making tabs/buttons disappear permanently
        after a failed capture. */
     hiddenEls.forEach(({ node, v }) => { node.style.display = v; });
+    overflowEls.forEach(({ node, x, y }) => { node.style.overflowX = x; node.style.overflowY = y; });
     if (wasHidden) el.setAttribute('style', origStyle);
     // Restore ancestor panels/tabs we force-opened, innermost first —
     // order doesn't actually matter for correctness here since each
