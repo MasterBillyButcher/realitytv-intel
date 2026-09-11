@@ -51,6 +51,17 @@ function formatReleaseDate(v) {
   const t = Date.parse(v);
   return isNaN(t) ? v : new Intl.DateTimeFormat('en-US', { month:'short', day:'numeric', year:'numeric' }).format(new Date(t));
 }
+function showDayLabel(s) {
+  if (!s?.releaseDate) return '';
+  const start = new Date(s.releaseDate + 'T00:00:00');
+  if (isNaN(start.getTime())) return '';
+  const startMid = new Date(start).setHours(0, 0, 0, 0);
+  const nowMid = new Date().setHours(0, 0, 0, 0);
+  const diffDays = Math.round((nowMid - startMid) / 86400000);
+  const isEst = /est\.?/i.test(s.date || '');
+  if (diffDays < 0) return `Starts in ${-diffDays} day${-diffDays === 1 ? '' : 's'}${isEst ? ' (est.)' : ''}`;
+  return `Day ${diffDays + 1}${isEst ? ' (est.)' : ''}`;
+}
 
 /* ─── THEME ─────────────────────────────────────────────── */
 function getCurrentTheme() {
@@ -328,7 +339,7 @@ function buildShowPanel(key) {
     <div class="ph">
       <div>
         <div class="ph-title show-title" style="color:${s.color}">${s.label}</div>
-        <div class="ph-desc">${s.platform || 'TBC'} &middot; ${showDateLabel(s)} &middot; Host: ${s.host || 'TBC'} &middot; ${s.desc || ''}</div>
+        <div class="ph-desc">${s.platform || 'TBC'} &middot; ${showDateLabel(s)} &middot; Host: ${s.host || 'TBC'} &middot; ${s.desc || ''}${showDayLabel(s) ? ` &middot; <strong>${showDayLabel(s)}</strong>` : ''}</div>
       </div>
       <div class="ph-act no-capture">
         <button class="btn b-gld b-sm" onclick="capture('sw-${key}-main','${key}')">Capture All</button>
@@ -945,14 +956,15 @@ function buildGrowthHTML(key) {
     <button class="sort-pill${scope === 'all' ? ' active' : ''}" onclick="setGrowthScope('${key}','all')" title="Every contestant, including eliminated/hidden">All contestants</button>
     ` : ''}
     <span style="width:1px;height:16px;background:var(--bdr2);margin:0 4px"></span>
-    ${isAdmin ? `<button class="btn b-gld b-xs live-refresh-btn" id="live-refresh-btn-${key}" onclick="refreshFollowersLive('${key}')" title="Fetch live Instagram follower counts for ${s?.label || key} right now">⟳ Refresh Followers</button>` : ''}
+    ${isAdmin ? `<button class="btn b-gld b-xs live-refresh-btn" id="live-refresh-btn-${key}" onclick="refreshFollowersLive('${key}')" title="Fetch live Instagram follower counts for ${s?.label || key} right now">⟳ Refresh Followers</button>
+    <span class="last-refresh-label no-capture" style="font-size:10px;color:var(--mut);margin-left:4px"></span>` : ''}
     <div class="growth-cols-wrap" style="position:relative">
       <button class="btn b-gh b-xs" onclick="toggleGrowthColsMenu(this)" title="Choose which columns to display">Columns</button>
       ${growthColumnsMenuHTML(colsMenuId)}
     </div>
   </div>
   <div class="gtbl-wrap" id="gtbl-inner-${key}">
-    <div class="gtbl-title">${s?.label || key.toUpperCase()}: Instagram Follower Growth Analysis</div>
+    <div class="gtbl-title">${s?.label || key.toUpperCase()}: Instagram Follower Growth Analysis${showDayLabel(s) ? ` · ${showDayLabel(s)}` : ''}</div>
     <table>
       <thead><tr>
         <th style="min-width:200px">Contestant</th>

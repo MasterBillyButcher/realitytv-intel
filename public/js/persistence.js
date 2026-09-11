@@ -314,6 +314,26 @@ function _agoLabel(ts) {
   return Math.round(diff / 86400) + 'd ago';
 }
 
+/* ─── LAST REFRESH TIMESTAMP (admin "last refreshed Xm ago") ── */
+const LAST_REFRESH_LS_KEY = 'realityTV2026_lastRefresh';
+
+function getLastRefreshAt() {
+  const v = localStorage.getItem(LAST_REFRESH_LS_KEY);
+  return v ? parseInt(v, 10) : null;
+}
+function setLastRefreshAt(ts = Date.now()) {
+  localStorage.setItem(LAST_REFRESH_LS_KEY, String(ts));
+  renderLastRefreshLabels();
+}
+function renderLastRefreshLabels() {
+  const ts = getLastRefreshAt();
+  document.querySelectorAll('.last-refresh-label').forEach(el => {
+    el.textContent = ts ? `Last refreshed ${_agoLabel(ts)}` : 'Never refreshed';
+  });
+}
+setInterval(renderLastRefreshLabels, 15000);
+document.addEventListener('DOMContentLoaded', renderLastRefreshLabels);
+
 /* ─── AUTO-PERSIST (called after any data mutation) ─────── */
 function _autoPersist() {
   try { saveToLocalStorage(false); } catch (e) { /* ignore */ }

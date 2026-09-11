@@ -128,14 +128,15 @@ async function refreshFollowersLive(scopeKey) {
   if (typeof renderRankings === 'function') renderRankings();
 
   let msg = `✓ Live-updated ${updated} contestant${updated !== 1 ? 's' : ''} in ${label}`;
-  if (updated > 0) msg += '. Now click ↓ Save JSON to download and push to GitHub';
+  if (updated > 0) msg += ' · publishing live…';
   if (failed.length) msg += ` · ${failed.length} failed: ${failed.slice(0, 3).join(', ')}${failed.length > 3 ? '…' : ''}`;
   toast(msg, updated > 0 ? '' : 'warn');
 
   if (updated > 0) {
     if (typeof saveToLocalStorage === 'function') saveToLocalStorage(false);
+    if (typeof setLastRefreshAt === 'function') setLastRefreshAt();
     if (typeof logActivity === 'function') logActivity('Live follower refresh', `${updated} updated in ${label}`, '');
-    _pulseSaveJsonButton();
+    if (typeof publishLive === 'function') await publishLive();
   }
 }
 

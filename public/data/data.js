@@ -55,9 +55,9 @@
       "color": "#F5A623",
       "platform": "Colors TV + JioHotstar",
       "host": "Salman Khan (exp.)",
-      "releaseDate": "2026-09-21",
-      "date": "Sep 21 2026 est.",
-      "desc": "Old vs Fresh Faces · 17 names under Instagram follower tracking (rumoured/unconfirmed) · Pre-production",
+      "releaseDate": "2026-09-06",
+      "date": "Sep 6, 2026",
+      "desc": "Old vs Fresh Faces · 17 names under Instagram follower tracking (rumoured/unconfirmed)",
       "emoji": "🏠"
     }
   },
