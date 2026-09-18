@@ -318,28 +318,11 @@ async function capture(elId, filename) {
 
     await new Promise(r => requestAnimationFrame(() => setTimeout(r, 200)));
 
-    /* Measure the ACTUAL rendered content box, not el.scrollWidth /
-       el.scrollHeight. scrollHeight measures el's own content box,
-       which is not always the same thing as "how tall does the visible
-       content really look" — it can include space from a child's
-       collapsed/adjoining margin, a horizontal-scrollbar reservation
-       from .gtbl-wrap's overflow-x:auto, or sub-pixel rounding drift
-       between layout passes, none of which getBoundingClientRect() is
-       vulnerable to since it reports the true painted box directly.
-       This was the remaining source of the blank strip below captures
-       that hiding the sort bar's chrome (the earlier fix) didn't fully
-       eliminate — that fix was necessary but not sufficient. */
+    /* Measure the element's own painted box. Used ONLY to pick a scale
+       factor — deliberately NOT passed to html2canvas as width/height.
+       See the comment on runCapture below for why. */
     const elRect = el.getBoundingClientRect();
-    let contentBottom = elRect.top;
-    let contentRight = elRect.left;
-    Array.from(el.children).forEach(child => {
-      if (getComputedStyle(child).display === 'none') return;
-      const r = child.getBoundingClientRect();
-      if (r.bottom > contentBottom) contentBottom = r.bottom;
-      if (r.right > contentRight) contentRight = r.right;
-    });
-    const fullWidth = Math.ceil(Math.max(contentRight - elRect.left, elRect.width));
-    const fullHeight = Math.ceil(Math.max(contentBottom - elRect.top, 1));
+    const fullWidth = Math.max(Math.ceil(elRect.width), 1);
 
     // Target a genuinely 4K–8K wide output regardless of how many
     // columns happen to be visible (fewer columns = a narrower table
@@ -364,15 +347,37 @@ async function capture(elId, filename) {
     // especially) — each fallback still targets the same 4K floor.
     let canvas, usedScale = targetScale;
     const scaleCascade = [targetScale, targetScale * 0.75, targetScale * 0.5, MIN_SCALE];
+
+    /* THE CAPTURE-OUTSIDE-THE-TABLE BUG.
+       This previously passed width/height/windowWidth/windowHeight,
+       all set to the element's measured size. That combination is what
+       produced the dark padding around the table:
+
+       - windowWidth/windowHeight resize the VIEWPORT that html2canvas
+         lays the cloned document out in. Shrinking the viewport from
+         (say) 1920px down to the table's own ~1400px re-triggers the
+         responsive CSS: the grid/table reflows NARROWER inside the
+         clone than it was on screen.
+       - width/height, meanwhile, still forced the canvas to the
+         ORIGINAL measured size.
+
+       So the canvas stayed 1400 wide while the reflowed content inside
+       it rendered narrower and shorter — and every uncovered pixel got
+       painted with `backgroundColor`, which in dark mode is #08080F.
+       That is exactly the black band along the right and bottom edges.
+
+       Fix: pass none of the four. html2canvas then measures the element
+       itself, in its real on-screen layout, with no viewport override
+       and therefore no reflow — canvas size and content size agree by
+       construction. Background is transparent so that even if a
+       rounding edge is uncovered, it can't show up as a dark band. */
     const runCapture = (scale) => html2canvas(el, {
-      backgroundColor: document.body.classList.contains('theme-light') ? '#F0F2F8' : '#08080F',
+      backgroundColor: null,
       scale,
       useCORS: true,
       logging: false,
-      width: fullWidth,
-      height: fullHeight,
-      windowWidth: fullWidth,
-      windowHeight: fullHeight,
+      scrollX: 0,
+      scrollY: 0,
       ignoreElements: node => {
         const tag = (node.tagName || '').toLowerCase();
         if (tag === 'button') return true;
