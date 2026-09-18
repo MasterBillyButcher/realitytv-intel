@@ -127,18 +127,84 @@ async function refreshFollowersLive(scopeKey) {
   if (typeof renderAll === 'function') renderAll();
   if (typeof renderRankings === 'function') renderRankings();
 
-  let msg = `✓ Live-updated ${updated} contestant${updated !== 1 ? 's' : ''} in ${label}`;
-  if (updated > 0) msg += ' · publishing live…';
+  let msg = `Live-updated ${updated} contestant${updated !== 1 ? 's' : ''} in ${label}`;
+  if (updated > 0) msg += '. Click Publish Live to push it to everyone';
   if (failed.length) msg += ` · ${failed.length} failed: ${failed.slice(0, 3).join(', ')}${failed.length > 3 ? '…' : ''}`;
   toast(msg, updated > 0 ? '' : 'warn');
 
   if (updated > 0) {
+    // Stamp when this scope was last refreshed, so the Growth tab can
+    // show a live "refreshed Xm Ys ago" readout. Keyed per show (plus
+    // an 'all' key) so refreshing one show doesn't reset another's
+    // timer — matching the fact that the refresh itself is per-show.
+    setLastRefreshed(scopeKey);
     if (typeof saveToLocalStorage === 'function') saveToLocalStorage(false);
-    if (typeof setLastRefreshAt === 'function') setLastRefreshAt();
     if (typeof logActivity === 'function') logActivity('Live follower refresh', `${updated} updated in ${label}`, '');
-    if (typeof publishLive === 'function') await publishLive();
+    _pulseSaveJsonButton();
   }
 }
+
+/* ─── LAST-REFRESHED TIMESTAMPS ─────────────────────────────
+   Per-scope, stored in localStorage so the readout survives a page
+   reload. A per-show refresh stamps only that show; the "all shows"
+   refresh stamps every show plus the 'all' bucket, since it genuinely
+   did refresh each of them. */
+const REFRESH_TS_PREFIX = 'rti_last_refresh_';
+
+function setLastRefreshed(scopeKey) {
+  const now = Date.now();
+  try {
+    if (scopeKey) {
+      localStorage.setItem(REFRESH_TS_PREFIX + scopeKey, String(now));
+    } else {
+      localStorage.setItem(REFRESH_TS_PREFIX + 'all', String(now));
+      (typeof getShowKeys === 'function' ? getShowKeys() : []).forEach(k =>
+        localStorage.setItem(REFRESH_TS_PREFIX + k, String(now))
+      );
+    }
+  } catch { /* storage disabled — the readout just won't persist */ }
+}
+
+function getLastRefreshed(scopeKey) {
+  try {
+    const raw = localStorage.getItem(REFRESH_TS_PREFIX + (scopeKey || 'all'));
+    const n = raw ? Number(raw) : NaN;
+    return Number.isFinite(n) ? n : null;
+  } catch { return null; }
+}
+
+/** "3h 12m 08s ago" / "just now" — seconds always shown so the readout
+ *  visibly ticks every second rather than looking frozen. */
+function formatSinceRefresh(ts) {
+  if (!ts) return 'Never refreshed';
+  const secs = Math.max(0, Math.floor((Date.now() - ts) / 1000));
+  if (secs < 3) return 'Refreshed just now';
+  const d = Math.floor(secs / 86400);
+  const h = Math.floor((secs % 86400) / 3600);
+  const m = Math.floor((secs % 3600) / 60);
+  const s = secs % 60;
+  const pad = n => String(n).padStart(2, '0');
+  let out;
+  if (d) out = `${d}d ${h}h ${pad(m)}m`;
+  else if (h) out = `${h}h ${pad(m)}m ${pad(s)}s`;
+  else if (m) out = `${m}m ${pad(s)}s`;
+  else out = `${s}s`;
+  return `Refreshed ${out} ago`;
+}
+
+/* One shared ticker drives every readout on the page, rather than one
+   interval per show panel. Runs once a second so the seconds actually
+   count up in real time. */
+function _tickRefreshReadouts() {
+  document.querySelectorAll('[data-refresh-readout]').forEach(el => {
+    const scope = el.getAttribute('data-refresh-readout') || '';
+    const ts = getLastRefreshed(scope === 'all' ? null : scope);
+    el.textContent = formatSinceRefresh(ts);
+    el.classList.toggle('refresh-stale', !ts);
+  });
+}
+setInterval(_tickRefreshReadouts, 1000);
+document.addEventListener('DOMContentLoaded', _tickRefreshReadouts);
 
 function _pulseSaveJsonButton() {
   document.querySelectorAll('button[onclick="exportJSON()"]').forEach(btn => {

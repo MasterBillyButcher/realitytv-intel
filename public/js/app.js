@@ -51,17 +51,6 @@ function formatReleaseDate(v) {
   const t = Date.parse(v);
   return isNaN(t) ? v : new Intl.DateTimeFormat('en-US', { month:'short', day:'numeric', year:'numeric' }).format(new Date(t));
 }
-function showDayLabel(s) {
-  if (!s?.releaseDate) return '';
-  const start = new Date(s.releaseDate + 'T00:00:00');
-  if (isNaN(start.getTime())) return '';
-  const startMid = new Date(start).setHours(0, 0, 0, 0);
-  const nowMid = new Date().setHours(0, 0, 0, 0);
-  const diffDays = Math.round((nowMid - startMid) / 86400000);
-  const isEst = /est\.?/i.test(s.date || '');
-  if (diffDays < 0) return `Starts in ${-diffDays} day${-diffDays === 1 ? '' : 's'}${isEst ? ' (est.)' : ''}`;
-  return `Day ${diffDays + 1}${isEst ? ' (est.)' : ''}`;
-}
 
 /* ─── THEME ─────────────────────────────────────────────── */
 function getCurrentTheme() {
@@ -339,7 +328,7 @@ function buildShowPanel(key) {
     <div class="ph">
       <div>
         <div class="ph-title show-title" style="color:${s.color}">${s.label}</div>
-        <div class="ph-desc">${s.platform || 'TBC'} &middot; ${showDateLabel(s)} &middot; Host: ${s.host || 'TBC'} &middot; ${s.desc || ''}${showDayLabel(s) ? ` &middot; <strong>${showDayLabel(s)}</strong>` : ''}</div>
+        <div class="ph-desc">${s.platform || 'TBC'} &middot; ${showDateLabel(s)} &middot; Host: ${s.host || 'TBC'} &middot; ${s.desc || ''}</div>
       </div>
       <div class="ph-act no-capture">
         <button class="btn b-gld b-sm" onclick="capture('sw-${key}-main','${key}')">Capture All</button>
@@ -956,15 +945,15 @@ function buildGrowthHTML(key) {
     <button class="sort-pill${scope === 'all' ? ' active' : ''}" onclick="setGrowthScope('${key}','all')" title="Every contestant, including eliminated/hidden">All contestants</button>
     ` : ''}
     <span style="width:1px;height:16px;background:var(--bdr2);margin:0 4px"></span>
-    ${isAdmin ? `<button class="btn b-gld b-xs live-refresh-btn" id="live-refresh-btn-${key}" onclick="refreshFollowersLive('${key}')" title="Fetch live Instagram follower counts for ${s?.label || key} right now">⟳ Refresh Followers</button>
-    <span class="last-refresh-label no-capture" style="font-size:10px;color:var(--mut);margin-left:4px"></span>` : ''}
+    ${isAdmin ? `<button class="btn b-gld b-xs live-refresh-btn" id="live-refresh-btn-${key}" onclick="refreshFollowersLive('${key}')" title="Fetch live Instagram follower counts for ${s?.label || key} only">Refresh Followers</button>` : ''}
+    <span class="refresh-readout" data-refresh-readout="${key}">${typeof formatSinceRefresh === 'function' ? formatSinceRefresh(getLastRefreshed(key)) : ''}</span>
     <div class="growth-cols-wrap" style="position:relative">
       <button class="btn b-gh b-xs" onclick="toggleGrowthColsMenu(this)" title="Choose which columns to display">Columns</button>
       ${growthColumnsMenuHTML(colsMenuId)}
     </div>
   </div>
   <div class="gtbl-wrap" id="gtbl-inner-${key}">
-    <div class="gtbl-title">${s?.label || key.toUpperCase()}: Instagram Follower Growth Analysis${showDayLabel(s) ? ` · ${showDayLabel(s)}` : ''}</div>
+    <div class="gtbl-title">${s?.label || key.toUpperCase()}: Instagram Follower Growth Analysis</div>
     <table>
       <thead><tr>
         <th style="min-width:200px">Contestant</th>
@@ -1688,6 +1677,22 @@ function refreshShowUIs() {
   // area goes fully blank until the user manually clicks a sidebar
   // item — this was the "blank screen after any change" bug.
   const activeId = document.querySelector('.panel.active')?.id;
+
+  // Also capture which SUB-TAB (Roster / Cards / Growth) was open inside
+  // each show panel. Restoring only the panel wasn't enough: every
+  // rebuilt show panel defaults back to the Roster pane, so editing
+  // anything while on the Growth tab dropped the user onto a different,
+  // not-yet-rendered pane — which reads as "it went blank" even though
+  // the panel itself was technically visible.
+  const activeTabs = {};
+  document.querySelectorAll('[id^="sw-"][id$="-main"]').forEach(host => {
+    const key = host.id.replace(/^sw-/, '').replace(/-main$/, '');
+    const pane = host.querySelector('.tab-pane.active');
+    if (!pane) return;
+    const m = pane.id.match(/^sw-.+-(roster|cards|growth)$/);
+    if (m) activeTabs[key] = m[1];
+  });
+
   rebuildDynamicPanels();
   rebuildSidebar();
   populateShowSel();
@@ -1696,6 +1701,14 @@ function refreshShowUIs() {
   if (typeof renderShowList === 'function') renderShowList();
   if (typeof rebuildExportPanel === 'function') rebuildExportPanel();
   updateStats();
+
+  // Re-apply each show's sub-tab. switchTab also re-runs the matching
+  // render for that pane, so the restored tab comes back populated
+  // rather than as an empty container.
+  Object.entries(activeTabs).forEach(([key, tab]) => {
+    if (document.getElementById('sw-' + key + '-main')) switchTab(key, tab);
+  });
+
   const restoreId = activeId && document.getElementById(activeId) ? activeId : 'panel-overview';
   showPanel(restoreId.replace(/^panel-/, ''));
 }
