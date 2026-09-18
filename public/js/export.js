@@ -244,6 +244,10 @@ async function capture(elId, filename) {
 
   let hiddenAncestors = [];
   let hiddenEls = [];
+  // Declared at function scope, not inside the try: the finally block
+  // below restores from it, and a block-scoped const inside try would
+  // be a ReferenceError there.
+  let scrollFixes = [];
   let wasHidden = false;
   let origStyle = '';
 
@@ -317,6 +321,46 @@ async function capture(elId, filename) {
     });
 
     await new Promise(r => requestAnimationFrame(() => setTimeout(r, 200)));
+
+    /* THE "CROPPED ON THE RIGHT" BUG (show Growth tab only).
+       .gtbl-wrap carries `overflow-x: auto`. In the All Growth panel
+       the table fits, so nothing clips and capture looks perfect. But
+       inside a show's Growth tab the container is narrower, the table
+       overflows, and the wrapper clips it behind a horizontal
+       scrollbar. html2canvas renders an element at its VISIBLE box
+       size, so everything past the clip edge (the Total Rate % column)
+       is simply never drawn — which is exactly the right-hand
+       truncation seen there but not in All Growth.
+
+       Fix: before measuring, widen any scrollable container (the
+       target itself and any descendant) to its own scrollWidth and
+       let it overflow visibly, so the full table is laid out on screen
+       with nothing clipped. Everything is restored in the finally
+       block along with the hidden chrome. */
+    scrollFixes = [];
+    const expandIfScrollable = node => {
+      if (!node || node.nodeType !== 1) return;
+      const cs = getComputedStyle(node);
+      const scrolls = /(auto|scroll)/.test(cs.overflowX) || /(auto|scroll)/.test(cs.overflow);
+      if (scrolls && node.scrollWidth > node.clientWidth + 1) {
+        scrollFixes.push({
+          node,
+          overflowX: node.style.overflowX,
+          overflow: node.style.overflow,
+          width: node.style.width,
+          maxWidth: node.style.maxWidth,
+        });
+        node.style.overflowX = 'visible';
+        node.style.overflow = 'visible';
+        node.style.width = node.scrollWidth + 'px';
+        node.style.maxWidth = 'none';
+      }
+    };
+    expandIfScrollable(el);
+    el.querySelectorAll('*').forEach(expandIfScrollable);
+
+    // Let the widened layout settle before measuring it.
+    await new Promise(r => requestAnimationFrame(() => setTimeout(r, 60)));
 
     /* Measure the element's own painted box. Used ONLY to pick a scale
        factor — deliberately NOT passed to html2canvas as width/height.
@@ -475,6 +519,13 @@ async function capture(elId, filename) {
        This is what was making tabs/buttons disappear permanently
        after a failed capture. */
     hiddenEls.forEach(({ node, v }) => { node.style.display = v; });
+    // Undo the scrollable-container widening applied before capture.
+    scrollFixes.forEach(({ node, overflowX, overflow, width, maxWidth }) => {
+      node.style.overflowX = overflowX;
+      node.style.overflow = overflow;
+      node.style.width = width;
+      node.style.maxWidth = maxWidth;
+    });
     if (wasHidden) el.setAttribute('style', origStyle);
     // Restore ancestor panels/tabs we force-opened, innermost first —
     // order doesn't actually matter for correctness here since each
